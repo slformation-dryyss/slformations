@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'navy': {
+                            900: '#0F172A',
+                            800: '#1E293B',
+                            700: '#334155'
+                        },
+                        'gold': {
+                            500: '#FBBF24',
+                            600: '#F59E0B'
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { font-family: 'Inter', sans-serif; }
+        .glass-effect { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .input-floating:focus + label,
+        .input-floating:not(:placeholder-shown) + label {
+            transform: translateY(-1.5rem) scale(0.85);
+            color: #FBBF24;
+        }
+        .input-floating + label {
+            transition: all 0.3s ease;
+        }
+        .password-strength-weak { background: #ef4444; }
+        .password-strength-medium { background: #f59e0b; }
+        .password-strength-strong { background: #10b981; }
+    </style>
+</head>
+<body class="bg-navy-900 text-white min-h-screen">
+
+<header id="header" class="fixed w-full top-0 z-50 glass-effect">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-graduation-cap text-navy-900 text-xl"></i>
+                </div>
+                <span class="text-xl font-bold">DriveAcademy<span class="text-gold-500">Pro</span></span>
+            </div>
+            
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-gray-300 hover:text-gold-500 transition">Accueil</a>
+                <a href="#" class="text-gray-300 hover:text-gold-500 transition">Formations</a>
+                <a href="#" class="text-gray-300 hover:text-gold-500 transition">Location</a>
+                <a href="#" class="text-gray-300 hover:text-gold-500 transition">Contact</a>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <button class="hidden md:block px-5 py-2 text-white hover:text-gold-500 transition font-medium">Connexion</button>
+                <button class="md:hidden text-white">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section id="registration-section" class="pt-24 pb-12 min-h-screen flex items-center">
+    <div class="max-w-7xl mx-auto px-6 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            <!-- Registration Form -->
+            <div id="registration-form" class="order-2 lg:order-1">
+                <div class="max-w-md mx-auto lg:mx-0">
+                    <div class="text-center lg:text-left mb-8">
+                        <h1 class="text-4xl font-bold mb-4">Rejoignez-nous !</h1>
+                        <p class="text-gray-400 text-lg">Créez votre compte et commencez votre formation dès aujourd'hui</p>
+                    </div>
+
+                    <form class="space-y-6">
+                        <!-- Profile Type Selection -->
+                        <div id="profile-type-section">
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Type de profil</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="profile_type" value="student" class="sr-only peer">
+                                    <div class="p-4 rounded-lg border-2 border-navy-700 peer-checked:border-gold-500 peer-checked:bg-gold-500/10 transition-all">
+                                        <div class="flex items-center space-x-3">
+                                            <i class="fa-solid fa-graduation-cap text-2xl text-gold-500"></i>
+                                            <div>
+                                                <div class="font-semibold">Élève</div>
+                                                <div class="text-sm text-gray-400">Formation permis</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="profile_type" value="professional" class="sr-only peer">
+                                    <div class="p-4 rounded-lg border-2 border-navy-700 peer-checked:border-gold-500 peer-checked:bg-gold-500/10 transition-all">
+                                        <div class="flex items-center space-x-3">
+                                            <i class="fa-solid fa-car text-2xl text-gold-500"></i>
+                                            <div>
+                                                <div class="font-semibold">Pro VTC</div>
+                                                <div class="text-sm text-gray-400">Formation + location</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="relative">
+                                <input type="text" id="firstname" placeholder=" " class="input-floating w-full px-4 py-3 bg-navy-800 border border-navy-700 rounded-lg focus:border-gold-500 focus:outline-none peer">
+                                <label for="firstname" class="absolute left-4 top-3 text-gray-400 pointer-events-none">Prénom</label>
+                            </div>
+                            <div class="relative">
+                                <input type="text" id="lastname" placeholder=" " class="input-floating w-full px-4 py-3 bg-navy-800 border border-navy-700 rounded-lg focus:border-gold-500 focus:outline-none peer">
+                                <label for="lastname" class="absolute left-4 top-3 text-gray-400 pointer-events-none">Nom</label>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <input type="email" id="email" placeholder=" " class="input-floating w-full px-4 py-3 bg-navy-800 border border-navy-700 rounded-lg focus:border-gold-500 focus:outline-none peer">
+                            <label for="email" class="absolute left-4 top-3 text-gray-400 pointer-events-none">Email</label>
+                            <i class="fa-solid fa-envelope absolute right-4 top-3.5 text-gray-400"></i>
+                        </div>
+
+                        <div class="relative">
+                            <input type="tel" id="phone" placeholder=" " class="input-floating w-full px-4 py-3 bg-navy-800 border border-navy-700 rounded-lg focus:border-gold-500 focus:outline-none peer">
+                            <label for="phone" class="absolute left-4 top-3 text-gray-400 pointer-events-none">Téléphone</label>
+                            <i class="fa-solid fa-phone absolute right-4 top-3.5 text-gray-400"></i>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="relative">
+                            <input type="password" id="password" placeholder=" " class="input-floating w-full px-4 py-3 bg-navy-800 border border-navy-700 rounded-lg focus:border-gold-500 focus:outline-none peer pr-12">
+                            <label for="password" class="absolute left-4 top-3 text-gray-400 pointer-events-none">Mot de passe</label>
+                            <button type="button" class="absolute right-4 top-3.5 text-gray-400 hover:text-white" onclick="togglePassword()">
+                                <i class="fa-solid fa-eye" id="password-eye"></i>
+                            </button>
+                        </div>
+
+                        <!-- Password Strength Indicator -->
+                        <div id="password-strength" class="space-y-2">
+                            <div class="flex space-x-1">
+                                <div class="h-1 flex-1 bg-navy-700 rounded" id="strength-bar-1"></div>
+                                <div class="h-1 flex-1 bg-navy-700 rounded" id="strength-bar-2"></div>
+                                <div class="h-1 flex-1 bg-navy-700 rounded" id="strength-bar-3"></div>
+                            </div>
+                            <p class="text-sm text-gray-400" id="strength-text">Utilisez au moins 8 caractères avec majuscules, chiffres et symboles</p>
+                        </div>
+
+                        <!-- Terms and Newsletter -->
+                        <div class="space-y-3">
+                            <label class="flex items-start space-x-3 cursor-pointer">
+                                <input type="checkbox" class="mt-1 w-4 h-4 text-gold-500 bg-navy-800 border-navy-700 rounded focus:ring-gold-500">
+                                <span class="text-sm text-gray-400">J'accepte les <a href="#" class="text-gold-500 hover:underline">Conditions Générales d'Utilisation</a> et la <a href="#" class="text-gold-500 hover:underline">Politique de Confidentialité</a></span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 text-gold-500 bg-navy-800 border-navy-700 rounded focus:ring-gold-500">
+                                <span class="text-sm text-gray-400">Je souhaite recevoir les offres et actualités par email</span>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-gold-500 to-gold-600 text-navy-900 rounded-lg font-bold text-lg hover:shadow-xl hover:shadow-gold-500/50 transition-all transform hover:scale-[1.02]">
+                            Créer mon compte
+                        </button>
+
+                        <!-- Social Login -->
+                        <div class="relative">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full border-t border-navy-700"></div>
+                            </div>
+                            <div class="relative flex justify-center text-sm">
+                                <span class="px-4 bg-navy-900 text-gray-400">ou</span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="w-full py-3.5 bg-white text-navy-900 rounded-lg font-semibold hover:bg-gray-100 transition-all flex items-center justify-center space-x-3">
+                            <i class="fa-brands fa-google text-xl"></i>
+                            <span>Continuer avec Google</span>
+                        </button>
+
+                        <!-- Login Link -->
+                        <div class="text-center">
+                            <p class="text-gray-400">Déjà inscrit ? <a href="#" class="text-gold-500 font-semibold hover:underline">Se connecter</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Visual Side -->
+            <div id="registration-visual" class="order-1 lg:order-2">
+                <div class="relative">
+                    <!-- Background Card -->
+                    <div class="glass-effect rounded-2xl p-8 lg:p-12">
+                        <div class="text-center mb-8">
+                            <div class="w-20 h-20 bg-gradient-to-br from-gold-500 to-gold-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                                <i class="fa-solid fa-rocket text-navy-900 text-3xl"></i>
+                            </div>
+                            <h2 class="text-3xl font-bold mb-4">Commencez Votre Parcours</h2>
+                            <p class="text-gray-400 text-lg">Rejoignez des milliers d'élèves qui ont transformé leur avenir professionnel</p>
+                        </div>
+
+                        <!-- Benefits List -->
+                        <div class="space-y-6">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-check text-gold-500"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-2">Formations Certifiantes</h4>
+                                    <p class="text-gray-400 text-sm">Programmes reconnus par l'État avec taux de réussite de 95%</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-4">
+                                <div class="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-calendar text-gold-500"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-2">Planning Flexible</h4>
+                                    <p class="text-gray-400 text-sm">Réservez vos créneaux en ligne selon vos disponibilités</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-4">
+                                <div class="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-car text-gold-500"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-2">Véhicules Premium</h4>
+                                    <p class="text-gray-400 text-sm">Flotte de véhicules récents Tesla, Mercedes, Lexus</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-4">
+                                <div class="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-headset text-gold-500"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-2">Support 7j/7</h4>
+                                    <p class="text-gray-400 text-sm">Équipe pédagogique disponible pour vous accompagner</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="mt-8 pt-8 border-t border-navy-700/50">
+                            <div class="grid grid-cols-3 gap-6 text-center">
+                                <div>
+                                    <div class="text-2xl font-bold text-gold-500">2500+</div>
+                                    <div class="text-sm text-gray-400">Élèves formés</div>
+                                </div>
+                                <div>
+                                    <div class="text-2xl font-bold text-gold-500">95%</div>
+                                    <div class="text-sm text-gray-400">Taux réussite</div>
+                                </div>
+                                <div>
+                                    <div class="text-2xl font-bold text-gold-500">15</div>
+                                    <div class="text-sm text-gray-400">Ans d'expérience</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Elements -->
+                    <div class="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-gold-500/20 to-gold-600/20 rounded-full blur-xl"></div>
+                    <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-xl"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const passwordEye = document.getElementById('password-eye');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordEye.classList.remove('fa-eye');
+        passwordEye.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        passwordEye.classList.remove('fa-eye-slash');
+        passwordEye.classList.add('fa-eye');
+    }
+}
+
+document.getElementById('password').addEventListener('input', function(e) {
+    const password = e.target.value;
+    const strengthBars = [
+        document.getElementById('strength-bar-1'),
+        document.getElementById('strength-bar-2'),
+        document.getElementById('strength-bar-3')
+    ];
+    const strengthText = document.getElementById('strength-text');
+    
+    // Reset bars
+    strengthBars.forEach(bar => {
+        bar.className = 'h-1 flex-1 bg-navy-700 rounded';
+    });
+    
+    if (password.length === 0) {
+        strengthText.textContent = 'Utilisez au moins 8 caractères avec majuscules, chiffres et symboles';
+        strengthText.className = 'text-sm text-gray-400';
+        return;
+    }
+    
+    let strength = 0;
+    
+    // Check length
+    if (password.length >= 8) strength++;
+    
+    // Check for uppercase and lowercase
+    if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+    
+    // Check for numbers and symbols
+    if (password.match(/[0-9]/) && password.match(/[^a-zA-Z0-9]/)) strength++;
+    
+    // Update bars and text
+    if (strength >= 1) {
+        strengthBars[0].classList.add('password-strength-weak');
+        strengthText.textContent = 'Mot de passe faible';
+        strengthText.className = 'text-sm text-red-400';
+    }
+    if (strength >= 2) {
+        strengthBars[1].classList.add('password-strength-medium');
+        strengthText.textContent = 'Mot de passe moyen';
+        strengthText.className = 'text-sm text-yellow-400';
+    }
+    if (strength >= 3) {
+        strengthBars[2].classList.add('password-strength-strong');
+        strengthText.textContent = 'Mot de passe fort';
+        strengthText.className = 'text-sm text-green-400';
+    }
+});
+</script>
+
+</body>
+</html>

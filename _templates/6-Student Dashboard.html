@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'navy': {
+                            900: '#0F172A',
+                            800: '#1E293B',
+                            700: '#334155'
+                        },
+                        'gold': {
+                            500: '#FBBF24',
+                            600: '#F59E0B'
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { font-family: 'Inter', sans-serif; }
+        .glass-effect { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(251, 191, 36, 0.15); }
+        .sidebar-link { transition: all 0.2s ease; }
+        .sidebar-link:hover { background: rgba(251, 191, 36, 0.1); border-left: 3px solid #FBBF24; }
+        .sidebar-link.active { background: rgba(251, 191, 36, 0.15); border-left: 3px solid #FBBF24; color: #FBBF24; }
+    </style>
+</head>
+<body class="bg-navy-900 text-white">
+
+<div class="flex min-h-screen">
+    <aside id="sidebar" class="w-64 bg-navy-800 border-r border-navy-700 fixed h-full overflow-y-auto">
+        <div class="p-6 border-b border-navy-700">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-graduation-cap text-navy-900 text-xl"></i>
+                </div>
+                <span class="text-xl font-bold">Drive<span class="text-gold-500">Academy</span></span>
+            </div>
+        </div>
+        
+        <nav class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="sidebar-link active flex items-center space-x-3 p-3 rounded-lg">
+                        <i class="fa-solid fa-chart-pie w-5"></i>
+                        <span class="font-medium">Tableau de bord</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300">
+                        <i class="fa-solid fa-book w-5"></i>
+                        <span class="font-medium">Mes formations</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300">
+                        <i class="fa-solid fa-calendar w-5"></i>
+                        <span class="font-medium">Mon planning</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300">
+                        <i class="fa-solid fa-credit-card w-5"></i>
+                        <span class="font-medium">Mes paiements</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300">
+                        <i class="fa-solid fa-bell w-5"></i>
+                        <span class="font-medium">Notifications</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300">
+                        <i class="fa-solid fa-message w-5"></i>
+                        <span class="font-medium">Messages</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300">
+                        <i class="fa-solid fa-user w-5"></i>
+                        <span class="font-medium">Mon profil</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="mt-8 pt-8 border-t border-navy-700">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300">
+                            <i class="fa-solid fa-car w-5"></i>
+                            <span class="font-medium">Location véhicules</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300">
+                            <i class="fa-solid fa-headset w-5"></i>
+                            <span class="font-medium">Support</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300">
+                            <i class="fa-solid fa-sign-out-alt w-5"></i>
+                            <span class="font-medium">Déconnexion</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="flex-1 ml-64">
+        <header id="header" class="bg-navy-800 border-b border-navy-700 px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold">Tableau de bord</h1>
+                    <p class="text-gray-400">Bonjour Marc, voici votre progression</p>
+                </div>
+                
+                <div class="flex items-center space-x-6">
+                    <div class="relative">
+                        <input type="text" placeholder="Rechercher..." class="bg-navy-700 border border-navy-600 rounded-lg px-4 py-2 pl-10 w-64 focus:border-gold-500 focus:outline-none">
+                        <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    
+                    <div class="relative">
+                        <button class="p-2 bg-navy-700 rounded-lg hover:bg-navy-600 transition relative">
+                            <i class="fa-solid fa-bell text-xl"></i>
+                            <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Avatar" class="w-10 h-10 rounded-full">
+                        <div>
+                            <div class="font-semibold">Marc Dubois</div>
+                            <div class="text-sm text-gray-400">Élève VTC</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8">
+            <div id="stats-widgets" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-navy-800 rounded-xl p-6 border border-navy-700 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-clock text-blue-400 text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold">24h</div>
+                            <div class="text-sm text-gray-400">/ 35h</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="text-sm text-gray-400 mb-1">Heures Effectuées</div>
+                        <div class="w-full bg-navy-700 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 68%"></div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-blue-400">68% complété</div>
+                </div>
+
+                <div class="bg-navy-800 rounded-xl p-6 border border-navy-700 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-gold-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-calendar-day text-gold-500 text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold">Demain</div>
+                            <div class="text-sm text-gray-400">14h30</div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-400 mb-1">Prochain Cours</div>
+                    <div class="text-gold-500 font-semibold">Pratique VTC</div>
+                    <div class="text-sm text-gray-400 mt-1">dans 18h 25min</div>
+                </div>
+
+                <div class="bg-navy-800 rounded-xl p-6 border border-navy-700 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-chart-line text-green-400 text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold">95%</div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-400 mb-3">Taux Réussite</div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-arrow-up text-green-400 text-xs"></i>
+                        </div>
+                        <span class="text-green-400 text-sm">+5% ce mois</span>
+                    </div>
+                </div>
+
+                <div class="bg-navy-800 rounded-xl p-6 border border-navy-700 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-envelope text-red-400 text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold">3</div>
+                            <span class="w-3 h-3 bg-red-500 rounded-full inline-block ml-1"></span>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-400 mb-1">Messages</div>
+                    <div class="text-red-400 font-semibold">Non lus</div>
+                    <div class="text-sm text-gray-400 mt-1">Dernier: il y a 2h</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div id="upcoming-sessions" class="bg-navy-800 rounded-xl border border-navy-700">
+                    <div class="p-6 border-b border-navy-700">
+                        <h3 class="text-xl font-bold flex items-center">
+                            <i class="fa-solid fa-calendar-alt text-gold-500 mr-3"></i>
+                            Prochaines Sessions
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-4 p-4 bg-navy-700 rounded-lg">
+                                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                    <i class="fa-solid fa-car text-blue-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-semibold">Pratique VTC</div>
+                                    <div class="text-sm text-gray-400">Demain, 14h30 - 16h30</div>
+                                    <div class="text-sm text-gold-500">Instructeur: Jean Moreau</div>
+                                </div>
+                                <button class="px-4 py-2 bg-gold-500 text-navy-900 rounded-lg text-sm font-semibold hover:bg-gold-600 transition">
+                                    Rejoindre
+                                </button>
+                            </div>
+
+                            <div class="flex items-center space-x-4 p-4 bg-navy-700 rounded-lg">
+                                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                    <i class="fa-solid fa-book text-green-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-semibold">Théorie VTC</div>
+                                    <div class="text-sm text-gray-400">Vendredi, 10h00 - 12h00</div>
+                                    <div class="text-sm text-gold-500">Instructeur: Marie Dupont</div>
+                                </div>
+                                <button class="px-4 py-2 bg-navy-600 text-gray-300 rounded-lg text-sm font-semibold">
+                                    Planifié
+                                </button>
+                            </div>
+
+                            <div class="flex items-center space-x-4 p-4 bg-navy-700 rounded-lg">
+                                <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                                    <i class="fa-solid fa-clipboard-check text-orange-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-semibold">Examen Blanc</div>
+                                    <div class="text-sm text-gray-400">Lundi 16, 09h00 - 11h00</div>
+                                    <div class="text-sm text-gold-500">Évaluation finale</div>
+                                </div>
+                                <button class="px-4 py-2 bg-orange-500 text-navy-900 rounded-lg text-sm font-semibold hover:bg-orange-600 transition">
+                                    Préparer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="notifications-panel" class="bg-navy-800 rounded-xl border border-navy-700">
+                    <div class="p-6 border-b border-navy-700">
+                        <h3 class="text-xl font-bold flex items-center">
+                            <i class="fa-solid fa-bell text-gold-500 mr-3"></i>
+                            Notifications Récentes
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">Nouveau cours disponible</div>
+                                    <div class="text-xs text-gray-400 mt-1">Votre cours de pratique VTC de demain est confirmé</div>
+                                    <div class="text-xs text-blue-400 mt-1">il y a 2h</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                                <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">Paiement confirmé</div>
+                                    <div class="text-xs text-gray-400 mt-1">Votre paiement de 450€ a été traité avec succès</div>
+                                    <div class="text-xs text-green-400 mt-1">hier</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3 p-3 bg-gold-500/10 border border-gold-500/20 rounded-lg">
+                                <div class="w-2 h-2 bg-gold-500 rounded-full mt-2"></div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">Rappel important</div>
+                                    <div class="text-xs text-gray-400 mt-1">N'oubliez pas d'apporter vos documents demain</div>
+                                    <div class="text-xs text-gold-400 mt-1">il y a 1 jour</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full mt-4 py-2 text-gold-500 hover:text-gold-400 transition text-sm font-medium">
+                            Voir toutes les notifications
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quick-actions" class="bg-navy-800 rounded-xl border border-navy-700">
+                <div class="p-6 border-b border-navy-700">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i class="fa-solid fa-bolt text-gold-500 mr-3"></i>
+                        Actions Rapides
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <button class="flex items-center space-x-3 p-4 bg-navy-700 hover:bg-navy-600 rounded-lg transition group">
+                            <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center group-hover:bg-blue-500/30 transition">
+                                <i class="fa-solid fa-calendar-plus text-blue-400"></i>
+                            </div>
+                            <span class="font-medium">Réserver un cours</span>
+                        </button>
+
+                        <button class="flex items-center space-x-3 p-4 bg-navy-700 hover:bg-navy-600 rounded-lg transition group">
+                            <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center group-hover:bg-green-500/30 transition">
+                                <i class="fa-solid fa-credit-card text-green-400"></i>
+                            </div>
+                            <span class="font-medium">Effectuer un paiement</span>
+                        </button>
+
+                        <button class="flex items-center space-x-3 p-4 bg-navy-700 hover:bg-navy-600 rounded-lg transition group">
+                            <div class="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center group-hover:bg-gold-500/30 transition">
+                                <i class="fa-solid fa-message text-gold-400"></i>
+                            </div>
+                            <span class="font-medium">Contacter support</span>
+                        </button>
+
+                        <button class="flex items-center space-x-3 p-4 bg-navy-700 hover:bg-navy-600 rounded-lg transition group">
+                            <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center group-hover:bg-purple-500/30 transition">
+                                <i class="fa-solid fa-download text-purple-400"></i>
+                            </div>
+                            <span class="font-medium">Télécharger documents</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

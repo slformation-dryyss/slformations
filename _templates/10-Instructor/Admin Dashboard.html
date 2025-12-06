@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'navy': {
+                            900: '#0F172A',
+                            800: '#1E293B',
+                            700: '#334155'
+                        },
+                        'gold': {
+                            500: '#FBBF24',
+                            600: '#F59E0B'
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { font-family: 'Inter', sans-serif; }
+        .glass-effect { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="bg-navy-900 text-white">
+
+<div class="flex h-screen overflow-hidden">
+    <aside id="sidebar" class="w-64 bg-navy-800 border-r border-navy-700 flex flex-col">
+        <div class="p-6 border-b border-navy-700">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-graduation-cap text-navy-900 text-xl"></i>
+                </div>
+                <span class="text-xl font-bold">DriveAcademy<span class="text-gold-500">Pro</span></span>
+            </div>
+        </div>
+        
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 bg-gold-500/10 text-gold-500 rounded-lg font-semibold">
+                <i class="fa-solid fa-chart-line w-5"></i>
+                <span>Vue d'ensemble</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-navy-700 rounded-lg transition">
+                <i class="fa-solid fa-users w-5"></i>
+                <span>Élèves</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-navy-700 rounded-lg transition">
+                <i class="fa-solid fa-book w-5"></i>
+                <span>Formations</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-navy-700 rounded-lg transition">
+                <i class="fa-solid fa-calendar w-5"></i>
+                <span>Planning</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-navy-700 rounded-lg transition">
+                <i class="fa-solid fa-car w-5"></i>
+                <span>Véhicules</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-navy-700 rounded-lg transition">
+                <i class="fa-solid fa-credit-card w-5"></i>
+                <span>Paiements</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-navy-700 rounded-lg transition">
+                <i class="fa-solid fa-gear w-5"></i>
+                <span>Paramètres</span>
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-navy-700">
+            <div class="flex items-center space-x-3 px-4 py-3">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg" alt="Admin" class="w-10 h-10 rounded-full">
+                <div class="flex-1">
+                    <div class="font-semibold text-sm">Admin</div>
+                    <div class="text-xs text-gray-400">Administrateur</div>
+                </div>
+                <i class="fa-solid fa-right-from-bracket text-gray-400 hover:text-gold-500 cursor-pointer"></i>
+            </div>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header id="header" class="bg-navy-800 border-b border-navy-700 px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold">Tableau de Bord Administrateur</h1>
+                    <p class="text-gray-400 text-sm">Vue d'ensemble de votre plateforme</p>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Rechercher..." class="bg-navy-700 text-white px-4 py-2 rounded-lg pl-10 w-64 focus:outline-none focus:ring-2 focus:ring-gold-500">
+                        <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <button class="relative p-2 bg-navy-700 rounded-lg hover:bg-navy-600 transition">
+                        <i class="fa-solid fa-bell text-gray-400"></i>
+                        <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center">3</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-8">
+            <div id="stats-grid" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-navy-800 rounded-2xl p-6 border border-navy-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-users text-blue-400 text-xl"></i>
+                        </div>
+                        <span class="text-green-400 text-sm font-semibold">+12%</span>
+                    </div>
+                    <div class="text-3xl font-bold mb-1">2,547</div>
+                    <div class="text-gray-400 text-sm">Élèves Actifs</div>
+                </div>
+
+                <div class="bg-navy-800 rounded-2xl p-6 border border-navy-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-gold-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-book text-gold-500 text-xl"></i>
+                        </div>
+                        <span class="text-green-400 text-sm font-semibold">+8%</span>
+                    </div>
+                    <div class="text-3xl font-bold mb-1">24</div>
+                    <div class="text-gray-400 text-sm">Formations Actives</div>
+                </div>
+
+                <div class="bg-navy-800 rounded-2xl p-6 border border-navy-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-euro-sign text-green-400 text-xl"></i>
+                        </div>
+                        <span class="text-green-400 text-sm font-semibold">+23%</span>
+                    </div>
+                    <div class="text-3xl font-bold mb-1">127,450€</div>
+                    <div class="text-gray-400 text-sm">Revenus Mensuels</div>
+                </div>
+
+                <div class="bg-navy-800 rounded-2xl p-6 border border-navy-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-car text-purple-400 text-xl"></i>
+                        </div>
+                        <span class="text-green-400 text-sm font-semibold">+5%</span>
+                    </div>
+                    <div class="text-3xl font-bold mb-1">87%</div>
+                    <div class="text-gray-400 text-sm">Taux Occupation Véhicules</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div id="revenue-chart-card" class="bg-navy-800 rounded-2xl p-6 border border-navy-700">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">Revenus Mensuels</h3>
+                        <select class="bg-navy-700 text-white px-3 py-1 rounded-lg text-sm">
+                            <option>6 derniers mois</option>
+                            <option>12 derniers mois</option>
+                        </select>
+                    </div>
+                    <div id="revenue-chart" style="height: 300px"></div>
+                </div>
+
+                <div id="formations-chart-card" class="bg-navy-800 rounded-2xl p-6 border border-navy-700">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">Répartition Formations</h3>
+                    </div>
+                    <div id="formations-chart" style="height: 300px"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div id="recent-students-card" class="lg:col-span-2 bg-navy-800 rounded-2xl p-6 border border-navy-700">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">Élèves Récents</h3>
+                        <a href="#" class="text-gold-500 text-sm font-semibold hover:underline">Voir tout</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left text-gray-400 text-sm border-b border-navy-700">
+                                    <th class="pb-3">Élève</th>
+                                    <th class="pb-3">Formation</th>
+                                    <th class="pb-3">Progression</th>
+                                    <th class="pb-3">Statut</th>
+                                    <th class="pb-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr class="border-b border-navy-700">
+                                    <td class="py-4">
+                                        <div class="flex items-center space-x-3">
+                                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Avatar" class="w-10 h-10 rounded-full">
+                                            <div>
+                                                <div class="font-semibold">Marc Dubois</div>
+                                                <div class="text-gray-400 text-xs">marc.dubois@email.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">Formation VTC</td>
+                                    <td class="py-4">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="flex-1 bg-navy-700 rounded-full h-2">
+                                                <div class="bg-gold-500 h-2 rounded-full" style="width: 75%"></div>
+                                            </div>
+                                            <span class="text-xs text-gray-400">75%</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4"><span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-semibold">Actif</span></td>
+                                    <td class="py-4">
+                                        <button class="text-gray-400 hover:text-gold-500"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-navy-700">
+                                    <td class="py-4">
+                                        <div class="flex items-center space-x-3">
+                                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" alt="Avatar" class="w-10 h-10 rounded-full">
+                                            <div>
+                                                <div class="font-semibold">Sophie Martin</div>
+                                                <div class="text-gray-400 text-xs">sophie.m@email.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">Permis B</td>
+                                    <td class="py-4">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="flex-1 bg-navy-700 rounded-full h-2">
+                                                <div class="bg-gold-500 h-2 rounded-full" style="width: 45%"></div>
+                                            </div>
+                                            <span class="text-xs text-gray-400">45%</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4"><span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-semibold">Actif</span></td>
+                                    <td class="py-4">
+                                        <button class="text-gray-400 hover:text-gold-500"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-navy-700">
+                                    <td class="py-4">
+                                        <div class="flex items-center space-x-3">
+                                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="Avatar" class="w-10 h-10 rounded-full">
+                                            <div>
+                                                <div class="font-semibold">Thomas Bernard</div>
+                                                <div class="text-gray-400 text-xs">t.bernard@email.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">SSIAP</td>
+                                    <td class="py-4">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="flex-1 bg-navy-700 rounded-full h-2">
+                                                <div class="bg-gold-500 h-2 rounded-full" style="width: 90%"></div>
+                                            </div>
+                                            <span class="text-xs text-gray-400">90%</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4"><span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-semibold">Actif</span></td>
+                                    <td class="py-4">
+                                        <button class="text-gray-400 hover:text-gold-500"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4">
+                                        <div class="flex items-center space-x-3">
+                                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg" alt="Avatar" class="w-10 h-10 rounded-full">
+                                            <div>
+                                                <div class="font-semibold">Emma Petit</div>
+                                                <div class="text-gray-400 text-xs">emma.p@email.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">Permis Moto</td>
+                                    <td class="py-4">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="flex-1 bg-navy-700 rounded-full h-2">
+                                                <div class="bg-gold-500 h-2 rounded-full" style="width: 30%"></div>
+                                            </div>
+                                            <span class="text-xs text-gray-400">30%</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4"><span class="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-xs font-semibold">En attente</span></td>
+                                    <td class="py-4">
+                                        <button class="text-gray-400 hover:text-gold-500"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="alerts-card" class="bg-navy-800 rounded-2xl p-6 border border-navy-700">
+                    <h3 class="text-xl font-bold mb-6">Alertes & Tâches</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                            <i class="fa-solid fa-circle-exclamation text-red-400 mt-1"></i>
+                            <div class="flex-1">
+                                <div class="font-semibold text-sm">Paiement en retard</div>
+                                <div class="text-xs text-gray-400 mt-1">3 élèves ont des paiements en retard</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3 p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                            <i class="fa-solid fa-triangle-exclamation text-orange-400 mt-1"></i>
+                            <div class="flex-1">
+                                <div class="font-semibold text-sm">Véhicule maintenance</div>
+                                <div class="text-xs text-gray-400 mt-1">Tesla Model 3 nécessite révision</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                            <i class="fa-solid fa-circle-info text-blue-400 mt-1"></i>
+                            <div class="flex-1">
+                                <div class="font-semibold text-sm">Nouvelles inscriptions</div>
+                                <div class="text-xs text-gray-400 mt-1">12 nouvelles demandes ce mois</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3 p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                            <i class="fa-solid fa-circle-check text-green-400 mt-1"></i>
+                            <div class="flex-1">
+                                <div class="font-semibold text-sm">Examens réussis</div>
+                                <div class="text-xs text-gray-400 mt-1">8 élèves ont réussi cette semaine</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quick-actions" class="bg-navy-800 rounded-2xl p-6 border border-navy-700">
+                <h3 class="text-xl font-bold mb-6">Actions Rapides</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <button class="flex items-center space-x-3 p-4 bg-navy-700 hover:bg-gold-500/10 hover:border-gold-500 border border-transparent rounded-lg transition">
+                        <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-user-plus text-blue-400"></i>
+                        </div>
+                        <span class="font-semibold">Nouvel Élève</span>
+                    </button>
+                    <button class="flex items-center space-x-3 p-4 bg-navy-700 hover:bg-gold-500/10 hover:border-gold-500 border border-transparent rounded-lg transition">
+                        <div class="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-calendar-plus text-gold-500"></i>
+                        </div>
+                        <span class="font-semibold">Planifier Cours</span>
+                    </button>
+                    <button class="flex items-center space-x-3 p-4 bg-navy-700 hover:bg-gold-500/10 hover:border-gold-500 border border-transparent rounded-lg transition">
+                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-file-invoice text-green-400"></i>
+                        </div>
+                        <span class="font-semibold">Générer Facture</span>
+                    </button>
+                    <button class="flex items-center space-x-3 p-4 bg-navy-700 hover:bg-gold-500/10 hover:border-gold-500 border border-transparent rounded-lg transition">
+                        <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fa-solid fa-chart-bar text-purple-400"></i>
+                        </div>
+                        <span class="font-semibold">Rapport Mensuel</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+window.addEventListener('load', function() {
+    try {
+        var revenueData = [{
+            type: 'scatter',
+            mode: 'lines',
+            fill: 'tozeroy',
+            x: ['Juil', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'],
+            y: [95000, 102000, 108000, 115000, 121000, 127450],
+            line: { color: '#FBBF24', width: 3 },
+            fillcolor: 'rgba(251, 191, 36, 0.1)'
+        }];
+        
+        var revenueLayout = {
+            title: { text: '', font: { size: 0 } },
+            xaxis: { title: '', gridcolor: '#334155', color: '#94a3b8' },
+            yaxis: { title: 'Revenus (€)', gridcolor: '#334155', color: '#94a3b8' },
+            margin: { t: 20, r: 20, b: 40, l: 60 },
+            plot_bgcolor: '#1E293B',
+            paper_bgcolor: '#1E293B',
+            showlegend: false
+        };
+        
+        Plotly.newPlot('revenue-chart', revenueData, revenueLayout, {responsive: true, displayModeBar: false, displaylogo: false});
+    } catch(e) {
+        document.getElementById('revenue-chart').innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">Erreur de chargement du graphique</div>';
+    }
+    
+    try {
+        var formationsData = [{
+            type: 'pie',
+            labels: ['VTC/Taxi', 'Permis Auto', 'Permis Moto', 'SSIAP', 'Autres'],
+            values: [35, 28, 18, 12, 7],
+            marker: { colors: ['#FBBF24', '#3B82F6', '#8B5CF6', '#EF4444', '#10B981'] },
+            textinfo: 'label+percent',
+            textfont: { color: '#fff' }
+        }];
+        
+        var formationsLayout = {
+            margin: { t: 20, r: 20, b: 20, l: 20 },
+            plot_bgcolor: '#1E293B',
+            paper_bgcolor: '#1E293B',
+            showlegend: true,
+            legend: { font: { color: '#94a3b8' }, x: 0, y: -0.2, orientation: 'h' }
+        };
+        
+        Plotly.newPlot('formations-chart', formationsData, formationsLayout, {responsive: true, displayModeBar: false, displaylogo: false});
+    } catch(e) {
+        document.getElementById('formations-chart').innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">Erreur de chargement du graphique</div>';
+    }
+});
+</script>
+
+</body>
+</html>
