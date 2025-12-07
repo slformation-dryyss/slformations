@@ -1,7 +1,27 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
-import { ArrowRight, Car, Clock, Euro, Users, Settings, Zap, Star } from "lucide-react";
+import {
+  ArrowRight,
+  Car,
+  Clock,
+  Euro,
+  Users,
+  Settings,
+  Zap,
+  Star,
+  Shield,
+  UserCheck,
+  Tag,
+  Wrench,
+  Headphones,
+} from "lucide-react";
+
+export const metadata = {
+  title: "SL Formations | Auto-école & centre de formation professionnelle",
+  description:
+    "Auto-école et centre de formation SL Formations : permis A, B, C, formations VTC & Taxi, CACES et formations professionnelles transport & logistique.",
+};
 
 export default function Home() {
   return (
@@ -9,319 +29,774 @@ export default function Home() {
       <Header />
 
       <main>
-        {/* Hero Section */}
-        <section id="hero" className="relative h-[700px] flex items-center justify-center overflow-hidden mt-20">
+        {/* Hero Section - Bienvenue */}
+        <section
+          id="hero"
+          className="relative min-h-[620px] flex items-center overflow-hidden mt-20"
+        >
           <div className="absolute inset-0 z-0">
-            <img 
-              className="w-full h-full object-cover" 
-              src="https://storage.googleapis.com/uxpilot-auth.appspot.com/4857025603-2ea2e73559d51288016e.png" 
-              alt="luxury black Tesla Model 3 driving on modern city road at sunset" 
+            <img
+              className="w-full h-full object-cover"
+              src="https://ls-formation.fr/wp-content/uploads/2025/03/femme-auto-ecole-2304w.webp"
+              alt="Élève en leçon de conduite"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-navy-900/95 via-navy-900/80 to-navy-900/60"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-navy-900/90 to-navy-900/70" />
           </div>
-          
-          <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
-            <div className="inline-block glass-effect px-4 py-2 rounded-full mb-6">
-              <span className="text-gold-500 font-semibold">🎓 +2500 élèves formés avec succès</span>
+
+          <div className="relative z-10 max-w-5xl mx-auto px-6 py-16 flex flex-col gap-10">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-black/60 border border-gold-500/30 mb-4 text-xs md:text-sm font-semibold text-gold-500">
+                Auto-école & centre de formation professionnelle
+              </div>
+
+              <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
+                Bienvenue chez{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-500 to-gold-600">
+                  SL Formations
+                </span>
+              </h1>
+
+              <p className="text-lg md:text-xl text-gray-200 mb-3 max-w-2xl">
+                Vous souhaitez passer votre permis moto ou voiture ? Vous
+                envisagez une formation pour devenir conducteur de VTC ou de
+                taxi ?
+              </p>
+              <p className="text-lg md:text-xl text-gray-200 mb-6 max-w-2xl">
+                Notre auto-école et centre de formation professionnelle vous
+                propose un accompagnement personnalisé pour les permis
+                deux-roues, automobile et poids lourds, ainsi que pour vos
+                formations CACES. Apprenez à conduire un véhicule de transport,
+                un engin de travaux publics, un VTC ou un taxi. Avec SL
+                Formations, passez à la vitesse supérieure !
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <Link
+                  href="/contact"
+                  className="px-8 py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-navy-900 rounded-full font-bold text-lg hover:shadow-xl hover:shadow-gold-500/60 transition flex items-center space-x-2"
+                >
+                  <span>Appelez-nous</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+                <Link
+                  href="/formations"
+                  className="px-8 py-4 rounded-full font-semibold text-white border border-white/20 hover:border-gold-500/70 bg-white/5 backdrop-blur-md transition flex items-center space-x-2"
+                >
+                  <span>Découvrir nos formations</span>
+                </Link>
+              </div>
             </div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Votre Avenir Professionnel<br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-500 to-gold-600">Commence Ici</span>
-            </h1>
-            
-            <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-              Formations Permis, VTC, Taxi et Location de Véhicules Premium pour votre réussite professionnelle
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/formations" className="px-8 py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-navy-900 rounded-lg font-bold text-lg hover:shadow-xl hover:shadow-gold-500/50 transition flex items-center space-x-2">
-                <span>Découvrir nos formations</span>
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link href="/location" className="px-8 py-4 glass-effect text-white rounded-lg font-bold text-lg hover:border-gold-500 transition flex items-center space-x-2">
-                <span>Louer un véhicule</span>
-                <Car className="w-5 h-5" />
-              </Link>
+
+            <div className="glass-effect rounded-2xl p-6 md:p-7 bg-black/60 border border-white/10">
+              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                <div>
+                  <h3 className="text-lg md:text-xl font-semibold mb-3">
+                    Nos domaines de formation
+                  </h3>
+                  <ul className="space-y-1.5 text-gray-200 text-sm md:text-[15px]">
+                    <li>• Permis moto (A1, A2, A)</li>
+                    <li>• Permis B boîte automatique et manuelle</li>
+                    <li>• Permis C – Poids lourd</li>
+                    <li>• Formations professionnelles transport & logistique</li>
+                    <li>• Formations CACES & travaux publics</li>
+                    <li>• Formations VTC & Taxi</li>
+                  </ul>
+                </div>
+                <div className="flex flex-col items-start md:items-end text-sm gap-2 md:min-w-[160px]">
+                  <span className="text-gray-300">
+                    95 % de taux de satisfaction
+                  </span>
+                  <span className="text-gold-500 font-semibold">
+                    +200 élèves inscrits
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Stats Section */}
-        <section id="stats" className="py-20 bg-navy-800/50">
+        {/* Nos permis */}
+        <section id="permis" className="py-20 bg-navy-900">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div className="text-center">
-                <div className="text-5xl font-bold text-gold-500 mb-2">2500+</div>
-                <div className="text-gray-400">Élèves Formés</div>
-              </div>
-              <div className="text-center">
-                <div className="text-5xl font-bold text-gold-500 mb-2">95%</div>
-                <div className="text-gray-400">Taux de Réussite</div>
-              </div>
-              <div className="text-center">
-                <div className="text-5xl font-bold text-gold-500 mb-2">15</div>
-                <div className="text-gray-400">Années d'Expérience</div>
-              </div>
-              <div className="text-center">
-                <div className="text-5xl font-bold text-gold-500 mb-2">50+</div>
-                <div className="text-gray-400">Véhicules Premium</div>
-              </div>
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">
+                Nos <span className="text-gold-500">permis</span>
+              </h2>
+              <p className="text-lg text-gray-300">
+                Une école de formation au savoir-faire reconnu pour réussir les
+                examens
+              </p>
+              <p className="text-gray-400 mt-4 max-w-2xl mx-auto">
+                Choisissez SL Formations pour décrocher votre permis A, B ou C.
+                Avec l’expertise de nos moniteurs diplômés d’État, vous êtes
+                très bien accompagné !
+              </p>
             </div>
-          </div>
-        </section>
 
-        {/* Formations Section */}
-        <section id="formations" className="py-24 bg-navy-900">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Nos <span className="text-gold-500">Formations</span></h2>
-              <p className="text-xl text-gray-400">Des programmes complets pour votre réussite professionnelle</p>
-            </div>
-            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Card 1 */}
-              <div className="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover">
+              {/* Permis A */}
+              <article className="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover flex flex-col">
                 <div className="h-48 overflow-hidden">
-                  <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/fc6207cbc0-b20c618d2d44c7cd4904.png" alt="modern motorcycle" />
+                  <img
+                    className="w-full h-full object-cover"
+                    src="https://ls-formation.fr/wp-content/uploads/2025/03/moto-ecole-397w.webp"
+                    alt="Permis moto"
+                  />
                 </div>
-                <div className="p-6">
-                  <div className="inline-block px-3 py-1 bg-gold-500/20 text-gold-500 rounded-full text-sm font-semibold mb-4">Permis</div>
-                  <h3 className="text-2xl font-bold mb-3">Permis Moto & Auto</h3>
-                  <p className="text-gray-400 mb-6">Formations complètes permis A, B, C, EB avec instructeurs certifiés et véhicules modernes</p>
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center space-x-2 text-gray-400">
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-block px-3 py-1 mb-3 rounded-full bg-gold-500/15 text-gold-500 text-xs font-semibold">
+                    Permis A - Moto
+                  </span>
+                  <h3 className="text-2xl font-bold mb-3">Permis A - Moto</h3>
+                  <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+                    Vous êtes épris de liberté ? Avec le permis moto, partez à
+                    la rencontre de sensations uniques. Notre auto-école à
+                    Pontault-Combault vous forme aux permis motos A1, A2 et A.
+                    Bénéficiez d’un suivi complet avec des moniteurs
+                    expérimentés.
+                  </p>
+                  <div className="mt-auto flex items-center justify-between text-sm text-gray-400">
+                    <span className="flex items-center space-x-1">
                       <Clock className="w-4 h-4" />
-                      <span>35h</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-gold-500 font-bold">
+                      <span>20h de conduite</span>
+                    </span>
+                    <span className="flex items-center space-x-1 text-gold-500 font-semibold">
                       <Euro className="w-4 h-4" />
-                      <span>1200</span>
-                    </div>
+                      <span>à partir de 649€</span>
+                    </span>
                   </div>
-                  <Link href="/formations/permis" className="block w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white text-center rounded-lg font-semibold transition">En savoir plus</Link>
                 </div>
-              </div>
-              
-              {/* Card 2 */}
-              <div className="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover">
+              </article>
+
+              {/* Permis B */}
+              <article className="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover flex flex-col">
                 <div className="h-48 overflow-hidden">
-                  <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/3eeb01f1b1-caef3ce5998f8d5fb2ea.png" alt="taxi driver" />
+                  <img
+                    className="w-full h-full object-cover"
+                    src="https://ls-formation.fr/wp-content/uploads/2025/03/father-teaching-his-teenage-son-to-drive.jpg"
+                    alt="Permis B"
+                  />
                 </div>
-                <div className="p-6">
-                  <div className="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm font-semibold mb-4">VTC/Taxi</div>
-                  <h3 className="text-2xl font-bold mb-3">Formation VTC & Taxi</h3>
-                  <p className="text-gray-400 mb-6">Devenez chauffeur professionnel VTC ou Taxi avec notre formation complète et certifiante</p>
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center space-x-2 text-gray-400">
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-block px-3 py-1 mb-3 rounded-full bg-gold-500/15 text-gold-500 text-xs font-semibold">
+                    Permis B – Voiture
+                  </span>
+                  <h3 className="text-2xl font-bold mb-3">
+                    Permis B - Boîte automatique et manuelle
+                  </h3>
+                  <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+                    Vous recherchez une auto-école sérieuse pour passer votre
+                    permis B ? Choisissez la formule que vous souhaitez : permis
+                    B en boîte automatique à 799 € ou en boîte manuelle à 899
+                    €. Selon votre profil, nous vous proposons un forfait de
+                    conduite personnalisé. Contactez-nous pour obtenir davantage
+                    d’informations !
+                  </p>
+                  <div className="mt-auto flex items-center justify-between text-sm text-gray-400">
+                    <span className="flex items-center space-x-1">
                       <Clock className="w-4 h-4" />
-                      <span>50h</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-gold-500 font-bold">
-                      <Euro className="w-4 h-4" />
-                      <span>1800</span>
-                    </div>
+                      <span>20h de conduite</span>
+                    </span>
+                    <span className="flex flex-col items-end text-gold-500 font-semibold">
+                      <span>Auto : 799€</span>
+                      <span>Manuelle : 899€</span>
+                    </span>
                   </div>
-                  <Link href="/formations/vtc" className="block w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white text-center rounded-lg font-semibold transition">En savoir plus</Link>
                 </div>
-              </div>
-              
-              {/* Card 3 */}
-              <div className="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover">
+              </article>
+
+              {/* Permis C */}
+              <article className="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover flex flex-col">
                 <div className="h-48 overflow-hidden">
-                  <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/af9a0550ea-0b25228232c72d35e1a1.png" alt="fire safety" />
+                  <img
+                    className="w-full h-full object-cover"
+                    src="https://ls-formation.fr/wp-content/uploads/2025/03/conducteur-camion-397w.webp"
+                    alt="Permis poids lourd"
+                  />
                 </div>
-                <div className="p-6">
-                  <div className="inline-block px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm font-semibold mb-4">Sécurité</div>
-                  <h3 className="text-2xl font-bold mb-3">SSIAP & Sécurité</h3>
-                  <p className="text-gray-400 mb-6">Formations sécurité incendie, prévention et SSIAP pour professionnels exigeants</p>
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center space-x-2 text-gray-400">
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-block px-3 py-1 mb-3 rounded-full bg-gold-500/15 text-gold-500 text-xs font-semibold">
+                    Permis C – Poids lourd
+                  </span>
+                  <h3 className="text-2xl font-bold mb-3">
+                    Permis C – Poids lourd
+                  </h3>
+                  <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+                    Vous souhaitez devenir chauffeur routier ? Passez votre
+                    permis poids lourd C, C1 ou C1E dans notre auto-école ! Vous
+                    êtes assuré d’être entouré de moniteurs expérimentés. Ces
+                    derniers, diplômés d’État, vous forment sur la partie
+                    théorique (la conduite hors circulation) et à la conduite en
+                    circulation. N’hésitez pas un seul instant, appelez-nous !
+                  </p>
+                  <div className="mt-auto flex items-center justify-between text-sm text-gray-400">
+                    <span className="flex items-center space-x-1">
                       <Clock className="w-4 h-4" />
-                      <span>67h</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-gold-500 font-bold">
+                      <span>30h de conduite</span>
+                    </span>
+                    <span className="flex items-center space-x-1 text-gold-500 font-semibold">
                       <Euro className="w-4 h-4" />
-                      <span>950</span>
-                    </div>
+                      <span>à partir de 2 990€</span>
+                    </span>
                   </div>
-                  <Link href="/formations/ssiap" className="block w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white text-center rounded-lg font-semibold transition">En savoir plus</Link>
                 </div>
-              </div>
+              </article>
             </div>
           </div>
         </section>
 
-        {/* Location Section */}
-        <section id="location" className="py-24 bg-navy-800/50">
+        {/* Conduite supervisée / permis accéléré */}
+        <section
+          id="conduite-supervisee"
+          className="py-20 bg-navy-800/40 border-y border-navy-700/60"
+        >
+          <div className="max-w-7xl mx-auto px-6 grid gap-10 md:grid-cols-[1.2fr,1.3fr] items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Conduite supervisée, permis accéléré :{" "}
+                <span className="text-gold-500">
+                  une offre adaptée à chaque profil
+                </span>
+              </h2>
+              <p className="text-gray-300 mb-4">
+                Vous avez obtenu votre code et suivi la formation des 20 heures
+                de conduite dans notre auto-école, mais vous ne vous sentez pas
+                encore sûr au volant ? La solution : la conduite supervisée.
+              </p>
+              <p className="text-gray-300 mb-4">
+                Avec cette formule, développez vos compétences avec un
+                accompagnateur à votre rythme. Si vous souhaitez avoir votre
+                permis rapidement, optez pour notre session de code et de permis
+                en accéléré.
+              </p>
+              <p className="text-gray-300 mb-6">
+                Prenez contact avec notre centre auto-école pour connaître nos
+                modalités d’inscription et nos tarifs.
+              </p>
+
+              <div className="flex flex-wrap gap-3">
+                <span className="px-4 py-2 rounded-full border border-gold-500/60 text-gold-500 text-sm">
+                  Conduite supervisée
+                </span>
+                <span className="px-4 py-2 rounded-full border border-gold-500/60 text-gold-500 text-sm">
+                  Permis en accéléré
+                </span>
+              </div>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden glass-effect">
+              <img
+                src="https://ls-formation.fr/wp-content/uploads/2025/03/conduite-supervisee-1920w.webp"
+                alt="Conduite supervisée"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Formations professionnelles */}
+        <section id="formations-pro" className="py-20 bg-navy-900">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Location <span className="text-gold-500">Véhicules VTC</span></h2>
-              <p className="text-xl text-gray-400">Véhicules premium pour chauffeurs professionnels diplômés</p>
+              <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-3">
+                Nos <span className="text-gold-500">formations professionnelles</span>
+              </h2>
+              <p className="text-lg text-gray-300 mb-4 max-w-3xl mx-auto">
+                Des formations aux métiers du transport et de la logistique
+                financées par France Travail ou votre CPF.
+              </p>
+              <p className="text-gray-200 max-w-2xl mx-auto">
+                <span className="font-semibold">
+                  Un centre de formation professionnelle certifié{" "}
+                  <span className="text-gold-500">Qualiopi</span>
+                </span>
+                <br />
+                Vous travaillez dans le domaine de la logistique, dans le
+                transport ou les travaux publics ? Vous avez besoin d’une
+                formation professionnelle spécifique ? Grâce à notre
+                certification Qualiopi, vous bénéficiez de fonds publics ou
+                mutualisés et d’une formation de qualité.
+              </p>
+              <div className="mt-6">
+                <Link
+                  href="/formations"
+                  className="inline-flex items-center px-6 py-3 rounded-lg bg-gold-500 text-navy-900 font-semibold hover:bg-gold-600 transition"
+                >
+                  formation professionnelle
+                </Link>
+              </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Formation Transport */}
+              <article className="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover flex flex-col">
+                <div className="h-48 overflow-hidden">
+                  <img
+                    src="https://ls-formation.fr/wp-content/uploads/2025/03/truck-driver-occupation-service.jpg"
+                    alt="Formation transport"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-2xl font-bold mb-2">Formation Transport</h3>
+                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                    Vous souhaitez exercer la profession de chauffeur de poids
+                    lourd ? Après l’obtention de votre permis C, C1, C1E ou CE,
+                    la FIMO marchandises est la certification obligatoire pour
+                    pratiquer votre activité. Plusieurs moyens de financement
+                    sont possibles, renseignez-vous auprès de notre équipe !
+                  </p>
+                  <Link
+                    href="/formations"
+                    className="mt-auto inline-flex items-center text-gold-500 text-sm font-semibold hover:text-gold-400"
+                  >
+                    En savoir plus
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </div>
+              </article>
+
+              {/* Formation Travaux publics */}
+              <article className="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover flex flex-col">
+                <div className="h-48 overflow-hidden">
+                  <img
+                    src="https://ls-formation.fr/wp-content/uploads/2025/03/chariot-elevateur-2304w.webp"
+                    alt="Formation travaux publics"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-2xl font-bold mb-2">
+                    Formation Travaux publics
+                  </h3>
+                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                    Conducteur d’engins de chantier, de grues mobiles… Pour
+                    travailler dans les travaux publics, SL Formations dispense
+                    les formations réglementaires nécessaires : le CACES R482
+                    pour la conduite des engins de chantiers et le CACES R483,
+                    certificat obligatoire pour manipuler une grue mobile en
+                    toute sécurité.
+                  </p>
+                  <Link
+                    href="/formations"
+                    className="mt-auto inline-flex items-center text-gold-500 text-sm font-semibold hover:text-gold-400"
+                  >
+                    En savoir plus
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </div>
+              </article>
+
+              {/* Formation CACES */}
+              <article className="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover flex flex-col">
+                <div className="h-48 overflow-hidden">
+                  <img
+                    src="https://ls-formation.fr/wp-content/uploads/2025/03/1e3ce169ed.jpg"
+                    alt="Formation CACES"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-2xl font-bold mb-2">Formation CACES</h3>
+                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                    Pour les conducteurs de nacelles, grues de chargement,
+                    engins de chantier et pour les conducteurs accompagnants de
+                    gerbeurs automoteurs, une formation s’impose. Nous vous
+                    guidons pour que vous obteniez le Certificat d’Aptitude à la
+                    Conduite En Sécurité (CACES). Selon le véhicule, nous vous
+                    orientons vers la formation adéquate.
+                  </p>
+                  <Link
+                    href="/formations"
+                    className="mt-auto inline-flex items-center text-gold-500 text-sm font-semibold hover:text-gold-400"
+                  >
+                    En savoir plus
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </div>
+              </article>
+
+              {/* Formation VTC & Taxi */}
+              <article className="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover flex flex-col">
+                <div className="h-48 overflow-hidden">
+                  <img
+                    src="https://ls-formation.fr/wp-content/uploads/2025/03/taxis-2304w.webp"
+                    alt="Formation VTC et Taxi"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-2xl font-bold mb-2">
+                    Formation VTC & Taxi
+                  </h3>
+                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                    Vous connaissez Pontault-Combault et ses alentours sur le
+                    bout des doigts, vous êtes toujours ponctuel ? Vous avez
+                    déjà de bons atouts pour devenir chauffeur VTC ou chauffeur
+                    de taxi. Inscrivez-vous dans notre centre de formation
+                    professionnelle à Pontault-Combault.
+                  </p>
+                  <Link
+                    href="/formations"
+                    className="mt-auto inline-flex items-center text-gold-500 text-sm font-semibold hover:text-gold-400"
+                  >
+                    En savoir plus
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </div>
+              </article>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Vehicle 1 */}
-              <div className="glass-effect rounded-2xl overflow-hidden card-hover">
-                <div className="relative h-56 overflow-hidden">
-                  <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/7432e9d0d4-c268d5c530784938a7cc.png" alt="Tesla Model 3" />
-                  <div className="absolute top-4 right-4 px-3 py-1 bg-green-500 text-white rounded-full text-sm font-semibold">Disponible</div>
+            </div>
+          </section>
+
+        {/* Statistiques & atouts */}
+        <section id="stats" className="py-16 bg-navy-800/40 border-y border-navy-700/60">
+          <div className="max-w-7xl mx-auto px-6 space-y-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-gold-500 mb-1">
+                  95%
                 </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-2">Tesla Model 3</h3>
-                  <div className="flex items-center space-x-4 text-gray-400 text-sm mb-4">
-                    <div className="flex items-center space-x-1">
-                      <Users className="w-4 h-4" />
-                      <span>5 places</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Settings className="w-4 h-4" />
-                      <span>Auto</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Zap className="w-4 h-4" />
-                      <span>Électrique</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 mb-4">
-                    <span className="text-gold-500 flex items-center"><Star className="w-4 h-4 fill-current" /> 4.8</span>
-                    <span className="text-gray-400 text-sm">(127 avis)</span>
-                  </div>
-                  <div className="mb-6">
-                    <div className="text-3xl font-bold text-gold-500 mb-1">49€<span className="text-lg text-gray-400">/jour</span></div>
-                    <div className="text-sm text-gray-400">280€/semaine</div>
-                  </div>
-                  <button className="w-full py-3 bg-gradient-to-r from-gold-500 to-gold-600 text-navy-900 rounded-lg font-bold hover:shadow-lg hover:shadow-gold-500/50 transition">Réserver maintenant</button>
+                <div className="text-gray-300 text-sm">
+                  Taux de satisfaction
                 </div>
               </div>
-              
-              {/* Vehicle 2 */}
-              <div className="glass-effect rounded-2xl overflow-hidden card-hover">
-                <div className="relative h-56 overflow-hidden">
-                  <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/21c3465555-971897d9b9633071990d.png" alt="Lexus UX" />
-                  <div className="absolute top-4 right-4 px-3 py-1 bg-green-500 text-white rounded-full text-sm font-semibold">Disponible</div>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-gold-500 mb-1">
+                  +10
                 </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-2">Lexus UX</h3>
-                  <div className="flex items-center space-x-4 text-gray-400 text-sm mb-4">
-                    <div className="flex items-center space-x-1">
-                      <Users className="w-4 h-4" />
-                      <span>5 places</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Settings className="w-4 h-4" />
-                      <span>Auto</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Zap className="w-4 h-4" />
-                      <span>Hybride</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 mb-4">
-                    <span className="text-gold-500 flex items-center"><Star className="w-4 h-4 fill-current" /> 4.9</span>
-                    <span className="text-gray-400 text-sm">(89 avis)</span>
-                  </div>
-                  <div className="mb-6">
-                    <div className="text-3xl font-bold text-gold-500 mb-1">55€<span className="text-lg text-gray-400">/jour</span></div>
-                    <div className="text-sm text-gray-400">320€/semaine</div>
-                  </div>
-                  <button className="w-full py-3 bg-gradient-to-r from-gold-500 to-gold-600 text-navy-900 rounded-lg font-bold hover:shadow-lg hover:shadow-gold-500/50 transition">Réserver maintenant</button>
+                <div className="text-gray-300 text-sm">Moniteurs qualifiés</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-gold-500 mb-1">
+                  +200
+                </div>
+                <div className="text-gray-300 text-sm">
+                  Élèves déjà inscrits
                 </div>
               </div>
-              
-              {/* Vehicle 3 */}
-              <div className="glass-effect rounded-2xl overflow-hidden card-hover">
-                <div className="relative h-56 overflow-hidden">
-                  <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/bf0a23550a-39f96e5636007eae13b2.png" alt="Mercedes E-Class" />
-                  <div className="absolute top-4 right-4 px-3 py-1 bg-orange-500 text-white rounded-full text-sm font-semibold">Bientôt</div>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-gold-500 mb-1">
+                  +50
                 </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-2">Mercedes Classe E</h3>
-                  <div className="flex items-center space-x-4 text-gray-400 text-sm mb-4">
-                    <div className="flex items-center space-x-1">
-                      <Users className="w-4 h-4" />
-                      <span>5 places</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Settings className="w-4 h-4" />
-                      <span>Auto</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Zap className="w-4 h-4" />
-                      <span>Diesel</span>
-                    </div>
+                <div className="text-gray-300 text-sm">
+                  Sessions de conduite / semaine
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-[1.2fr,1.4fr] gap-10 items-center">
+              <div className="glass-effect rounded-2xl p-6">
+                <h3 className="text-2xl font-bold mb-3">
+                  Des cours de conduite
+                </h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Apprenez à conduire en toute confiance avec nos moniteurs
+                  expérimentés. Que vous soyez débutant ou que vous souhaitiez
+                  perfectionner votre conduite, nous vous accompagnons à chaque
+                  étape pour assurer votre réussite.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-bold mb-4">
+                  L’apprentissage de la conduite en toute sérénité avec{" "}
+                  <span className="text-gold-500">SL Formations</span>
+                </h3>
+                <p className="text-gray-300 text-sm mb-6">
+                  Nous offrons des formations professionnelles de qualité,
+                  adaptées aux exigences du secteur, avec des formateurs
+                  expérimentés et des outils modernes.
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                  <div className="glass-effect rounded-xl p-4 flex flex-col items-start space-y-2">
+                    <Shield className="w-6 h-6 text-gold-500" />
+                    <span className="font-semibold">Sécurité garantie</span>
                   </div>
-                  <div className="flex items-center space-x-2 mb-4">
-                    <span className="text-gold-500 flex items-center"><Star className="w-4 h-4 fill-current" /> 5.0</span>
-                    <span className="text-gray-400 text-sm">(156 avis)</span>
+                  <div className="glass-effect rounded-xl p-4 flex flex-col items-start space-y-2">
+                    <UserCheck className="w-6 h-6 text-gold-500" />
+                    <span className="font-semibold">
+                      Instructeurs expérimentés
+                    </span>
                   </div>
-                  <div className="mb-6">
-                    <div className="text-3xl font-bold text-gold-500 mb-1">65€<span className="text-lg text-gray-400">/jour</span></div>
-                    <div className="text-sm text-gray-400">380€/semaine</div>
+                  <div className="glass-effect rounded-xl p-4 flex flex-col items-start space-y-2">
+                    <Tag className="w-6 h-6 text-gold-500" />
+                    <span className="font-semibold">Meilleurs prix</span>
                   </div>
-                  <button className="w-full py-3 bg-navy-700 text-gray-400 rounded-lg font-bold cursor-not-allowed">Bientôt disponible</button>
+                  <div className="glass-effect rounded-xl p-4 flex flex-col items-start space-y-2">
+                    <Wrench className="w-6 h-6 text-gold-500" />
+                    <span className="font-semibold">Matériel haut de gamme</span>
+                  </div>
+                  <div className="glass-effect rounded-xl p-4 flex flex-col items-start space-y-2">
+                    <Headphones className="w-6 h-6 text-gold-500" />
+                    <span className="font-semibold">Service client</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section id="testimonials" className="py-24 bg-navy-900">
+        {/* Processus */}
+        <section id="processus" className="py-20 bg-navy-900">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Ils Nous Font <span className="text-gold-500">Confiance</span></h2>
-              <p className="text-xl text-gray-400">Découvrez les témoignages de nos élèves</p>
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-3">
+                Notre <span className="text-gold-500">processus</span>
+              </h2>
+              <p className="text-lg text-gray-300">
+                Obtenez votre permis avec SL Formations
+              </p>
+              <p className="text-gray-400 mt-2">
+                Passez votre permis en toute simplicité
+              </p>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-navy-800 rounded-2xl p-8 border border-navy-700">
-                <div className="flex items-center mb-6">
-                  <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Avatar" className="w-16 h-16 rounded-full mr-4" />
-                  <div>
-                    <div className="font-bold text-lg">Marc Dubois</div>
-                    <div className="text-gray-400 text-sm">Chauffeur VTC</div>
-                  </div>
-                </div>
-                <div className="text-gold-500 mb-4 flex"><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /></div>
-                <p className="text-gray-300">"Formation VTC exceptionnelle ! J'ai obtenu ma carte professionnelle en 3 mois et je loue maintenant une Tesla Model 3. Le suivi est parfait."</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="glass-effect rounded-2xl p-6 border border-navy-700">
+                <div className="text-gold-500 font-bold text-sm mb-2">01</div>
+                <h3 className="text-xl font-semibold mb-3">
+                  Choisissez votre permis
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  Nous avons la formation adaptée à vos besoins. Sélectionnez
+                  la catégorie qui vous correspond et commencez votre formation
+                  dès aujourd’hui !
+                </p>
               </div>
-              
-              <div className="bg-navy-800 rounded-2xl p-8 border border-navy-700">
-                <div className="flex items-center mb-6">
-                  <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" alt="Avatar" className="w-16 h-16 rounded-full mr-4" />
-                  <div>
-                    <div className="font-bold text-lg">Sophie Martin</div>
-                    <div className="text-gray-400 text-sm">Permis B</div>
-                  </div>
-                </div>
-                <div className="text-gold-500 mb-4 flex"><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /></div>
-                <p className="text-gray-300">"Moniteurs patients et pédagogues. J'ai eu mon permis du premier coup ! Les véhicules sont récents et l'ambiance est vraiment top."</p>
+
+              <div className="glass-effect rounded-2xl p-6 border border-navy-700">
+                <div className="text-gold-500 font-bold text-sm mb-2">02</div>
+                <h3 className="text-xl font-semibold mb-3">
+                  Organisez votre programme de conduite
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  Planifiez vos séances de conduite selon votre disponibilité.
+                  Nos moniteurs s’adaptent à votre rythme pour une progression
+                  optimale.
+                </p>
               </div>
-              
-              <div className="bg-navy-800 rounded-2xl p-8 border border-navy-700">
-                <div className="flex items-center mb-6">
-                  <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg" alt="Avatar" className="w-16 h-16 rounded-full mr-4" />
-                  <div>
-                    <div className="font-bold text-lg">Thomas Bernard</div>
-                    <div className="text-gray-400 text-sm">SSIAP</div>
-                  </div>
-                </div>
-                <div className="text-gold-500 mb-4 flex"><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /></div>
-                <p className="text-gray-300">"Formation SSIAP très professionnelle avec des formateurs expérimentés. Matériel de qualité et mise en situation réaliste. Je recommande !"</p>
+
+              <div className="glass-effect rounded-2xl p-6 border border-navy-700">
+                <div className="text-gold-500 font-bold text-sm mb-2">03</div>
+                <h3 className="text-xl font-semibold mb-3">
+                  Passez l’examen et obtenez votre permis
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  Nous organisons votre passage à l’examen officiel dans les
+                  meilleures conditions pour maximiser vos chances de réussite
+                  du premier coup.
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section id="cta" className="py-24 bg-gradient-to-r from-gold-500 to-gold-600">
+        {/* Témoignages */}
+        <section id="testimonials" className="py-20 bg-navy-800/40 border-y border-navy-700/60">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-3">
+                Vos <span className="text-gold-500">avis</span>
+              </h2>
+              <p className="text-lg text-gray-300">
+                Ce que nos clients disent de nous
+              </p>
+            </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <article className="bg-navy-900/70 rounded-2xl p-6 border border-navy-700">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-lg">Inès Bouraoui</h3>
+                  <div className="flex text-gold-500">
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  « Je suis actuellement inscrite à cette école de conduite. Un
+                  accueil très chaleureux et une équipe qui conseille et motive
+                  ses élèves. J&apos;effectue des cours avec une monitrice très
+                  patiente et certainement passionnée par son métier.
+                  J&apos;apprécie beaucoup son sens du détail et sa façon
+                  d&apos;adapter le cours aux lacunes de l&apos;élève. Elle me
+                  met toujours à l&apos;aise pour que je puisse gérer au mieux
+                  mon stress... »
+                </p>
+              </article>
+
+              <article className="bg-navy-900/70 rounded-2xl p-6 border border-navy-700">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-lg">Clara C</h3>
+                  <div className="flex text-gold-500">
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  « Excellente auto-école ! Je recommande les yeux fermés ✅ »
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Permis */}
+        <section id="pricing-permis" className="py-20 bg-navy-900">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-3">
+                Nos <span className="text-gold-500">pricing permis</span>
+              </h2>
+            </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Permis A – Moto */}
+              <article className="glass-effect rounded-2xl p-6 border border-navy-700 flex flex-col">
+                <h3 className="text-xl font-bold mb-2">Permis A – Moto</h3>
+                <p className="text-gray-300 text-sm mb-4">
+                  Apprenez à piloter une moto en toute sécurité avec une
+                  formation adaptée aux débutants et confirmés.
+                </p>
+                <div className="text-3xl font-bold text-gold-500 mb-2">
+                  649€
+                </div>
+                <ul className="text-gray-300 text-sm space-y-1 mb-4">
+                  <li>• 8 heures de plateau + 12 heures de circulation</li>
+                  <li>• Accès au code moto en ligne</li>
+                  <li>• Accompagnement personnalisé</li>
+                  <li>• Préparation à l’examen pratique</li>
+                </ul>
+              </article>
+
+              {/* Permis B – Voiture */}
+              <article className="glass-effect rounded-2xl p-6 border border-navy-700 flex flex-col">
+                <h3 className="text-xl font-bold mb-2">Permis B – Voiture</h3>
+                <p className="text-gray-300 text-sm mb-4">
+                  Le permis idéal pour conduire une voiture en toute autonomie.
+                  Formation complète avec moniteurs expérimentés.
+                </p>
+                <div className="text-3xl font-bold text-gold-500 mb-2">
+                  1 325€
+                </div>
+                <ul className="text-gray-300 text-sm space-y-1 mb-4">
+                  <li>• 20 heures de conduite avec un moniteur</li>
+                  <li>• Accès illimité au code de la route en ligne</li>
+                  <li>• Formation théorique et pratique complète</li>
+                  <li>• Préparation intensive à l’examen</li>
+                  <li>• Accompagnement administratif</li>
+                </ul>
+              </article>
+
+              {/* Permis Poids Lourd */}
+              <article className="glass-effect rounded-2xl p-6 border border-navy-700 flex flex-col">
+                <h3 className="text-xl font-bold mb-2">Permis Poids Lourd</h3>
+                <p className="text-gray-300 text-sm mb-4">
+                  Formation professionnelle pour obtenir votre permis camion et
+                  accéder aux métiers du transport routier.
+                </p>
+                <div className="text-3xl font-bold text-gold-500 mb-2">
+                  2 990€
+                </div>
+                <ul className="text-gray-300 text-sm space-y-1 mb-4">
+                  <li>• 30 heures de conduite avec moniteur PL</li>
+                  <li>• Formation théorique et réglementaire</li>
+                  <li>• Préparation aux épreuves de l&apos;examen</li>
+                  <li>• Techniques de conduite en sécurité</li>
+                  <li>• Accompagnement pour les démarches administratives</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className="py-20 bg-navy-800/40 border-y border-navy-700/60">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-3">
+                FAQ – Vos questions, nos réponses
+              </h2>
+            </div>
+
+              <div className="space-y-6">
+                <div className="glass-effect rounded-2xl p-5 border border-navy-700">
+                <h3 className="font-semibold mb-2">
+                  1. Quelles formations proposez-vous ?
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  Nous proposons des formations en conduite (permis B, A, C, CE,
+                  D), en transport routier (FIMO, FCO) et en manutention (CACES
+                  pour engins de chantier, chariots élévateurs et grues).
+                </p>
+                </div>
+
+                <div className="glass-effect rounded-2xl p-5 border border-navy-700">
+                <h3 className="font-semibold">
+                  2. Vos formations sont-elles certifiées ?
+                </h3>
+                </div>
+
+                <div className="glass-effect rounded-2xl p-5 border border-navy-700">
+                <h3 className="font-semibold">
+                  3. Vos formations sont-elles éligibles au CPF ?
+                </h3>
+                </div>
+
+                <div className="glass-effect rounded-2xl p-5 border border-navy-700">
+                <h3 className="font-semibold">
+                  4. Qui peut suivre vos formations ?
+                </h3>
+                </div>
+
+                <div className="glass-effect rounded-2xl p-5 border border-navy-700">
+                <h3 className="font-semibold">
+                  9. Peut-on passer les formations en accéléré ?
+                </h3>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        {/* CTA finale */}
+        <section
+          id="cta"
+          className="py-20 bg-gradient-to-r from-gold-500 to-gold-600"
+        >
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-navy-900 mb-6">Prêt à Démarrer Votre Formation ?</h2>
-            <p className="text-xl text-navy-800 mb-10">Rejoignez plus de 2500 élèves qui ont réussi avec DriveAcademy Pro</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-navy-900 mb-4">
+              Prêt à démarrer votre formation ?
+            </h2>
+            <p className="text-lg text-navy-800 mb-8">
+              Rejoignez plus de 200 élèves qui ont choisi SL Formations pour
+              réussir leur permis et leur projet professionnel.
+            </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/formations" className="px-8 py-4 bg-navy-900 text-white rounded-lg font-bold text-lg hover:bg-navy-800 transition">Voir toutes les formations</Link>
-              <Link href="/contact" className="px-8 py-4 bg-white text-navy-900 rounded-lg font-bold text-lg hover:bg-gray-100 transition">Contactez-nous</Link>
+              <Link
+                href="/formations"
+                className="px-8 py-4 bg-navy-900 text-white rounded-lg font-bold text-lg hover:bg-navy-800 transition"
+              >
+                Voir toutes les formations
+              </Link>
+              <Link
+                href="/contact"
+                className="px-8 py-4 bg-white text-navy-900 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
+              >
+                Contactez-nous
+              </Link>
+              <Link
+                href="/location"
+                className="px-8 py-4 glass-effect text-navy-900 font-bold text-lg border border-navy-900/30 hover:border-navy-900/60 transition flex items-center space-x-2"
+              >
+                <Car className="w-5 h-5" />
+                <span>Louer un véhicule</span>
+              </Link>
             </div>
           </div>
         </section>

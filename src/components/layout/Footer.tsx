@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { GraduationCap, Facebook, Instagram, Linkedin, MapPin, Phone } from "lucide-react";
+import Image from "next/image";
+import { Facebook, Instagram, Linkedin, MapPin, Phone } from "lucide-react";
 
 export function Footer() {
   return (
@@ -7,13 +8,15 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center">
-                <GraduationCap className="text-navy-900 w-6 h-6" />
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="relative h-10 w-40 md:w-48">
+                <Image
+                  src="/sl_formations_logo_1.jpg"
+                  alt="SL Formations"
+                  fill
+                  className="object-contain"
+                />
               </div>
-              <span className="text-xl font-bold">
-                DriveAcademy<span className="text-gold-500">Pro</span>
-              </span>
             </div>
             <p className="text-gray-400 mb-4">
               Votre partenaire formation et location pour réussir dans le transport professionnel.

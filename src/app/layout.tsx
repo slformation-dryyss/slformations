@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/components/auth/Providers";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -8,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "DriveAcademy Pro",
-  description: "Formation VTC, Taxi et Permis",
+  title: "SL Formations",
+  description: "SL Formations - Formations Permis, VTC, Taxi et Sécurité",
 };
 
 export default function RootLayout({
@@ -22,7 +23,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} antialiased bg-navy-900 text-white`}
       >
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

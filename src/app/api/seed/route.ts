@@ -133,8 +133,13 @@ export async function GET() {
     }
 
     return NextResponse.json({ message: 'Seeding finished successfully' });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error seeding database:', error);
-    return NextResponse.json({ error: 'Error seeding database', details: error }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Error seeding database', 
+      message: error.message,
+      stack: error.stack,
+      details: JSON.stringify(error)
+    }, { status: 500 });
   }
 }

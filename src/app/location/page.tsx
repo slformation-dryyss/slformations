@@ -127,7 +127,7 @@ export default function LocationPage() {
                         <div className="relative h-56 overflow-hidden">
                             <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/7432e9d0d4-891813ec552ad6192df3.png" alt="Tesla Model 3" />
                             <div className="absolute top-4 right-4 px-3 py-1 bg-green-500 text-white rounded-full text-sm font-semibold">Disponible</div>
-                            <div className="absolute top-4 left-4 px-3 py-1 bg-blue-500/80 text-white rounded-full text-sm font-semibold">Premium</div>
+                            <div className="absolute top-4 left-4 px-3 py-1 bg-gold-500/90 text-navy-900 rounded-full text-sm font-semibold">Premium</div>
                         </div>
                         <div className="p-6">
                             <h3 className="text-2xl font-bold mb-2">Tesla Model 3</h3>

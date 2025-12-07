@@ -92,12 +92,12 @@
                 <div class="glass-effect rounded-2xl p-6">
                     <h3 class="text-xl font-bold mb-4 flex items-center">
                         <i class="fa-solid fa-filter text-gold-500 mr-2"></i>
-                        Filtres
+                        Affiner votre recherche
                     </h3>
                     
                     <div class="mb-6">
                         <div class="relative">
-                            <input type="text" placeholder="Rechercher une formation..." class="w-full bg-navy-800 border border-navy-700 rounded-lg px-4 py-3 pl-10 text-white focus:border-gold-500 focus:outline-none">
+                            <input type="text" placeholder="Rechercher une thématique, un code formation..." class="w-full bg-navy-800 border border-navy-700 rounded-lg px-4 py-3 pl-10 text-white focus:border-gold-500 focus:outline-none">
                             <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                         </div>
                     </div>
@@ -143,19 +143,19 @@
                     </div>
                     
                     <div class="mb-6">
-                        <h4 class="font-semibold mb-3">Budget</h4>
+                        <h4 class="font-semibold mb-3">Dispositif de financement</h4>
                         <div class="space-y-2">
                             <label class="flex items-center">
-                                <input type="radio" name="price" class="mr-3 accent-gold-500">
-                                <span>Moins de 1000€</span>
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>Éligible CPF</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="radio" name="price" class="mr-3 accent-gold-500">
-                                <span>1000€ - 1500€</span>
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>Financement entreprise</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="radio" name="price" class="mr-3 accent-gold-500">
-                                <span>Plus de 1500€</span>
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>Financement personnel</span>
                             </label>
                         </div>
                     </div>
@@ -190,13 +190,12 @@
                         <span class="font-semibold text-white">24 formations</span> disponibles
                     </div>
                     <div class="flex items-center space-x-4">
-                        <span class="text-gray-400">Trier par:</span>
+                        <span class="text-gray-400">Trier les résultats :</span>
                         <select class="bg-navy-800 border border-navy-700 rounded-lg px-4 py-2 text-white focus:border-gold-500 focus:outline-none">
-                            <option>Plus récent</option>
-                            <option>Prix croissant</option>
-                            <option>Prix décroissant</option>
-                            <option>Durée</option>
-                            <option>Popularité</option>
+                            <option>Pertinence (par défaut)</option>
+                            <option>Prochaine session</option>
+                            <option>Intitulé A-Z</option>
+                            <option>Durée croissante</option>
                         </select>
                     </div>
                 </div>
@@ -213,22 +212,29 @@
                                 <div class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Débutant</div>
                             </div>
                             <h3 class="text-xl font-bold mb-2">Permis Moto A2</h3>
-                            <p class="text-gray-400 text-sm mb-4 line-clamp-2">Formation complète pour obtenir votre permis moto A2. Théorie et pratique avec moniteurs certifiés.</p>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-2 text-gray-400 text-sm">
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Formation complète pour obtenir votre permis moto A2, avec un suivi pédagogique individualisé, ateliers pratiques et accompagnement aux examens.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
                                     <i class="fa-regular fa-clock"></i>
-                                    <span>20h</span>
+                                    <span>20h de formation</span>
                                 </div>
-                                <div class="text-gold-500 font-bold text-lg">890€</div>
-                            </div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-1">
-                                    <span class="text-gold-500">⭐ 4.8</span>
-                                    <span class="text-gray-400 text-xs">(156 avis)</span>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel</span>
                                 </div>
-                                <span class="text-green-400 text-sm">📅 Prochaine session: 15 Jan</span>
                             </div>
-                            <button class="w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">S'inscrire</button>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : conducteurs débutants</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">890€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span>📅 Prochaine session : 15 Jan</span>
+                                <span class="text-gray-400">Certification interne</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-gold-500 hover:text-gold-500 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
+                            </div>
                         </div>
                     </div>
                     
@@ -242,22 +248,28 @@
                                 <div class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Débutant</div>
                             </div>
                             <h3 class="text-xl font-bold mb-2">Permis Voiture B</h3>
-                            <p class="text-gray-400 text-sm mb-4 line-clamp-2">Formation permis B avec code et conduite. Véhicules récents et pédagogie moderne.</p>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-2 text-gray-400 text-sm">
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Parcours complet pour le permis B : code, conduite, mises en situation réelles et temps d’échanges avec votre formateur pour consolider les acquis.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
                                     <i class="fa-regular fa-clock"></i>
-                                    <span>35h</span>
+                                    <span>35h de formation</span>
                                 </div>
-                                <div class="text-gold-500 font-bold text-lg">1200€</div>
-                            </div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-1">
-                                    <span class="text-gold-500">⭐ 4.9</span>
-                                    <span class="text-gray-400 text-xs">(324 avis)</span>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel</span>
                                 </div>
-                                <span class="text-green-400 text-sm">📅 Sessions continues</span>
                             </div>
-                            <button class="w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">S'inscrire</button>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : nouveaux conducteurs</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">1200€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span>📅 Sessions continues</span>
+                                <span class="text-gray-400">Préparation examen officiel</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-gold-500 hover:text-gold-500 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
                         </div>
                     </div>
                     
@@ -271,22 +283,28 @@
                                 <div class="px-2 py-1 bg-orange-500/20 text-orange-400 rounded text-xs">Professionnel</div>
                             </div>
                             <h3 class="text-xl font-bold mb-2">Formation VTC Complète</h3>
-                            <p class="text-gray-400 text-sm mb-4 line-clamp-2">Devenez chauffeur VTC professionnel. Formation théorique et pratique certifiante.</p>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-2 text-gray-400 text-sm">
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Parcours professionnalisant pour devenir chauffeur VTC : réglementation, relation client, gestion d’activité et conduite en milieu urbain.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
                                     <i class="fa-regular fa-clock"></i>
-                                    <span>50h</span>
+                                    <span>50h de formation</span>
                                 </div>
-                                <div class="text-gold-500 font-bold text-lg">1800€</div>
-                            </div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-1">
-                                    <span class="text-gold-500">⭐ 4.7</span>
-                                    <span class="text-gray-400 text-xs">(89 avis)</span>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel / terrain</span>
                                 </div>
-                                <span class="text-green-400 text-sm">📅 Prochaine session: 22 Jan</span>
                             </div>
-                            <button class="w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">S'inscrire</button>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : futurs chauffeurs VTC</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">1800€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span>📅 Prochaine session : 22 Jan</span>
+                                <span class="text-gray-400">Certification professionnelle</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-blue-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-blue-400 hover:text-blue-400 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
                         </div>
                     </div>
                     
@@ -300,22 +318,28 @@
                                 <div class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs">Intermédiaire</div>
                             </div>
                             <h3 class="text-xl font-bold mb-2">SSIAP 1 - Agent de Sécurité</h3>
-                            <p class="text-gray-400 text-sm mb-4 line-clamp-2">Formation agent de sécurité incendie et d'assistance à personnes. Diplôme SSIAP 1.</p>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-2 text-gray-400 text-sm">
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Acquérir les compétences nécessaires pour assurer la sécurité incendie et l’assistance aux personnes au sein des ERP et IGH.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
                                     <i class="fa-regular fa-clock"></i>
-                                    <span>67h</span>
+                                    <span>67h de formation</span>
                                 </div>
-                                <div class="text-gold-500 font-bold text-lg">950€</div>
-                            </div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-1">
-                                    <span class="text-gold-500">⭐ 4.6</span>
-                                    <span class="text-gray-400 text-xs">(67 avis)</span>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel</span>
                                 </div>
-                                <span class="text-green-400 text-sm">📅 Prochaine session: 5 Fév</span>
                             </div>
-                            <button class="w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">S'inscrire</button>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : futurs agents SSIAP 1</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">950€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span>📅 Prochaine session : 5 Fév</span>
+                                <span class="text-gray-400">Diplôme SSIAP 1</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-red-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-red-400 hover:text-red-400 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
                         </div>
                     </div>
                     
@@ -329,22 +353,28 @@
                                 <div class="px-2 py-1 bg-orange-500/20 text-orange-400 rounded text-xs">Professionnel</div>
                             </div>
                             <h3 class="text-xl font-bold mb-2">Formation Chauffeur Taxi</h3>
-                            <p class="text-gray-400 text-sm mb-4 line-clamp-2">Formation complète pour obtenir votre carte professionnelle de chauffeur de taxi.</p>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-2 text-gray-400 text-sm">
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Préparation complète à l’examen de chauffeur de taxi : réglementation, topographie, relation client et gestion de course.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
                                     <i class="fa-regular fa-clock"></i>
-                                    <span>45h</span>
+                                    <span>45h de formation</span>
                                 </div>
-                                <div class="text-gold-500 font-bold text-lg">1650€</div>
-                            </div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-1">
-                                    <span class="text-gold-500">⭐ 4.5</span>
-                                    <span class="text-gray-400 text-xs">(43 avis)</span>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel</span>
                                 </div>
-                                <span class="text-green-400 text-sm">📅 Prochaine session: 12 Fév</span>
                             </div>
-                            <button class="w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">S'inscrire</button>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : futurs chauffeurs de taxi</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">1650€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span>📅 Prochaine session : 12 Fév</span>
+                                <span class="text-gray-400">Préparation carte pro</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-blue-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-blue-400 hover:text-blue-400 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
                         </div>
                     </div>
                     
@@ -358,22 +388,28 @@
                                 <div class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs">Intermédiaire</div>
                             </div>
                             <h3 class="text-xl font-bold mb-2">Permis Poids Lourd C</h3>
-                            <p class="text-gray-400 text-sm mb-4 line-clamp-2">Formation permis C pour conduire des véhicules de transport de marchandises.</p>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-2 text-gray-400 text-sm">
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Programme complet pour maîtriser la conduite de véhicules de transport de marchandises et la réglementation associée.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
                                     <i class="fa-regular fa-clock"></i>
-                                    <span>105h</span>
+                                    <span>105h de formation</span>
                                 </div>
-                                <div class="text-gold-500 font-bold text-lg">2200€</div>
-                            </div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-1">
-                                    <span class="text-gold-500">⭐ 4.4</span>
-                                    <span class="text-gray-400 text-xs">(28 avis)</span>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel</span>
                                 </div>
-                                <span class="text-orange-400 text-sm">📅 Sessions sur demande</span>
                             </div>
-                            <button class="w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">S'inscrire</button>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : conducteurs poids lourd</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">2200€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span class="text-orange-400">📅 Sessions sur demande</span>
+                                <span class="text-gray-400">Préparation examen permis C</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-purple-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-purple-400 hover:text-purple-400 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
                         </div>
                     </div>
                     

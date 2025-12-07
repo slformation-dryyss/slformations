@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0F172A;
+  /* Palette alignée sur le logo SL Formations : fond noir + or */
+  --background: #000000;
   --foreground: #ffffff;
 }
 
@@ -10,11 +11,14 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   
-  --color-navy-900: #0F172A;
-  --color-navy-800: #1E293B;
-  --color-navy-700: #334155;
-  --color-gold-500: #FBBF24;
-  --color-gold-600: #F59E0B;
+  /* Les classes bg-navy-xxx deviennent des déclinaisons de noir/gris très foncé */
+  --color-navy-900: #000000;
+  --color-navy-800: #050816;
+  --color-navy-700: #111827;
+
+  /* Or inspiré du logo (dégradé conservé via 500/600) */
+  --color-gold-500: #fbbf24;
+  --color-gold-600: #f59e0b;
 }
 
 body {
@@ -38,4 +42,19 @@ body {
   transform: translateY(-8px);
   box-shadow: 0 20px 40px rgba(251, 191, 36, 0.2);
   border-color: #FBBF24;
+}
+
+/* Scroll reveal (apparition douce au scroll) */
+.sr-base {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s ease-out;
+  will-change: opacity, transform;
+}
+
+.sr-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
