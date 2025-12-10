@@ -1,0 +1,27 @@
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { ProfilePageClient } from "@/components/dashboard/ProfilePageClient";
+
+export const metadata = {
+  title: "Mon profil | SL Formations",
+};
+
+export default function DashboardProfilePage({
+  searchParams,
+}: {
+  searchParams?: { onboarding?: string };
+}) {
+  return (
+    <div className="min-h-screen bg-navy-900 text-white font-sans">
+      <Header />
+
+      <main className="pt-24 pb-12">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 flex">
+          <ProfilePageClient searchParams={searchParams} />
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

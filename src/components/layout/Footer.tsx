@@ -46,13 +46,14 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-bold text-lg mb-4">Services</h4>
+            <h4 className="font-bold text-lg mb-4">Services & Aide</h4>
             <ul className="space-y-2 text-gray-400">
               <li><Link href="/location" className="hover:text-gold-500 transition">Location Véhicules</Link></li>
               <li><Link href="/planning" className="hover:text-gold-500 transition">Planning & Réservation</Link></li>
               <li><Link href="/dashboard" className="hover:text-gold-500 transition">Espace Élève</Link></li>
-              <li><Link href="/paiement" className="hover:text-gold-500 transition">Paiement en ligne</Link></li>
-              <li><Link href="/support" className="hover:text-gold-500 transition">Support 7j/7</Link></li>
+              <li><Link href="/faq" className="hover:text-gold-500 transition">FAQ & Support</Link></li>
+              <li><Link href="/legal/cgv" className="hover:text-gold-500 transition">CGV</Link></li>
+              <li><Link href="/legal/privacy" className="hover:text-gold-500 transition">Confidentialité</Link></li>
             </ul>
           </div>
 
@@ -67,8 +68,17 @@ export function Footer() {
                 <Phone className="text-gold-500 w-5 h-5" />
                 <span>01 23 45 67 89</span>
               </li>
+              <li className="mt-4">
+                <Link href="/contact" className="inline-block text-gold-500 hover:underline">
+                  Nous envoyer un message
+                </Link>
+              </li>
             </ul>
           </div>
+        </div>
+        
+        <div className="border-t border-navy-800 pt-8 text-center text-gray-500 text-sm">
+          <p>© {new Date().getFullYear()} SL Formations. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

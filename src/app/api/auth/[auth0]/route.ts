@@ -10,7 +10,13 @@ export async function GET(
   ctx: { params: Promise<{ auth0: string }> }
 ) {
   const params = await ctx.params;
-  return authHandler(req, { params } as { params: { auth0: string } });
+  console.log(`[Auth0] GET route hit: /api/auth/${params.auth0}`);
+  try {
+    return await authHandler(req, { params: params } as any);
+  } catch (error: any) {
+    console.error(`[Auth0] ❌ Error in GET /api/auth/${params.auth0}:`, error);
+    throw error; // Let nextjs handle or bubble up
+  }
 }
 
 export async function POST(
@@ -18,7 +24,13 @@ export async function POST(
   ctx: { params: Promise<{ auth0: string }> }
 ) {
   const params = await ctx.params;
-  return authHandler(req, { params } as { params: { auth0: string } });
+  console.log(`[Auth0] POST route hit: /api/auth/${params.auth0}`);
+  try {
+    return await authHandler(req, { params: params } as any);
+  } catch (error: any) {
+    console.error(`[Auth0] ❌ Error in POST /api/auth/${params.auth0}:`, error);
+    throw error;
+  }
 }
 
 // Évite la mise en cache / static pour ces routes d'authentification

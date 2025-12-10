@@ -1,5 +1,8 @@
-import { getOrCreateUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Clock,
   CalendarDays,
@@ -10,20 +13,86 @@ import {
   Car,
 } from "lucide-react";
 import Image from "next/image";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
-export default async function Dashboard() {
-  const user = await getOrCreateUser();
+type ProfileResponse = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  isProfileComplete: boolean;
+  createdAt: string;
+  firstName: string | null;
+  lastName: string | null;
+  phone: string | null;
+  picture?: string | null;
+};
 
-  if (!user) {
-    redirect("/api/auth/login");
+export default function Dashboard() {
+  const router = useRouter();
+  const { user: auth0User, isLoading } = useUser();
+  const [profile, setProfile] = useState<ProfileResponse | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (!auth0User) {
+      router.replace("/api/auth/login?returnTo=/dashboard");
+      return;
+    }
+
+    // Email non vérifié → onboarding email
+    if (!(auth0User as any).email_verified) {
+      router.replace("/dashboard/verify-email");
+      return;
+    }
+
+    const loadProfile = async () => {
+      try {
+        const res = await fetch("/api/profile", { cache: "no-store" });
+        if (!res.ok) {
+          throw new Error("Impossible de charger le profil");
+        }
+        const data: ProfileResponse = await res.json();
+
+        // Admin → redirection tableau de bord admin
+        if (data.role === "ADMIN") {
+          router.replace("/admin");
+          return;
+        }
+
+        // Profil incomplet → onboarding profil
+        if (!data.isProfileComplete) {
+          router.replace("/dashboard/profile?onboarding=1");
+          return;
+        }
+
+        setProfile({
+          ...data,
+          picture: (auth0User as any).picture ?? null,
+        });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    loadProfile();
+  }, [auth0User, isLoading, router]);
+
+  if (isLoading || loadingProfile || !auth0User || !profile) {
+    return (
+      <div className="min-h-screen bg-navy-900 text-white flex items-center justify-center">
+        <p className="text-gray-300 text-sm">
+          Chargement de votre tableau de bord...
+        </p>
+      </div>
+    );
   }
 
-  // Redirige automatiquement selon le rôle
-  if (user.role === "ADMIN") {
-    redirect("/admin");
-  }
-  // On pourrait plus tard créer un tableau de bord dédié aux formateurs
-  // et rediriger les rôles INSTRUCTOR vers une autre page.
+  const user = profile;
 
   return (
     <div className="min-h-screen bg-navy-900 text-white pt-24 pb-12">
@@ -40,18 +109,27 @@ export default async function Dashboard() {
             <div className="px-4 py-2.5 rounded-lg bg-gold-500/15 border-l-4 border-gold-500 text-gold-400 font-semibold">
               Tableau de bord
             </div>
-            <div className="px-4 py-2.5 rounded-lg text-gray-300 flex items-center space-x-2">
+            <Link
+              href="/dashboard/mes-formations"
+              className="block px-4 py-2.5 rounded-lg text-gray-300 hover:bg-navy-700 hover:text-white transition flex items-center space-x-2"
+            >
               <GraduationCap className="w-4 h-4" />
               <span>Mes formations</span>
-            </div>
-            <div className="px-4 py-2.5 rounded-lg text-gray-300 flex items-center space-x-2">
+            </Link>
+            <Link
+              href="/dashboard/planning"
+              className="block px-4 py-2.5 rounded-lg text-gray-300 hover:bg-navy-700 hover:text-white transition flex items-center space-x-2"
+            >
               <CalendarDays className="w-4 h-4" />
               <span>Mon planning</span>
-            </div>
-            <div className="px-4 py-2.5 rounded-lg text-gray-300 flex items-center space-x-2">
+            </Link>
+            <Link
+              href="/dashboard/paiement"
+              className="block px-4 py-2.5 rounded-lg text-gray-300 hover:bg-navy-700 hover:text-white transition flex items-center space-x-2"
+            >
               <CreditCard className="w-4 h-4" />
               <span>Mes paiements</span>
-            </div>
+            </Link>
             <div className="px-4 py-2.5 rounded-lg text-gray-300 flex items-center space-x-2">
               <MessageSquare className="w-4 h-4" />
               <span>Messages</span>

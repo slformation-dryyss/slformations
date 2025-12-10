@@ -1,4 +1,4 @@
-import { getOrCreateUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import {
   Bell,
@@ -19,15 +19,8 @@ export const metadata = {
 };
 
 export default async function AdminDashboardPage() {
-  const user = await getOrCreateUser();
-
-  if (!user) {
-    redirect("/api/auth/login");
-  }
-
-  if (user.role !== "ADMIN") {
-    redirect("/dashboard");
-  }
+  const user = await requireAdmin();
+  // requireAdmin redirige déjà si pas autorisé (inclut OWNER)
 
   return (
     <div className="min-h-screen bg-navy-900 text-white flex overflow-hidden">
@@ -82,7 +75,7 @@ export default async function AdminDashboardPage() {
           <div className="flex items-center space-x-3 px-4 py-3 rounded-lg">
             <div className="relative w-9 h-9">
               <Image
-                src={user.picture || "/sl_formations_logo_2.jpg"}
+                src={"/sl_formations_logo_2.jpg"}
                 alt={user.name || "Admin"}
                 fill
                 className="rounded-full object-cover"
@@ -354,5 +347,6 @@ export default async function AdminDashboardPage() {
     </div>
   );
 }
+
 
 

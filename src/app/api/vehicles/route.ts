@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { getVehicles } from '@/lib/vehicles-store';
 
 export async function GET() {
   try {
-    const vehicles = await prisma.vehicle.findMany();
+    const vehicles = await getVehicles();
     return NextResponse.json(vehicles);
   } catch (error) {
     console.error('Error fetching vehicles:', error);

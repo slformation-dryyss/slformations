@@ -76,6 +76,14 @@ export function Header() {
               <Loader2 className="w-6 h-6 animate-spin text-gold-500" />
             ) : user ? (
               <div className="flex items-center space-x-4 relative">
+                {/* Bouton d'accès direct à l'espace élève (desktop) */}
+                <Link
+                  href="/dashboard"
+                  className="hidden md:inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-gold-500 to-gold-600 text-navy-900 rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-gold-500/40 transition"
+                >
+                  Accéder à mon espace
+                </Link>
+
                 <Link
                   href="/profile"
                   className="flex items-center space-x-2 text-white hover:text-gold-500 transition"
@@ -94,13 +102,13 @@ export function Header() {
                     {user.name}
                   </span>
                 </Link>
-                <a
+                <Link
                   href="/api/auth/logout"
                   className="p-2 text-gray-400 hover:text-white transition"
                   title="Se déconnecter"
                 >
                   <LogOut className="w-5 h-5" />
-                </a>
+                </Link>
 
                 {/* Icône profil avec menu déroulant espace élève */}
                 <button
@@ -123,28 +131,28 @@ export function Header() {
                       <span>Tableau de bord</span>
                     </Link>
                     <Link
-                      href="/mes-formations"
+                      href="/dashboard/mes-formations"
                       className="flex items-center space-x-2 px-4 py-2 text-gray-200 hover:bg-navy-800 hover:text-gold-500 transition"
                     >
                       <GraduationCap className="w-4 h-4" />
                       <span>Mes formations</span>
                     </Link>
                     <Link
-                      href="/planning"
+                      href="/dashboard/planning"
                       className="flex items-center space-x-2 px-4 py-2 text-gray-200 hover:bg-navy-800 hover:text-gold-500 transition"
                     >
                       <CalendarDays className="w-4 h-4" />
                       <span>Mon planning</span>
                     </Link>
                     <Link
-                      href="/paiement"
+                      href="/dashboard/paiement"
                       className="flex items-center space-x-2 px-4 py-2 text-gray-200 hover:bg-navy-800 hover:text-gold-500 transition"
                     >
                       <CreditCardIcon className="w-4 h-4" />
                       <span>Mes paiements</span>
                     </Link>
                     <Link
-                      href="/profile"
+                      href="/dashboard/profile"
                       className="flex items-center space-x-2 px-4 py-2 text-gray-200 hover:bg-navy-800 hover:text-gold-500 transition"
                     >
                       <User className="w-4 h-4" />
@@ -155,18 +163,20 @@ export function Header() {
               </div>
             ) : (
               <>
-                <a
-                  href="/api/auth/login"
+                {/* Desktop : lien texte Connexion à gauche */}
+                <Link
+                  href="/api/auth/login?returnTo=/dashboard"
                   className="hidden md:block px-5 py-2 text-white hover:text-gold-500 transition font-medium"
                 >
                   Connexion
-                </a>
-                <a
-                  href="/api/auth/login?screen_hint=signup"
+                </Link>
+                {/* CTA principal : Accéder à mon espace (redirige vers le login) */}
+                <Link
+                  href="/api/auth/login?returnTo=/dashboard"
                   className="px-6 py-2.5 bg-gradient-to-r from-gold-500 to-gold-600 text-navy-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/50 transition"
                 >
-                  S&apos;inscrire
-                </a>
+                  Accéder à mon espace
+                </Link>
               </>
             )}
             <button
@@ -240,7 +250,7 @@ export function Header() {
                   <span>Tableau de bord</span>
                 </Link>
                 <Link
-                  href="/mes-formations"
+                  href="/dashboard/mes-formations"
                   className="flex items-center space-x-2 py-1 text-gray-200 hover:text-gold-500 transition"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -248,7 +258,7 @@ export function Header() {
                   <span>Mes formations</span>
                 </Link>
                 <Link
-                  href="/planning"
+                  href="/dashboard/planning"
                   className="flex items-center space-x-2 py-1 text-gray-200 hover:text-gold-500 transition"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -256,7 +266,7 @@ export function Header() {
                   <span>Mon planning</span>
                 </Link>
                 <Link
-                  href="/paiement"
+                  href="/dashboard/paiement"
                   className="flex items-center space-x-2 py-1 text-gray-200 hover:text-gold-500 transition"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -264,7 +274,7 @@ export function Header() {
                   <span>Mes paiements</span>
                 </Link>
                 <Link
-                  href="/profile"
+                  href="/dashboard/profile"
                   className="flex items-center space-x-2 py-1 text-gray-200 hover:text-gold-500 transition"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -301,31 +311,31 @@ export function Header() {
                       {user.name}
                     </span>
                   </Link>
-                  <a
+                  <Link
                     href="/api/auth/logout"
                     className="p-2 text-gray-400 hover:text-white transition"
                     title="Se déconnecter"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <LogOut className="w-5 h-5" />
-                  </a>
+                  </Link>
                 </div>
               ) : (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-1">
-                  <a
-                    href="/api/auth/login"
+                  <Link
+                    href="/api/auth/login?returnTo=/dashboard"
                     className="px-4 py-2 text-sm text-white hover:text-gold-500 transition text-center"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Connexion
-                  </a>
-                  <a
-                    href="/api/auth/login?screen_hint=signup"
+                  </Link>
+                  <Link
+                    href="/api/auth/login?screen_hint=signup&returnTo=/dashboard"
                     className="px-4 py-2 bg-gradient-to-r from-gold-500 to-gold-600 text-navy-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/50 transition text-center text-sm"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     S&apos;inscrire
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

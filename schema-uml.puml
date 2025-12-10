@@ -1,0 +1,242 @@
+@startuml
+
+' =======================
+' Classes principales
+' =======================
+
+class User {
+  +id: String
+  +auth0Id: String
+  +email: String
+  +name: String
+  +firstName: String
+  +lastName: String
+  +phone: String
+  +birthDate: DateTime
+  +addressLine1: String
+  +addressLine2: String
+  +postalCode: String
+  +city: String
+  +country: String
+  +profession: String
+  +employerName: String
+  +wantsVtcTraining: Boolean
+  +wantsTaxiTraining: Boolean
+  +nationalIdNumber: String
+  +drivingLicenseNumber: String
+  +drivingLicenseType: String
+  +drivingLicenseIssuedAt: DateTime
+  +lastLoginAt: DateTime
+  +role: String  <<STUDENT|INSTRUCTOR|ADMIN>>
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class Course {
+  +id: String
+  +title: String
+  +slug: String
+  +description: String
+  +price: Float
+  +imageUrl: String
+  +isPublished: Boolean
+  +type: String <<VTC|TAXI|PERMIS_AUTO|...>>
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class Module {
+  +id: String
+  +title: String
+  +description: String
+  +position: Int
+  +isPublished: Boolean
+  +courseId: String
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class Lesson {
+  +id: String
+  +title: String
+  +description: String
+  +videoUrl: String
+  +content: String
+  +position: Int
+  +isPublished: Boolean
+  +isFree: Boolean
+  +duration: Int
+  +moduleId: String
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class LessonProgress {
+  +id: String
+  +isCompleted: Boolean
+  +userId: String
+  +lessonId: String
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class Enrollment {
+  +id: String
+  +userId: String
+  +courseId: String
+  +status: String <<PENDING|ACTIVE|COMPLETED|CANCELLED>>
+  +progress: Int
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class Order {
+  +id: String
+  +userId: String
+  +courseId: String
+  +amount: Float
+  +currency: String
+  +status: String <<PENDING|PAID|FAILED|REFUNDED>>
+  +stripeSessionId: String
+  +stripePaymentId: String
+  +couponId: String
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class UserDocument {
+  +id: String
+  +userId: String
+  +type: String
+  +fileUrl: String
+  +status: String <<PENDING|APPROVED|REJECTED>>
+  +uploadedAt: DateTime
+  +reviewedAt: DateTime
+}
+
+class Address {
+  +id: String
+  +userId: String
+  +label: String
+  +line1: String
+  +line2: String
+  +postalCode: String
+  +city: String
+  +country: String
+  +isDefault: Boolean
+}
+
+class Payment {
+  +id: String
+  +orderId: String
+  +provider: String
+  +providerPaymentId: String
+  +status: String <<PENDING|SUCCEEDED|FAILED|REFUNDED>>
+  +amount: Float
+  +currency: String
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class Coupon {
+  +id: String
+  +code: String
+  +description: String
+  +discountPct: Int
+  +discountAmt: Float
+  +validFrom: DateTime
+  +validUntil: DateTime
+  +maxUses: Int
+  +usedCount: Int
+  +isActive: Boolean
+}
+
+class Vehicle {
+  +id: String
+  +model: String
+  +brand: String
+  +type: String <<SEDAN|SUV|ELECTRIC|HYBRID|DIESEL>>
+  +pricePerDay: Float
+  +status: String <<AVAILABLE|RENTED|MAINTENANCE>>
+  +image: String
+  +features: String
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class Booking {
+  +id: String
+  +userId: String
+  +courseId: String
+  +vehicleId: String
+  +startDate: DateTime
+  +endDate: DateTime
+  +status: String <<PENDING|CONFIRMED|CANCELLED|COMPLETED>>
+  +totalAmount: Float
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class Session {
+  +id: String
+  +courseId: String
+  +teacherId: String
+  +startsAt: DateTime
+  +endsAt: DateTime
+  +mode: String <<IN_PERSON|ONLINE|HYBRID>>
+  +location: String
+  +maxSeats: Int
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class SessionBooking {
+  +id: String
+  +sessionId: String
+  +userId: String
+  +status: String <<BOOKED|CANCELLED|ATTENDED|NO_SHOW>>
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+
+class ContactMessage {
+  +id: String
+  +name: String
+  +email: String
+  +phone: String
+  +subject: String
+  +message: String
+  +createdAt: DateTime
+}
+
+' =======================
+' Relations
+' =======================
+
+User "1" -- "0..*" Enrollment : enrollments
+User "1" -- "0..*" LessonProgress : progress
+User "1" -- "0..*" Order : orders
+User "1" -- "0..*" Booking : bookings
+User "1" -- "0..*" SessionBooking : sessionBookings
+User "1" -- "0..*" Session : sessionsTeaching (teacher)
+User "1" -- "0..*" UserDocument : documents
+User "1" -- "0..*" Address : addresses
+
+Course "1" -- "0..*" Module : modules
+Course "1" -- "0..*" Enrollment : enrollments
+Course "1" -- "0..*" Order : orders
+Course "1" -- "0..*" Booking : bookings
+Course "1" -- "0..*" Session : sessions
+
+Module "1" -- "0..*" Lesson : lessons
+Lesson "1" -- "0..*" LessonProgress : progress
+
+Vehicle "1" -- "0..*" Booking : bookings
+
+Session "1" -- "0..*" SessionBooking : bookings
+
+Order "1" -- "0..*" Payment : payments
+Coupon "1" -- "0..*" Order : orders
+
+@enduml
+
