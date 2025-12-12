@@ -134,7 +134,7 @@ export default async function FormationVTCPage() {
               src="https://ls-formation.fr/wp-content/uploads/2025/03/taxis-2304w.webp"
               alt="Chauffeur VTC professionnel"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-navy-900/95 via-navy-900/85 to-navy-900/60" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/70" />
           </div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
@@ -322,7 +322,7 @@ export default async function FormationVTCPage() {
             </div>
 
             {/* Pourquoi SL Formations */}
-            <div className="bg-gradient-to-br from-navy-900 to-navy-800 rounded-2xl p-10 text-white">
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-10 text-white">
               <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
                 <Shield className="w-8 h-8 text-gold-500" />
                 Pourquoi choisir SL Formations ?
@@ -376,12 +376,12 @@ export default async function FormationVTCPage() {
                     <div key={course.id} className="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all group">
                       <div className="h-48 overflow-hidden relative">
                         <img src={course.imageUrl || '/placeholder-course.jpg'} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
-                        <div className="absolute top-4 left-4 bg-navy-900 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">VTC</div>
+                        <div className="absolute top-4 left-4 bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">VTC</div>
                       </div>
                       <div className="p-6">
                         <h4 className="font-bold text-slate-900 text-xl mb-3 group-hover:text-gold-600 transition">{course.title}</h4>
                         <p className="text-slate-600 text-sm line-clamp-2 mb-5">{course.description}</p>
-                        <Link href={`/formations/${course.slug}`} className="block w-full text-center bg-navy-900 text-white font-semibold py-3 rounded-lg hover:bg-gold-600 transition-all shadow-sm hover:shadow-md">
+                        <Link href={`/formations/${course.slug}`} className="block w-full text-center bg-slate-900 text-white font-semibold py-3 rounded-lg hover:bg-gold-600 transition-all shadow-sm hover:shadow-md">
                           Découvrir le programme
                         </Link>
                         {/* @ts-ignore */}

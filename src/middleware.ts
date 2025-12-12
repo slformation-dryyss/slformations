@@ -24,7 +24,8 @@ export default async function middleware(request: NextRequest) {
       console.log(`[Middleware] ⛔ Pas de session -> Redirection Login`);
       const loginUrl = request.nextUrl.clone();
       loginUrl.pathname = "/api/auth/login";
-      loginUrl.searchParams.set("returnTo", pathname);
+      // Toujours rediriger vers /dashboard après login, pas vers la page demandée
+      loginUrl.searchParams.set("returnTo", "/dashboard");
       return NextResponse.redirect(loginUrl);
     }
 
