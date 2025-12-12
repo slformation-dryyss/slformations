@@ -49,3 +49,5 @@ export async function getLessonWithCourseBySlug(
   return { course, currentLesson, prevLesson, nextLesson };
 }
 
+
+

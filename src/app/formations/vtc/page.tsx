@@ -17,7 +17,7 @@ export const metadata = {
 
 export default function FormationVTCPage() {
   return (
-    <div className="min-h-screen bg-navy-900 text-white font-sans">
+    <div className="min-h-screen text-slate-900 font-sans">
       <Header />
 
       <main>
@@ -288,6 +288,8 @@ export default function FormationVTCPage() {
     </div>
   );
 }
+
+
 
 
 

@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.auth0.com",
       },
+      {
+        protocol: "https",
+        hostname: "ls-formation.fr",
+      },
     ],
   },
 };

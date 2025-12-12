@@ -11,6 +11,25 @@ export async function getCourses() {
 export async function getCourseBySlug(slug: string) {
   return prisma.course.findUnique({
     where: { slug },
+    include: {
+      modules: {
+        include: {
+          lessons: true,
+        },
+      },
+    },
   });
 }
+
+export async function getCoursesByType(type: string) {
+  return prisma.course.findMany({
+    where: {
+      type: type,
+      isPublished: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+
 

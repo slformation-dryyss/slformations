@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-navy-900 text-white font-sans">
+    <div className="min-h-screen text-slate-900 font-sans">
       <Header />
       <main className="pt-32 pb-20">
         <div className="max-w-4xl mx-auto px-6">
@@ -16,9 +16,9 @@ export default function PrivacyPage() {
             Politique de Confidentialité
           </h1>
           
-          <div className="space-y-8 text-gray-300 leading-relaxed">
+          <div className="space-y-8 text-slate-600 leading-relaxed">
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">1. Collecte des Données</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">1. Collecte des Données</h2>
               <p>
                 Nous collectons les informations que vous nous fournissez lors de votre inscription, de vos commandes ou lors de vos échanges avec notre support :
                 nom, prénom, adresse email, numéro de téléphone, historique de progression.
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">2. Utilisation des Données</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">2. Utilisation des Données</h2>
               <p>
                 Vos données sont utilisées pour :
               </p>
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">3. Partage des Données</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">3. Partage des Données</h2>
               <p>
                 SL Formations ne vend pas vos données personnelles. Elles peuvent être partagées uniquement avec nos prestataires tiers indispensables au service :
                 Stripe (paiement), Auth0 (authentification), Vercel (hébergement).
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">4. Cookies</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">4. Cookies</h2>
               <p>
                 Nous utilisons des cookies essentiels pour le fonctionnement du site (session, sécurité) et des cookies d&apos;analyse pour comprendre l&apos;utilisation du site.
                 Vous pouvez gérer vos préférences via les paramètres de votre navigateur.
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">5. Vos Droits (RGPD)</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">5. Vos Droits (RGPD)</h2>
               <p>
                 Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification, de suppression et de portabilité de vos données.
                 Pour exercer ces droits, contactez-nous à : contact@slformations.com.
@@ -68,5 +68,7 @@ export default function PrivacyPage() {
     </div>
   );
 }
+
+
 
 

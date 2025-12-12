@@ -197,7 +197,7 @@ export function ProfilePageClient({
               <div className="relative inline-block mb-6">
                 <div className="relative w-28 h-28 md:w-32 md:h-32">
                   <Image
-                    src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg"
+                    src={auth0User.picture || "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg"}
                     alt="Profil utilisateur"
                     fill
                     className="rounded-full border-4 border-gold-500 object-cover"
@@ -209,16 +209,18 @@ export function ProfilePageClient({
               </div>
 
               <h2 className="text-xl md:text-2xl font-bold mb-1">
-                {user.name ||
-                  [user.firstName, user.lastName].filter(Boolean).join(' ') ||
-                  'Utilisateur'}
+                {[user.firstName, user.lastName].filter(Boolean).length > 0
+                  ? [user.firstName, user.lastName].filter(Boolean).join(" ")
+                  : user.name && user.name !== user.email
+                  ? user.name
+                  : "Bienvenue"}
               </h2>
               <p className="text-gray-400 text-sm mb-3">{user.email}</p>
-              <div className="inline-flex items-center px-4 py-1.5 bg-blue-500/20 text-blue-400 rounded-full text-xs font-semibold mb-6">
+              {/* <div className="inline-flex items-center px-4 py-1.5 bg-blue-500/20 text-blue-400 rounded-full text-xs font-semibold mb-6">
                 <span className="mr-2">🚗</span> Élève VTC
-              </div>
+              </div> */}
 
-              <div className="space-y-3 text-left text-xs md:text-sm">
+              <div className="space-y-3 text-left text-xs md:text-sm mt-6">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400">Membre depuis</span>
                   <span className="font-semibold">
@@ -229,40 +231,17 @@ export function ProfilePageClient({
                   <span className="text-gray-400">Rôle</span>
                   <span className="font-semibold">{user.role}</span>
                 </div>
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                   <span className="text-gray-400">Heures effectuées</span>
-                  <span className="font-semibold">24h / 50h</span>
-                </div>
+                  <span className="font-semibold">0h / --</span>
+                </div> */}
               </div>
             </div>
 
             <div className="bg-navy-800 rounded-2xl p-6 border border-navy-700 text-xs md:text-sm">
               <h3 className="font-bold text-base mb-4">Progression</h3>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-gray-400">Formation VTC</span>
-                    <span className="text-gold-500 font-semibold">48%</span>
-                  </div>
-                  <div className="w-full bg-navy-700 rounded-full h-2">
-                    <div
-                      className="bg-gradient-to-r from-gold-500 to-gold-600 h-2 rounded-full"
-                      style={{ width: '48%' }}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-gray-400">Permis B</span>
-                    <span className="text-green-500 font-semibold">100%</span>
-                  </div>
-                  <div className="w-full bg-navy-700 rounded-full h-2">
-                    <div
-                      className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full"
-                      style={{ width: '100%' }}
-                    />
-                  </div>
-                </div>
+              <div className="text-center text-gray-500 py-4 italic">
+                Aucune formation en cours
               </div>
             </div>
           </div>
@@ -294,40 +273,8 @@ export function ProfilePageClient({
 
             <section className="bg-navy-800 rounded-2xl p-6 md:p-8 border border-navy-700 text-xs md:text-sm">
               <h3 className="text-lg md:text-2xl font-bold mb-4">Mes documents</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-4 bg-navy-700 rounded-lg border border-navy-600">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-green-400" />
-                    </div>
-                    <div>
-                      <div className="font-semibold">Attestation de réussite Permis B</div>
-                      <div className="text-[11px] text-gray-400">
-                        PDF • Mis à jour le 12/10/2024
-                      </div>
-                    </div>
-                  </div>
-                  <button className="px-3 py-2 border border-navy-500 rounded-lg hover:border-gold-500 hover:text-gold-500 transition">
-                    Télécharger
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-navy-700 rounded-lg border border-navy-600">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-blue-400" />
-                    </div>
-                    <div>
-                      <div className="font-semibold">Convention de formation VTC</div>
-                      <div className="text-[11px] text-gray-400">
-                        PDF • Mis à jour le 05/09/2024
-                      </div>
-                    </div>
-                  </div>
-                  <button className="px-3 py-2 border border-navy-500 rounded-lg hover:border-gold-500 hover:text-gold-500 transition">
-                    Télécharger
-                  </button>
-                </div>
+              <div className="text-center text-gray-500 py-8 italic border border-navy-700 border-dashed rounded-lg">
+                Aucun document disponible pour le moment.
               </div>
             </section>
           </div>
@@ -336,4 +283,6 @@ export function ProfilePageClient({
     </>
   );
 }
+
+
 

@@ -37,7 +37,7 @@ export default async function LearnPage({
   }
 
   return (
-    <div className="min-h-screen bg-navy-900 text-white font-sans">
+    <div className="min-h-screen text-slate-900 font-sans">
       <Header />
 
       <main className="pt-28 pb-16">
@@ -51,7 +51,7 @@ export default async function LearnPage({
             />
 
             <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-sm text-gray-400">
+              <div className="flex items-center gap-2 text-sm text-slate-500">
                 <span>Formation :</span>
                 <Link
                   href={`/formations/${course.slug ?? ""}`}
@@ -65,7 +65,7 @@ export default async function LearnPage({
                 {prevLesson && (
                   <Link
                     href={`/learn/${course.slug}/${prevLesson.id}`}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-navy-700 text-sm hover:border-gold-500 hover:text-gold-500 transition"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-200 text-sm bg-white text-slate-600 hover:border-gold-500 hover:text-gold-500 transition"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Précédent
@@ -74,7 +74,7 @@ export default async function LearnPage({
                 {nextLesson && (
                   <Link
                     href={`/learn/${course.slug}/${nextLesson.id}`}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold-500 bg-gold-500/10 text-sm text-gold-500 hover:bg-gold-500 hover:text-navy-900 transition"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold-500 bg-gold-500 text-sm text-slate-900 hover:bg-gold-600 hover:text-slate-900 transition font-semibold"
                   >
                     Suivant
                     <ChevronRight className="w-4 h-4" />
@@ -86,14 +86,14 @@ export default async function LearnPage({
 
           {/* Sidebar curriculum */}
           <aside className="space-y-4">
-            <h2 className="text-lg font-semibold mb-2">Programme de la formation</h2>
+              <h2 className="text-lg font-semibold mb-2 text-slate-900">Programme de la formation</h2>
             <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-2">
               {course.modules.map((module) => (
-                <div key={module.id} className="bg-navy-800/70 rounded-xl border border-navy-700">
-                  <div className="px-4 py-3 border-b border-navy-700/70">
-                    <p className="font-semibold text-gold-500 text-sm">{module.title}</p>
+                <div key={module.id} className="bg-white rounded-xl border border-slate-200 shadow-sm">
+                  <div className="px-4 py-3 border-b border-slate-100 bg-slate-50 rounded-t-xl">
+                    <p className="font-semibold text-slate-700 text-sm">{module.title}</p>
                   </div>
-                  <div className="divide-y divide-navy-700/70">
+                  <div className="divide-y divide-slate-100">
                     {module.lessons.map((lesson) => {
                       const isCurrent = lesson.id === currentLesson.id;
                       const isLocked = !lesson.isFree && !enrollment;
@@ -101,14 +101,14 @@ export default async function LearnPage({
                         <Link
                           key={lesson.id}
                           href={isLocked ? "#" : `/learn/${course.slug}/${lesson.id}`}
-                          className={`flex items-center gap-3 px-4 py-3 text-sm hover:bg-white/5 transition ${
-                            isCurrent ? "bg-white/10" : ""
-                          } ${isLocked ? "cursor-not-allowed opacity-60" : ""}`}
+                          className={`flex items-center gap-3 px-4 py-3 text-sm hover:bg-slate-50 transition ${
+                            isCurrent ? "bg-gold-500/10 text-gold-600 font-medium" : "text-slate-600"
+                          } ${isLocked ? "cursor-not-allowed opacity-60 text-slate-400" : ""}`}
                         >
                           {lesson.isFree || enrollment ? (
-                            <PlayCircle className="w-4 h-4 text-gold-500 shrink-0" />
+                            <PlayCircle className={`w-4 h-4 shrink-0 ${isCurrent ? "text-gold-500" : "text-slate-400"}`} />
                           ) : (
-                            <Lock className="w-4 h-4 text-gray-500 shrink-0" />
+                            <Lock className="w-4 h-4 text-slate-300 shrink-0" />
                           )}
                           <span className="flex-1 truncate">{lesson.title}</span>
                         </Link>
@@ -126,4 +126,6 @@ export default async function LearnPage({
     </div>
   );
 }
+
+
 

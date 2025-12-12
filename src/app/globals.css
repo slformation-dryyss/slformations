@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  /* Palette alignée sur le logo SL Formations : fond noir + or */
-  --background: #000000;
-  --foreground: #ffffff;
+  /* Palette Light & Gold : fond clair + or */
+  /* Fond légèrement grisé pour réduire l'effet blanc pur */
+  --background: #e2e8f0; /* Slate 200 - Slightly darker to reduce glare */
+  --foreground: #020617; /* Slate 950 - MAX CONTRAST TEXT */
 }
 
 @theme inline {
@@ -11,12 +12,14 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   
-  /* Les classes bg-navy-xxx deviennent des déclinaisons de noir/gris très foncé */
-  --color-navy-900: #000000;
-  --color-navy-800: #050816;
-  --color-navy-700: #111827;
+  /* Redéfinition des variables 'navy' pour un Thème Clair Logique */
+  /* Fond : Slate 100 (léger gris) | Cartes : White | Bordures : Slate 200/300 */
+  --color-navy-900: #e2e8f0; /* Page Background (Slate 200) */
+  --color-navy-800: #ffffff; /* Card Background (White) */
+  --color-navy-700: #e2e8f0; /* Borders (Slate 200) */
+  --color-navy-600: #cbd5e1; /* Stronger Element Borders (Slate 300) */
 
-  /* Or inspiré du logo (dégradé conservé via 500/600) */
+  /* Or inspiré du logo */
   --color-gold-500: #fbbf24;
   --color-gold-600: #f59e0b;
 }
@@ -27,11 +30,11 @@ body {
   font-family: var(--font-sans), sans-serif;
 }
 
-/* Glass effect utility */
+/* Glass effect utility (Light Mode) */
 .glass-effect {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.6); /* Slate 200 with opacity */
 }
 
 .card-hover {

@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -91,6 +90,7 @@ model Course {
   // Relations anciennes
   bookings    Booking[]
   sessions    Session[]
+  courseSessions CourseSession[]
 
   @@index([type])
   @@index([isPublished, type])
@@ -160,6 +160,26 @@ model Lesson {
   updatedAt   DateTime @updatedAt
 
   @@index([moduleId, position])
+}
+
+model CourseSession {
+  id          String   @id @default(cuid())
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  startDate   DateTime
+  endDate     DateTime
+  location    String?  // e.g. "Centre Épinay", "Paris 10"
+  maxSpots    Int      @default(10)
+  bookedSpots Int      @default(0)
+  
+  isPublished Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId])
+  @@index([startDate])
 }
 
 model LessonProgress {

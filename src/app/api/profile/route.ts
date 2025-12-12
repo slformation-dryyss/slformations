@@ -138,4 +138,50 @@ export async function PUT(request: Request) {
 
   return NextResponse.json(updated);
 }
+// Crée ou Met à jour le profil (utilisé par l'Onboarding)
+export async function POST(request: NextRequest) {
+  try {
+    // 1. Authentification sécurisée
+    const { getOrCreateUser } = await import("@/lib/auth");
+    const user = await getOrCreateUser(request);
 
+    if (!user) {
+      return NextResponse.json(
+        { error: "Non autorisé" },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+
+    // 2. Préparation des données
+    // On marque le profil comme complet si c'est explicitement demandé (Onboarding)
+    const isProfileComplete = body.isOnboarding ? true : user.isProfileComplete;
+
+    // 3. Update DB
+    const updated = await prisma.user.update({
+      where: { id: user.id }, // Sécurité : on update l'ID de la session
+      data: {
+        firstName: body.firstName ?? undefined,
+        lastName: body.lastName ?? undefined,
+        phone: body.phone ?? undefined,
+        birthDate: body.birthDate ? new Date(body.birthDate) : undefined,
+        addressLine1: body.addressLine1 ?? undefined,
+        postalCode: body.postalCode ?? undefined,
+        city: body.city ?? undefined,
+        country: body.country ?? undefined,
+        profession: body.profession ?? undefined,
+        isProfileComplete,
+      },
+    });
+
+    return NextResponse.json(updated);
+
+  } catch (error: any) {
+    console.error("[API /api/profile][POST] Erreur", error);
+    return NextResponse.json(
+      { error: "Erreur serveur" },
+      { status: 500 }
+    );
+  }
+}

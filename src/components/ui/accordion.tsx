@@ -99,10 +99,12 @@ export function AccordionContent({ className, children }: AccordionContentProps)
   if (!open) return null;
 
   return (
-    <div className={cn("pb-4 pt-0 text-sm text-gray-300", className)}>
+    <div className={cn("pb-4 pt-0 text-sm text-slate-600", className)}>
       {children}
     </div>
   );
 }
+
+
 
 

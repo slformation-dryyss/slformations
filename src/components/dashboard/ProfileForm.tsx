@@ -269,58 +269,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           </label>
         </div>
 
-        {/* Informations administratives */}
-        <div className="md:col-span-2 mt-4">
-          <h4 className="text-sm font-semibold mb-3 text-gray-200">
-            Informations administratives (facultatif)
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-400 mb-1">
-                N° de pièce d'identité
-              </label>
-              <input
-                type="text"
-                value={nationalIdNumber}
-                onChange={(e) => setNationalIdNumber(e.target.value)}
-                className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-400 mb-1">
-                N° de permis de conduire
-              </label>
-              <input
-                type="text"
-                value={drivingLicenseNumber}
-                onChange={(e) => setDrivingLicenseNumber(e.target.value)}
-                className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-400 mb-1">
-                Catégorie de permis (A, B, C...)
-              </label>
-              <input
-                type="text"
-                value={drivingLicenseType}
-                onChange={(e) => setDrivingLicenseType(e.target.value)}
-                className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-400 mb-1">
-                Date de délivrance du permis
-              </label>
-              <input
-                type="date"
-                value={drivingLicenseIssuedAt}
-                onChange={(e) => setDrivingLicenseIssuedAt(e.target.value)}
-                className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
-              />
-            </div>
-          </div>
-        </div>
+
       </form>
     </section>
   );

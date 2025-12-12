@@ -42,28 +42,26 @@ export default function VerifyEmailPage() {
   const email = user?.email || "votre adresse email";
 
   return (
-    <div className="min-h-screen bg-navy-900 text-white font-sans">
-      <Header />
-
-      <main className="pt-28 pb-16">
+    <>
+      <div className="pt-28 pb-16">
         <div className="max-w-xl mx-auto px-4">
-          <div className="bg-navy-800/80 border border-navy-700 rounded-2xl p-8 shadow-xl text-center">
+          <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xl text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gold-500/15 border border-gold-500/60">
-              <MailWarning className="w-7 h-7 text-gold-400" />
+              <MailWarning className="w-7 h-7 text-gold-600" />
             </div>
 
-            <h1 className="text-2xl md:text-3xl font-bold mb-3">
+            <h1 className="text-2xl md:text-3xl font-bold mb-3 text-slate-900">
               Vérifiez votre adresse email
             </h1>
 
-            <p className="text-gray-300 text-sm md:text-base mb-4">
+            <p className="text-slate-500 text-sm md:text-base mb-4">
               Merci pour votre inscription sur <span className="font-semibold">SL Formations</span>.
               Pour accéder à votre espace élève, nous devons d&apos;abord vérifier votre adresse email :
             </p>
 
-            <p className="text-gold-400 font-semibold mb-6">{email}</p>
+            <p className="text-gold-600 font-semibold mb-6">{email}</p>
 
-            <div className="space-y-3 text-xs md:text-sm text-gray-400 text-left bg-navy-900/60 rounded-xl p-5 mb-6">
+            <div className="space-y-3 text-xs md:text-sm text-slate-500 text-left bg-slate-50 rounded-xl p-5 mb-6 border border-slate-100">
               <p>1. Ouvrez votre boîte mail et cliquez sur le lien de vérification envoyé par Auth0.</p>
               <p>2. Une fois votre email vérifié, revenez sur le site et cliquez sur le bouton ci-dessous.</p>
             </div>
@@ -89,9 +87,9 @@ export default function VerifyEmailPage() {
             </div>
           </div>
         </div>
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </>
   );
 }
+
+
