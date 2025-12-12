@@ -1,4 +1,5 @@
 import { auth0 } from "@/lib/auth0";
+import { NextRequest } from "next/server";
 
-export const GET = (req: Request) => auth0.middleware(req);
-export const POST = (req: Request) => auth0.middleware(req);
+export const GET = (req: NextRequest) => auth0.middleware(req);
+export const POST = (req: NextRequest) => auth0.middleware(req);
