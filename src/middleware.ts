@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { withMiddlewareAuthRequired } from "@auth0/nextjs-auth0/edge";
+import { auth0 } from "./lib/auth0";
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -16,43 +16,43 @@ export default async function middleware(request: NextRequest) {
   if (pathname.startsWith("/dashboard")) {
     console.log(`[Middleware] 🔒 Tentative d'accès à la zone protégée : ${pathname}`);
 
-    // On utilise la version Edge de getSession
-    const { getSession } = await import("@auth0/nextjs-auth0/edge");
+    // Auth0 v4: Récupération de la session via le client Edge-compatible
+    const session = await auth0.getSession(request);
 
-    // withMiddlewareAuthRequired protège la route (redirection login si non connecté)
-    // et injecte la session si on fournit une fonction.
-    const authMiddleware = withMiddlewareAuthRequired(async (req) => {
-      const res = NextResponse.next();
-      const session = await getSession(req, res);
-      
-      const user = session?.user;
-      const isVerifyPage = req.nextUrl.pathname === "/dashboard/verify-email";
-      const isVerified = user?.email_verified;
+    // Si pas de session, redirection vers Login
+    if (!session) {
+      console.log(`[Middleware] ⛔ Pas de session -> Redirection Login`);
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/auth/login";
+      loginUrl.searchParams.set("returnTo", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
 
-      console.log(`[Middleware] Session trouvée pour : ${user?.email || "Inconnu"}`);
-      console.log(`[Middleware] Email vérifié : ${isVerified}, Page actuelle : ${req.nextUrl.pathname}`);
+    const user = session.user;
+    const isVerifyPage = request.nextUrl.pathname === "/dashboard/verify-email";
+    const isVerified = user?.email_verified;
 
-      // 1. Si non vérifié et tente d'accéder à autre chose que la page de verif
-      if (!isVerified && !isVerifyPage) {
-        console.warn(`[Middleware] ⛔ Accès refusé (Email non vérifié) -> Redirection /dashboard/verify-email`);
-        const url = req.nextUrl.clone();
-        url.pathname = "/dashboard/verify-email";
-        return NextResponse.redirect(url);
-      }
+    console.log(`[Middleware] Session trouvée pour : ${user?.email || "Inconnu"}`);
+    console.log(`[Middleware] Email vérifié : ${isVerified}, Page actuelle : ${request.nextUrl.pathname}`);
 
-      // 2. Si déjà vérifié et tente d'accéder à la page de verif (optionnel mais plus propre)
-      if (isVerified && isVerifyPage) {
-        console.log(`[Middleware] ✅ Déjà vérifié, inutile de rester sur verify-email -> Redirection /dashboard`);
-        const url = req.nextUrl.clone();
-        url.pathname = "/dashboard";
-        return NextResponse.redirect(url);
-      }
+    // 1. Si non vérifié et tente d'accéder à autre chose que la page de verif
+    if (!isVerified && !isVerifyPage) {
+      console.warn(`[Middleware] ⛔ Accès refusé (Email non vérifié) -> Redirection /dashboard/verify-email`);
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard/verify-email";
+      return NextResponse.redirect(url);
+    }
 
-      console.log(`[Middleware] ✅ Accès autorisé à ${pathname}`);
-      return res;
-    });
+    // 2. Si déjà vérifié et tente d'accéder à la page de verif (optionnel mais plus propre)
+    if (isVerified && isVerifyPage) {
+      console.log(`[Middleware] ✅ Déjà vérifié, inutile de rester sur verify-email -> Redirection /dashboard`);
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
 
-    return authMiddleware(request, {} as any);
+    console.log(`[Middleware] ✅ Accès autorisé à ${pathname}`);
+    return NextResponse.next();
   }
 
   return NextResponse.next();
