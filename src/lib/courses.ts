@@ -16,6 +16,17 @@ export async function getCourseBySlug(slug: string) {
         include: {
           lessons: true,
         },
+        orderBy: { position: 'asc' },
+      },
+      courseSessions: {
+        where: {
+          startDate: {
+            gte: new Date(),
+          },
+          isPublished: true,
+        },
+        orderBy: { startDate: 'asc' },
+        take: 10,
       },
     },
   });
@@ -62,6 +73,7 @@ export async function getAllSessionsByType(type: string) {
         take: 10
     });
 }
+
 
 
 

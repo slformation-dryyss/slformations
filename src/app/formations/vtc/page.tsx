@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import SessionCalendar from "@/components/formations/SessionCalendar";
 import SidebarFilter from "@/components/formations/SidebarFilter";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/Accordion";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 export const metadata = {
   title: "Formation VTC Professionnel | SL Formations",
@@ -405,4 +405,5 @@ export default async function FormationVTCPage() {
     </div>
   );
 }
+
 
