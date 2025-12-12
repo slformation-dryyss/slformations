@@ -23,7 +23,7 @@ export default async function middleware(request: NextRequest) {
     if (!session) {
       console.log(`[Middleware] ⛔ Pas de session -> Redirection Login`);
       const loginUrl = request.nextUrl.clone();
-      loginUrl.pathname = "/auth/login";
+      loginUrl.pathname = "/api/auth/login";
       loginUrl.searchParams.set("returnTo", pathname);
       return NextResponse.redirect(loginUrl);
     }
