@@ -27,8 +27,40 @@ export async function getCoursesByType(type: string) {
       type: type,
       isPublished: true,
     },
+    include: {
+        courseSessions: {
+            where: {
+                startDate: {
+                    gte: new Date(), // Future sessions only
+                }, 
+                isPublished: true
+            },
+            orderBy: { startDate: 'asc' },
+            take: 5
+        }
+    },
     orderBy: { createdAt: "desc" },
   });
+}
+
+export async function getAllSessionsByType(type: string) {
+    return prisma.courseSession.findMany({
+        where: {
+            course: {
+                type: type,
+                isPublished: true,
+            },
+            startDate: { gte: new Date() },
+            isPublished: true,
+        },
+        include: {
+            course: {
+                select: { title: true, slug: true }
+            }
+        },
+        orderBy: { startDate: 'asc' },
+        take: 10
+    });
 }
 
 

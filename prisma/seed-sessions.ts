@@ -4,13 +4,7 @@ import { addDays, setHours, setMinutes } from 'date-fns';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  },
-});
+const prisma = new PrismaClient();
 
 async function main() {
   console.log('Start seeding Course Sessions...');
@@ -74,6 +68,18 @@ async function main() {
   if (bsbe) {
       await createSessions(bsbe.id, [
           { start: nextDate(8), duration: 2, location: 'Centre Épinay-sur-Seine' },
+      ]);
+  }
+
+  // 5. Recuperation Points
+  const points = await getCourse('stage-recuperation-points');
+  if (points) {
+      await createSessions(points.id, [
+          { start: nextDate(4), duration: 2, location: 'Centre Épinay-sur-Seine' },
+          { start: nextDate(11), duration: 2, location: 'Centre Épinay-sur-Seine' },
+          { start: nextDate(18), duration: 2, location: 'Centre Bobigny' },
+          { start: nextDate(25), duration: 2, location: 'Centre Paris 14ème' },
+          { start: nextDate(32), duration: 2, location: 'Centre Villepinte' },
       ]);
   }
 
