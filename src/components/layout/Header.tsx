@@ -28,9 +28,9 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
-            <div className="relative h-14 w-14 md:h-16 md:w-16">
+            <div className="relative h-12 w-48 md:w-56">
               <Image
-                src="/LOGO copie.svg"
+                src="/LOGO long.png"
                 alt="SL Formations"
                 fill
                 className="object-contain"
