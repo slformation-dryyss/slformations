@@ -280,7 +280,7 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
           {upcomingSessions.length > 0 && (
             <section>
               {/* @ts-ignore */}
-              <SessionCalendar sessions={upcomingSessions} />
+              <SessionCalendar sessions={upcomingSessions} courseTitle={course.title} />
             </section>
           )}
         </div>

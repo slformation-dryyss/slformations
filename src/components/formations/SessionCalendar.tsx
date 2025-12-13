@@ -10,17 +10,18 @@ interface Session {
   location: string | null;
   maxSpots: number;
   bookedSpots: number;
-  course: {
+  course?: {
     title: string;
-    slug: string;
+    slug: string | null;
   };
 }
 
 interface SessionCalendarProps {
   sessions: Session[];
+  courseTitle?: string; // Titre du cours si on est sur une page de cours spécifique
 }
 
-export default function SessionCalendar({ sessions }: SessionCalendarProps) {
+export default function SessionCalendar({ sessions, courseTitle }: SessionCalendarProps) {
   // Sort sessions by date
   const sortedSessions = [...sessions].sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
@@ -45,9 +46,11 @@ export default function SessionCalendar({ sessions }: SessionCalendarProps) {
         {sortedSessions.map((session) => (
           <div key={session.id} className="group border-l-4 border-gold-500 bg-slate-50 p-4 rounded-r-lg hover:bg-white hover:shadow-md transition cursor-pointer">
             <div className="flex justify-between items-start mb-2">
-              <h4 className="font-semibold text-slate-800 text-sm group-hover:text-gold-600 transition">
-                {session.course.title}
-              </h4>
+              {(session.course?.title || courseTitle) && (
+                <h4 className="font-semibold text-slate-800 text-sm group-hover:text-gold-600 transition">
+                  {session.course?.title || courseTitle}
+                </h4>
+              )}
              <span className="text-xs font-bold bg-gold-100 text-gold-700 px-2 py-1 rounded">
                 {(session.maxSpots - session.bookedSpots) > 0 ? `${session.maxSpots - session.bookedSpots} places` : 'Complet'}
              </span>
