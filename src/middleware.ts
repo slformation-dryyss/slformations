@@ -12,6 +12,11 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Ne pas intercepter les routes Auth0 pour éviter la boucle
+  if (pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
   // Protection Auth0 pour les zones privées : tout l'espace élève vit sous /dashboard
   if (pathname.startsWith("/dashboard")) {
     console.log(`[Middleware] 🔒 Tentative d'accès à la zone protégée : ${pathname}`);
@@ -25,7 +30,6 @@ export default async function middleware(request: NextRequest) {
         console.log(`[Middleware] ⛔ Pas de session -> Redirection Login`);
         const loginUrl = request.nextUrl.clone();
         loginUrl.pathname = "/api/auth/login";
-        // Toujours rediriger vers /dashboard après login, pas vers la page demandée
         loginUrl.searchParams.set("returnTo", "/dashboard");
         return NextResponse.redirect(loginUrl);
       }
