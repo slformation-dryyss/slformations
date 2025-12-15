@@ -10,15 +10,4 @@ export const auth0 = new Auth0Client({
     // @ts-ignore
     profile: '/api/auth/me',
   },
-  session: {
-    name: 'appSession',
-    rolling: true,
-    rollingDuration: 24 * 60 * 60, // 24 hours
-    absoluteDuration: 7 * 24 * 60 * 60, // 7 days
-    cookie: {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    },
-  },
 });
