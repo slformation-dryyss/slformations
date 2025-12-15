@@ -60,3 +60,5 @@ export function BuyCourseButton({ courseId }: BuyCourseButtonProps) {
 
 
 
+
+

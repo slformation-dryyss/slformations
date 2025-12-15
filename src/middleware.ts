@@ -12,9 +12,9 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Ne pas intercepter les routes Auth0 pour éviter la boucle
+  // Laisser Auth0 gérer ses propres routes via son middleware interne
   if (pathname.startsWith("/api/auth")) {
-    return NextResponse.next();
+    return auth0.middleware(request);
   }
 
   // Protection Auth0 pour les zones privées : tout l'espace élève vit sous /dashboard

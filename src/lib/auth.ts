@@ -1,4 +1,4 @@
-import { getSession } from "@auth0/nextjs-auth0";
+import { auth0 } from "@/lib/auth0";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Stripe from "stripe";
@@ -68,11 +68,10 @@ export async function getOrCreateUser(req?: NextRequest) {
   
   // Dans les Route Handlers (API), il faut passer req/res pour que getSession fonctionne avec Next 15+
   if (req) {
-    const res = new NextResponse();
-    session = await getSession(req, res);
+    session = await auth0.getSession(req);
   } else {
     // Dans les Server Components, getSession() fonctionne implicitement
-    session = await getSession();
+    session = await auth0.getSession();
   }
 
   if (!session?.user) {
@@ -222,10 +221,9 @@ export async function getOrCreateUser(req?: NextRequest) {
 export async function requireVerifiedAuth0User(req?: NextRequest) {
   let session;
   if (req) {
-     const res = new NextResponse();
-     session = await getSession(req, res);
+     session = await auth0.getSession(req);
   } else {
-     session = await getSession();
+     session = await auth0.getSession();
   }
 
   if (!session?.user) {
