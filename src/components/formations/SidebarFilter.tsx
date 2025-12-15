@@ -34,7 +34,7 @@ export default function SidebarFilter() {
                 href={filter.href}
                 className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition ${
                     isActive 
-                    ? 'bg-navy-900 text-white shadow-md' 
+                    ? 'bg-slate-900 text-white shadow-md' 
                     : 'bg-slate-50 text-slate-600 hover:bg-white hover:shadow-sm hover:text-gold-600'
                 }`}
             >

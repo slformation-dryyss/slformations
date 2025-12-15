@@ -33,10 +33,32 @@ type ProfileResponse = {
   picture?: string | null;
 };
 
+type DashboardStats = {
+  stats: {
+    completedHours: number;
+    totalHours: number;
+    progressPercentage: number;
+    futureSessionsCount: number;
+  };
+  nextSession: {
+    id: string;
+    date: string;
+    title: string;
+    location: string | null;
+  } | null;
+  recentBookings: Array<{
+    id: string;
+    date: string;
+    title: string;
+    location: string | null;
+  }>;
+};
+
 export default function Dashboard() {
   const router = useRouter();
   const { user: auth0User, isLoading } = useUser();
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
 
   useEffect(() => {
@@ -53,25 +75,23 @@ export default function Dashboard() {
       return;
     }
 
-    const loadProfile = async () => {
+    const loadData = async () => {
       try {
-        const res = await fetch("/api/profile", { cache: "no-store" });
-        if (!res.ok) {
-          throw new Error("Impossible de charger le profil");
-        }
-        const data: ProfileResponse = await res.json();
+        setLoadingProfile(true);
+        // Load Profile
+        const profileRes = await fetch("/api/profile", { cache: "no-store" });
+        if (!profileRes.ok) throw new Error("Impossible de charger le profil");
+        const profileData: ProfileResponse = await profileRes.json();
 
         // Admin → redirection tableau de bord admin
-        if (data.role === "ADMIN") {
+        if (profileData.role === "ADMIN") {
           router.replace("/admin");
           return;
         }
 
         // Profil incomplet → onboarding profil (sauf si skippé)
-        if (!data.isProfileComplete) {
-          // Vérification du cookie "skip"
+        if (!profileData.isProfileComplete) {
           const hasSkipped = document.cookie.split("; ").find(row => row.startsWith("sl_onboarding_skipped="));
-          
           if (!hasSkipped) {
             router.replace("/dashboard/onboarding");
             return;
@@ -79,9 +99,17 @@ export default function Dashboard() {
         }
 
         setProfile({
-          ...data,
+          ...profileData,
           picture: (auth0User as any).picture ?? null,
         });
+
+        // Load Stats
+        const statsRes = await fetch("/api/dashboard/stats", { cache: "no-store" });
+        if (statsRes.ok) {
+            const statsData = await statsRes.json();
+            setStats(statsData);
+        }
+
       } catch (e) {
         console.error(e);
       } finally {
@@ -89,7 +117,7 @@ export default function Dashboard() {
       }
     };
 
-    loadProfile();
+    loadData();
   }, [auth0User, isLoading, router]);
 
   if (isLoading || loadingProfile || !auth0User || !profile) {
@@ -107,6 +135,12 @@ export default function Dashboard() {
   const displayName = user.firstName 
     ? user.firstName 
     : (user.name || "Élève");
+
+  const completedHours = stats?.stats.completedHours || 0;
+  // const totalHours = stats?.stats.totalHours || 0;
+  const progressPct = stats?.stats.progressPercentage || 0;
+  const futureSessions = stats?.stats.futureSessionsCount || 0;
+  const nextSession = stats?.nextSession;
 
   return (
     <>
@@ -209,7 +243,7 @@ export default function Dashboard() {
               </div>
             </header>
 
-            {/* Statistiques rapides (Vides pour l'instant) */}
+            {/* Statistiques dynamiques */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
               <div className="bg-white rounded-xl p-5 border border-slate-200 card-hover shadow-sm">
                 <div className="flex items-center justify-between mb-3">
@@ -217,18 +251,18 @@ export default function Dashboard() {
                     <Clock className="w-5 h-5 text-blue-500" />
                   </div>
                   <div className="text-right text-sm">
-                    <div className="text-2xl font-bold text-slate-900">0h</div>
-                    <div className="text-slate-400 text-xs">/ 0h</div>
+                    <div className="text-2xl font-bold text-slate-900">{completedHours}h</div>
+                    {/* <div className="text-slate-400 text-xs">/ {totalHours}h</div> */}
                   </div>
                 </div>
                 <p className="text-xs text-slate-500 mb-1">Heures effectuées</p>
                 <div className="w-full bg-slate-100 rounded-full h-2 mb-1">
                   <div
                     className="bg-blue-500 h-2 rounded-full"
-                    style={{ width: "0%" }}
+                    style={{ width: `${Math.min(progressPct, 100)}%` }}
                   />
                 </div>
-                <p className="text-xs text-blue-500">0% complété</p>
+                <p className="text-xs text-blue-500">{progressPct}% completé (moy.)</p>
               </div>
 
               <div className="bg-white rounded-xl p-5 border border-slate-200 card-hover shadow-sm">
@@ -237,13 +271,19 @@ export default function Dashboard() {
                     <CalendarDays className="w-5 h-5 text-slate-500" />
                   </div>
                   <div className="text-right text-sm">
-                    <div className="text-lg font-bold text-slate-400">Aucun</div>
-                    {/* <div className="text-gray-400 text-xs">--:--</div> */}
+                    {nextSession ? (
+                        <>
+                            <div className="text-lg font-bold text-slate-900 truncate max-w-[120px]" title={nextSession.title}>{nextSession.title}</div>
+                            <div className="text-gold-600 text-xs font-semibold">{new Date(nextSession.date).toLocaleDateString()}</div>
+                        </>
+                    ) : (
+                        <div className="text-lg font-bold text-slate-400">Aucun</div>
+                    )}
                   </div>
                 </div>
                 <p className="text-xs text-slate-500 mb-1">Prochain cours</p>
-                <p className="text-slate-500 text-sm italic">
-                  Pas de session planifiée
+                <p className="text-slate-500 text-xs italic truncate">
+                  {nextSession ? nextSession.location || "En ligne/Centre" : "Pas de session planifiée"}
                 </p>
               </div>
 
@@ -266,14 +306,14 @@ export default function Dashboard() {
                     <Car className="w-5 h-5 text-purple-500" />
                   </div>
                   <div className="text-right text-sm">
-                    <div className="text-2xl font-bold text-slate-900">0</div>
+                    <div className="text-2xl font-bold text-slate-900">{futureSessions}</div>
                   </div>
                 </div>
                 <p className="text-xs text-slate-500 mb-1">
                   Prochaines sessions
                 </p>
                 <p className="text-xs text-slate-400">
-                  Aucune session à venir
+                  {futureSessions > 0 ? "Réservations confirmées" : "Aucune session à venir"}
                 </p>
               </div>
             </div>
@@ -303,11 +343,32 @@ export default function Dashboard() {
               </div>
 
               <div className="lg:col-span-2 bg-navy-800 rounded-2xl p-6 border border-navy-700">
-                <h2 className="text-lg font-semibold mb-3">Mes réservations</h2>
-                <p className="text-slate-500 italic text-sm">
-                  Aucune réservation pour le moment. Vous pourrez bientôt voir ici
-                  vos sessions planifiées (conduite, code, VTC, etc.).
-                </p>
+                <h2 className="text-lg font-semibold mb-3">Mes sessions à venir</h2>
+                {stats?.recentBookings && stats.recentBookings.length > 0 ? (
+                    <div className="space-y-3">
+                        {stats.recentBookings.map((session) => (
+                             <div key={session.id} className="flex items-center justify-between bg-navy-700/50 p-3 rounded-lg border border-navy-600">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-navy-900 p-2 rounded text-gold-500">
+                                        <CalendarDays className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <div className="font-bold text-sm text-slate-200">{session.title}</div>
+                                        <div className="text-xs text-slate-400">{session.location || "Lieu non précisé"}</div>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="font-mono text-sm font-bold text-white">{new Date(session.date).toLocaleDateString()}</div>
+                                    <div className="text-xs text-slate-500">{new Date(session.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                                </div>
+                             </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-slate-500 italic text-sm">
+                    Aucune réservation trouvée. Consultez le planning pour réserver une session.
+                    </p>
+                )}
               </div>
             </div>
           </section>

@@ -49,7 +49,10 @@ export function DashboardHeader() {
               <div className="flex items-center space-x-3">
                 <div className="flex flex-col text-right mr-1">
                   <span className="text-sm font-semibold text-slate-900">{user.name}</span>
-                  <span className="text-xs text-slate-500">Élève</span>
+                  {/* Note: Ideally we should fetch the real role from DB here. 
+                      For now, 'Élève' is a reasonable default for this dashboard. 
+                      The specific role is visible in the profile page. */}
+                  <span className="text-xs text-slate-500">Espace Membre</span>
                 </div>
                 <div className="relative h-9 w-9">
                    {user.picture ? (
