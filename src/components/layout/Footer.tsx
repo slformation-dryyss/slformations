@@ -24,13 +24,6 @@ export async function Footer() {
     return acc;
   }, {} as Record<string, string>);
 
-  const courses = await prisma.course.findMany({
-    where: { isPublished: true },
-    select: { title: true, slug: true },
-    take: 5,
-    orderBy: { createdAt: 'desc' }
-  });
-
   const address = settings["CONTACT_ADDRESS"] || "123 Avenue de Paris, 75001";
   const phone = settings["CONTACT_PHONE"] || "01 23 45 67 89";
   const email = settings["CONTACT_EMAIL"] || "contact@sl-formations.fr";
@@ -75,18 +68,13 @@ export async function Footer() {
           <div>
             <h4 className="font-bold text-lg mb-4 text-slate-900">Formations</h4>
             <ul className="space-y-2 text-slate-600">
-              {courses.map((course) => (
-                <li key={course.slug}>
-                  <Link href={`/formations/${course.slug}`} className="hover:text-gold-500 transition line-clamp-1">
-                    {course.title}
-                  </Link>
-                </li>
-              ))}
-              {courses.length === 0 && (
-                <>
-                  <li><Link href="/formations" className="hover:text-gold-500 transition">Catalogue Complet</Link></li>
-                </>
-              )}
+              <li><Link href="/formations/recuperation-points" className="hover:text-gold-500 transition">Récupération de Points</Link></li>
+              <li><Link href="/formations/vtc" className="hover:text-gold-500 transition">VTC / Taxi</Link></li>
+              <li><Link href="/formations/caces" className="hover:text-gold-500 transition">CACES®</Link></li>
+              <li><Link href="/formations/secourisme" className="hover:text-gold-500 transition">Secourisme (SST)</Link></li>
+              <li><Link href="/formations/incendie" className="hover:text-gold-500 transition">Sécurité Incendie</Link></li>
+              <li><Link href="/formations/habilitation-electrique" className="hover:text-gold-500 transition">Habilitation Élec.</Link></li>
+              <li><Link href="/formations/catalogue" className="font-medium text-gold-600 hover:underline transition mt-2 inline-block">Tout le catalogue</Link></li>
             </ul>
           </div>
 
@@ -94,7 +82,7 @@ export async function Footer() {
             <h4 className="font-bold text-lg mb-4 text-slate-900">Services & Aide</h4>
             <ul className="space-y-2 text-slate-600">
               <li><Link href="/location" className="hover:text-gold-500 transition">Location Véhicules</Link></li>
-              <li><Link href="/planning" className="hover:text-gold-500 transition">Planning & Réservation</Link></li>
+              <li><Link href="/dashboard/planning" className="hover:text-gold-500 transition">Planning & Réservation</Link></li>
               <li><Link href="/dashboard" className="hover:text-gold-500 transition">Espace Élève</Link></li>
               <li><Link href="/faq" className="hover:text-gold-500 transition">FAQ & Support</Link></li>
               <li><Link href="/legal/cgv" className="hover:text-gold-500 transition">CGV</Link></li>
