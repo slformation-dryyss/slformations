@@ -10,4 +10,18 @@ export const auth0 = new Auth0Client({
     // @ts-ignore
     profile: '/api/auth/me',
   },
+  session: {
+    rollingDuration: 60 * 60 * 24,
+    absoluteDuration: 60 * 60 * 24 * 7,
+  },
+  async beforeSessionSaved(session, idToken) {
+    if (idToken) {
+      session.user = {
+        ...session.user,
+        "https://slformations.com/roles": idToken["https://slformations.com/roles"],
+        "https://slformations.com/role": idToken["https://slformations.com/role"],
+      };
+    }
+    return session;
+  },
 });

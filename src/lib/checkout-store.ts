@@ -6,7 +6,7 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })
+  ? new Stripe(stripeSecretKey)
   : null;
 
 /**
@@ -31,9 +31,11 @@ export async function createCheckoutSession(user: User, courseId: string) {
     amount: course.price,
   });
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await (stripe.checkout.sessions.create as any)({
     mode: "payment",
-    payment_method_types: ["card"],
+    automatic_payment_methods: {
+      enabled: true,
+    },
     customer: user.stripeCustomerId || undefined,
     customer_email: user.stripeCustomerId ? undefined : user.email || undefined,
     line_items: [
@@ -53,7 +55,7 @@ export async function createCheckoutSession(user: User, courseId: string) {
       userId: user.id,
       courseId: course.id,
     },
-    success_url: `${appUrl}/mes-formations?session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${appUrl}/paiement/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${appUrl}/formations/${course.slug ?? ""}`,
   });
 

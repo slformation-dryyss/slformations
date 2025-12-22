@@ -17,6 +17,20 @@ const stripe = stripeSecretKey
   // The error `Type '"2024-06-20"' is not assignable to type '"2025-11-17.clover"'` implies the types expect 2025-11-17.
   : null;
 
+// Helper pour décoder le JWT sans librairie externe (pour éviter erreurs NPM)
+function parseJwt(token: string) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        return null;
+    }
+}
+
 function mapAuth0RolesToPrisma(auth0Roles: string[] | undefined | null): Role {
   // Valeur par défaut : élève
   if (!auth0Roles || auth0Roles.length === 0) {
@@ -101,10 +115,33 @@ export async function getOrCreateUser(req?: NextRequest) {
   const inferredPhone = auth0User.phone_number as string | undefined;
 
   // Rôles envoyés par Auth0 dans le claim custom
-  const auth0Roles = (auth0User as any)[AUTH0_ROLE_CLAIM] as
-    | string[]
-    | undefined;
+  let auth0Roles = (auth0User as any)[AUTH0_ROLE_CLAIM] as string[] | undefined;
+
+  // FALLBACK ULTIME : Si session.user est vide, on va chercher directement dans le tokenSet de la session
+  // Note: auth0.getSession() retourne { user, tokenSet, ... }
+  // On doit caster 'session' en any pour accéder à tokenSet ou idToken s'ils ne sont pas typés correctement
+  const sessionAny = session as any;
+  const idToken = sessionAny.tokenSet?.idToken || sessionAny.idToken;
+
+  if (!auth0Roles && idToken) {
+    try {
+      console.log("[AUTH] 🛡️ Tentative extraction directe depuis ID Token...");
+      const decoded: any = parseJwt(idToken);
+      if (decoded) {
+         auth0Roles = decoded[AUTH0_ROLE_CLAIM];
+         console.log(`[AUTH] 🛡️ SUCCÈS: Rôles trouvés dans le JWT brut:`, auth0Roles);
+      }
+    } catch (e) {
+      console.error("[AUTH] Erreur décodage manuel JWT:", e);
+    }
+  }
+
+  console.log(`[AUTH] DEBUG ROLE EXTRACTION:`);
+  console.log(`- Claim key: ${AUTH0_ROLE_CLAIM}`);
+  console.log(`- Extracted roles: ${JSON.stringify(auth0Roles)}`);
+
   const mappedRole = mapAuth0RolesToPrisma(auth0Roles);
+  console.log(`- Mapped role: ${mappedRole}`);
   console.log("[AUTH] getOrCreateUser: rôles Auth0 et rôle mappé", {
     auth0Roles,
     mappedRole,
@@ -130,7 +167,12 @@ export async function getOrCreateUser(req?: NextRequest) {
     dbUser = await prisma.user.update({
       where: { id: dbUser.id },
       data: {
-        role: mappedRole,
+        // Logic to prevent accidental downgrade of manual Admin/Owner
+        // If Auth0 says STUDENT (default) but DB has higher role, keep DB role.
+        role: (mappedRole === "STUDENT" && ["OWNER", "ADMIN", "SECRETARY", "INSTRUCTOR"].includes(dbUser.role)) 
+              ? dbUser.role 
+              : mappedRole,
+        
         // On garde le nom/email à jour depuis Auth0 si disponibles
         name: auth0User.name || auth0User.nickname || dbUser.name,
         email: auth0User.email ?? dbUser.email,

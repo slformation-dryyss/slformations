@@ -22,6 +22,10 @@ interface ProfileFormProps {
     drivingLicenseNumber: string | null;
     drivingLicenseType: string | null;
     drivingLicenseIssuedAt: string | null;
+    role?: string;
+    bio?: string | null;
+    diplomas?: string[];
+    badges?: string[];
   };
 }
 
@@ -248,26 +252,30 @@ export function ProfileForm({ user }: ProfileFormProps) {
           />
         </div>
 
-        <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-          <label className="inline-flex items-center gap-2 text-gray-300">
-            <input
-              type="checkbox"
-              checked={wantsVtcTraining}
-              onChange={(e) => setWantsVtcTraining(e.target.checked)}
-              className="w-4 h-4 rounded border-navy-600 bg-navy-700"
-            />
-            <span>Je suis intéressé(e) par une formation VTC</span>
-          </label>
-          <label className="inline-flex items-center gap-2 text-gray-300">
-            <input
-              type="checkbox"
-              checked={wantsTaxiTraining}
-              onChange={(e) => setWantsTaxiTraining(e.target.checked)}
-              className="w-4 h-4 rounded border-navy-600 bg-navy-700"
-            />
-            <span>Je suis intéressé(e) par une formation Taxi</span>
-          </label>
-        </div>
+
+        {/* Champs spécifiques aux élèves */}
+        {user.role === "STUDENT" && (
+          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+            <label className="inline-flex items-center gap-2 text-gray-300">
+              <input
+                type="checkbox"
+                checked={wantsVtcTraining}
+                onChange={(e) => setWantsVtcTraining(e.target.checked)}
+                className="w-4 h-4 rounded border-navy-600 bg-navy-700"
+              />
+              <span>Je suis intéressé(e) par une formation VTC</span>
+            </label>
+            <label className="inline-flex items-center gap-2 text-gray-300">
+              <input
+                type="checkbox"
+                checked={wantsTaxiTraining}
+                onChange={(e) => setWantsTaxiTraining(e.target.checked)}
+                className="w-4 h-4 rounded border-navy-600 bg-navy-700"
+              />
+              <span>Je suis intéressé(e) par une formation Taxi</span>
+            </label>
+          </div>
+        )}
 
 
       </form>

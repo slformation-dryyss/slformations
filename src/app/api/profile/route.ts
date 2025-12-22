@@ -60,7 +60,10 @@ export async function GET(request: NextRequest) {
       drivingLicenseNumber: user.drivingLicenseNumber,
       drivingLicenseType: user.drivingLicenseType,
       drivingLicenseIssuedAt: user.drivingLicenseIssuedAt,
-      stripeCustomerId: user.stripeCustomerId, // Ajout utile pour le front
+      stripeCustomerId: user.stripeCustomerId,
+      bio: user.bio,
+      diplomas: user.diplomas,
+      badges: user.badges,
     });
 
   } catch (error: any) {
@@ -127,6 +130,8 @@ export async function PUT(request: Request) {
       drivingLicenseType: body.drivingLicenseType ?? null,
       drivingLicenseIssuedAt,
       isProfileComplete,
+      bio: body.bio ?? null,
+      diplomas: body.diplomas ?? undefined, // Arrays need undefined or explicit set
     },
   });
 

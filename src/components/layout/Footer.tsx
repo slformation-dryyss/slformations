@@ -1,8 +1,40 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Instagram, Linkedin, MapPin, Phone } from "lucide-react";
+import { Facebook, Instagram, Linkedin, MapPin, Phone, Mail } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
-export function Footer() {
+export async function Footer() {
+  const settingsList = await prisma.systemSetting.findMany({
+    where: {
+      key: {
+        in: [
+          "CONTACT_PHONE",
+          "CONTACT_ADDRESS",
+          "CONTACT_EMAIL",
+          "SOCIAL_FACEBOOK",
+          "SOCIAL_INSTAGRAM",
+          "SOCIAL_LINKEDIN"
+        ]
+      }
+    }
+  });
+
+  const settings = settingsList.reduce((acc, curr) => {
+    acc[curr.key] = curr.value;
+    return acc;
+  }, {} as Record<string, string>);
+
+  const courses = await prisma.course.findMany({
+    where: { isPublished: true },
+    select: { title: true, slug: true },
+    take: 5,
+    orderBy: { createdAt: 'desc' }
+  });
+
+  const address = settings["CONTACT_ADDRESS"] || "123 Avenue de Paris, 75001";
+  const phone = settings["CONTACT_PHONE"] || "01 23 45 67 89";
+  const email = settings["CONTACT_EMAIL"] || "contact@sl-formations.fr";
+
   return (
     <footer id="footer" className="bg-white border-t border-slate-200 py-16">
       <div className="max-w-7xl mx-auto px-6">
@@ -22,26 +54,39 @@ export function Footer() {
               Votre partenaire formation et location pour réussir dans le transport professionnel.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
-                <Linkedin className="w-5 h-5" />
-              </a>
+              {settings["SOCIAL_FACEBOOK"] && (
+                  <a href={settings["SOCIAL_FACEBOOK"]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
+                    <Facebook className="w-5 h-5" />
+                  </a>
+              )}
+              {settings["SOCIAL_INSTAGRAM"] && (
+                  <a href={settings["SOCIAL_INSTAGRAM"]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
+                    <Instagram className="w-5 h-5" />
+                  </a>
+              )}
+              {settings["SOCIAL_LINKEDIN"] && (
+                  <a href={settings["SOCIAL_LINKEDIN"]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
+                    <Linkedin className="w-5 h-5" />
+                  </a>
+              )}
             </div>
           </div>
 
           <div>
             <h4 className="font-bold text-lg mb-4 text-slate-900">Formations</h4>
             <ul className="space-y-2 text-slate-600">
-              <li><Link href="/formations/permis-moto" className="hover:text-gold-500 transition">Permis Moto</Link></li>
-              <li><Link href="/formations/permis-auto" className="hover:text-gold-500 transition">Permis Auto</Link></li>
-              <li><Link href="/formations/vtc" className="hover:text-gold-500 transition">Formation VTC</Link></li>
-              <li><Link href="/formations/taxi" className="hover:text-gold-500 transition">Formation Taxi</Link></li>
-              <li><Link href="/formations/ssiap" className="hover:text-gold-500 transition">SSIAP</Link></li>
+              {courses.map((course) => (
+                <li key={course.slug}>
+                  <Link href={`/formations/${course.slug}`} className="hover:text-gold-500 transition line-clamp-1">
+                    {course.title}
+                  </Link>
+                </li>
+              ))}
+              {courses.length === 0 && (
+                <>
+                  <li><Link href="/formations" className="hover:text-gold-500 transition">Catalogue Complet</Link></li>
+                </>
+              )}
             </ul>
           </div>
 
@@ -61,12 +106,16 @@ export function Footer() {
             <h4 className="font-bold text-lg mb-4 text-slate-900">Contact</h4>
             <ul className="space-y-3 text-slate-600">
               <li className="flex items-center space-x-2">
-                <MapPin className="text-gold-500 w-5 h-5" />
-                <span>123 Avenue de Paris, 75001</span>
+                <MapPin className="text-gold-500 w-5 h-5 flex-shrink-0" />
+                <span>{address}</span>
               </li>
               <li className="flex items-center space-x-2">
-                <Phone className="text-gold-500 w-5 h-5" />
-                <span>01 23 45 67 89</span>
+                <Phone className="text-gold-500 w-5 h-5 flex-shrink-0" />
+                <span>{phone}</span>
+              </li>
+               <li className="flex items-center space-x-2">
+                <Mail className="text-gold-500 w-5 h-5 flex-shrink-0" />
+                <span>{email}</span>
               </li>
               <li className="mt-4">
                 <Link href="/contact" className="inline-block text-gold-500 hover:underline">

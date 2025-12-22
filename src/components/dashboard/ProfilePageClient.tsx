@@ -4,14 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
-  CalendarDays,
-  ChartLine,
-  CreditCard,
-  FileText,
   GraduationCap,
-  LogOut,
-  MessageSquare,
-  Settings,
   User,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -109,64 +102,7 @@ export function ProfilePageClient({
 
   return (
     <>
-      {/* Sidebar */}
-      <aside className="hidden lg:block w-64 mr-6 bg-navy-800 rounded-2xl border border-navy-700 h-[calc(100vh-7rem)] sticky top-24 overflow-y-auto">
-        <nav className="p-4 space-y-2 text-sm">
-          <Link
-            href="/dashboard"
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-navy-700 hover:text-white transition text-left"
-          >
-            <ChartLine className="w-4 h-4" />
-            <span>Tableau de bord</span>
-          </Link>
-          <Link
-            href="/dashboard/mes-formations"
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-navy-700 hover:text-white transition text-left"
-          >
-            <GraduationCap className="w-4 h-4" />
-            <span>Mes formations</span>
-          </Link>
-          <Link
-            href="/dashboard/planning"
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-navy-700 hover:text-white transition text-left"
-          >
-            <CalendarDays className="w-4 h-4" />
-            <span>Mon planning</span>
-          </Link>
-          <Link
-            href="/dashboard/paiement"
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-navy-700 hover:text-white transition text-left"
-          >
-            <CreditCard className="w-4 h-4" />
-            <span>Mes paiements</span>
-          </Link>
-          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-navy-700 hover:text-white transition text-left">
-            <MessageSquare className="w-4 h-4" />
-            <span>Messages</span>
-          </button>
-          <Link
-            href="/dashboard/profile"
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-gold-500/15 border-l-4 border-gold-500 text-gold-400 text-left"
-          >
-            <User className="w-4 h-4" />
-            <span>Mon profil</span>
-          </Link>
 
-          <div className="border-t border-navy-700 my-4" />
-
-          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-navy-700 hover:text-white transition text-left">
-            <Settings className="w-4 h-4" />
-            <span>Paramètres</span>
-          </button>
-          <Link
-            href="/api/auth/logout"
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition text-left"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Déconnexion</span>
-          </Link>
-        </nav>
-      </aside>
 
       {/* Contenu principal */}
       <section className="flex-1">
@@ -180,11 +116,13 @@ export function ProfilePageClient({
 
           {isOnboarding && (
             <div className="rounded-xl border border-gold-500/40 bg-gold-500/10 px-4 py-3 text-xs md:text-sm text-gold-100">
-              <p className="font-semibold mb-1">Bienvenue sur votre espace élève 🎓</p>
+              <p className="font-semibold mb-1">
+                {user.role === "INSTRUCTOR" ? "Bienvenue sur votre espace formateur 🎓" : "Bienvenue sur votre espace élève 🎓"}
+              </p>
               <p>
-                Pour accéder à toutes les fonctionnalités du tableau de bord (planning,
-                paiements, formations), merci de compléter votre profil ci-dessous. Cela ne
-                prend que quelques minutes.
+                {user.role === "INSTRUCTOR" 
+                  ? "Merci de compléter votre profil pour faciliter la gestion administrative et le planning."
+                  : "Pour accéder à toutes les fonctionnalités du tableau de bord, merci de compléter votre profil ci-dessous."}
               </p>
             </div>
           )}
@@ -238,12 +176,14 @@ export function ProfilePageClient({
               </div>
             </div>
 
-            <div className="bg-navy-800 rounded-2xl p-6 border border-navy-700 text-xs md:text-sm">
-              <h3 className="font-bold text-base mb-4">Progression</h3>
-              <div className="text-center text-gray-500 py-4 italic">
-                Aucune formation en cours
+            {user.role === "STUDENT" && (
+              <div className="bg-navy-800 rounded-2xl p-6 border border-navy-700 text-xs md:text-sm">
+                <h3 className="font-bold text-base mb-4">Progression</h3>
+                <div className="text-center text-gray-500 py-4 italic">
+                  Aucune formation en cours
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Formulaire informations + documents */}
@@ -268,8 +208,36 @@ export function ProfilePageClient({
                 drivingLicenseNumber: user.drivingLicenseNumber,
                 drivingLicenseType: user.drivingLicenseType,
                 drivingLicenseIssuedAt: user.drivingLicenseIssuedAt,
+                role: user.role,
+                bio: user.bio,
+                diplomas: user.diplomas,
+                badges: user.badges,
               }}
             />
+
+            {/* Badges Section for Instructors (or everyone if we gameify later) */}
+            {(user.role === "INSTRUCTOR" || (user.badges && user.badges.length > 0)) && (
+                <div className="bg-navy-800 rounded-2xl p-6 border border-navy-700 text-xs md:text-sm">
+                    <h3 className="font-bold text-base mb-4">Badges & Certifications</h3>
+                    {(!user.badges || user.badges.length === 0) ? (
+                        <div className="text-center text-gray-500 py-4 italic">
+                            Aucun badge obtenu pour le moment.
+                        </div>
+                    ) : (
+                        <div className="flex flex-wrap gap-4">
+                            {user.badges.map((badge: string, idx: number) => (
+                                <div key={idx} className="flex flex-col items-center gap-2 p-3 bg-navy-900 rounded-lg border border-navy-600 min-w-[100px]">
+                                    <div className="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center text-gold-500 text-xl">
+                                        🏆
+                                    </div>
+                                    <span className="text-xs font-semibold capitalize">{badge.replace(/_/g, " ")}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+
 
             <section className="bg-navy-800 rounded-2xl p-6 md:p-8 border border-navy-700 text-xs md:text-sm">
               <h3 className="text-lg md:text-2xl font-bold mb-4">Mes documents</h3>

@@ -59,54 +59,9 @@ export default function DashboardMesFormationsPage() {
   return (
     <>
       <div className="pt-24 pb-12">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 flex">
-          {/* Sidebar type dashboard */}
-          <aside className="hidden lg:block w-64 mr-6 bg-navy-800 rounded-2xl border border-navy-700 h-[calc(100vh-7rem)] sticky top-24">
-            <nav className="p-6 space-y-2 text-sm">
-              <Link
-                href="/dashboard"
-                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition text-left"
-              >
-                <ChartLine className="w-4 h-4" />
-                <span>Tableau de bord</span>
-              </Link>
-              <Link
-                href="/dashboard/mes-formations"
-                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-gold-500 text-navy-900 font-semibold text-left"
-              >
-                <BookOpen className="w-4 h-4" />
-                <span>Mes formations</span>
-              </Link>
-              <Link
-                href="/dashboard/planning"
-                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition text-left"
-              >
-                <CalendarDays className="w-4 h-4" />
-                <span>Mon planning</span>
-              </Link>
-              <Link
-                href="/dashboard/paiement"
-                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition text-left"
-              >
-                <CreditCard className="w-4 h-4" />
-                <span>Mes paiements</span>
-              </Link>
-              <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition text-left">
-                <MessageSquare className="w-4 h-4" />
-                <span>Messages</span>
-              </button>
-              <Link
-                href="/dashboard/profile"
-                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition text-left"
-              >
-                <User className="w-4 h-4" />
-                <span>Profil</span>
-              </Link>
-            </nav>
-          </aside>
-
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
           {/* Contenu principal */}
-          <section className="flex-1">
+          <section className="w-full">
             {/* En-tête page */}
             <div className="flex items-center justify-between mb-8">
               <div>

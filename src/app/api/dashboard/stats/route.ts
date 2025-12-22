@@ -51,6 +51,77 @@ export async function GET() {
       return new NextResponse("User not found", { status: 404 });
     }
 
+    // Check role from DB user (more reliable than session claims for logic)
+    const isInstructor = user.role === "INSTRUCTOR" || user.role === "ADMIN" || user.role === "OWNER";
+
+    if (isInstructor) {
+        // Fetch teacher specific stats
+        const teachingSlots = await prisma.sessionSlot.findMany({
+            where: {
+                teacherId: user.id,
+                start: {
+                    gte: new Date()
+                }
+            },
+            include: {
+                session: {
+                    include: {
+                        course: true
+                    }
+                },
+                module: true
+            },
+            orderBy: {
+                start: 'asc'
+            },
+            take: 5
+        });
+
+        // Calculate past hours taught (approximate)
+        const pastSlots = await prisma.sessionSlot.findMany({
+            where: {
+                teacherId: user.id,
+                end: {
+                    lt: new Date()
+                }
+            },
+            select: {
+                start: true,
+                end: true
+            }
+        });
+        
+        const hoursTaught = pastSlots.reduce((acc, slot) => {
+            return acc + (slot.end.getTime() - slot.start.getTime()) / (1000 * 60 * 60);
+        }, 0);
+
+        const nextSlot = teachingSlots[0] || null;
+
+        return NextResponse.json({
+            role: user.role,
+            stats: {
+                completedHours: Math.round(hoursTaught * 10) / 10, // Hours taught instead of learned
+                futureSessionsCount: teachingSlots.length,
+                // Other stats can be null or different for teachers
+                progressPercentage: 0, 
+                totalHours: 0
+            },
+            nextSession: nextSlot ? {
+                id: nextSlot.session.id,
+                date: nextSlot.start.toISOString(), // Use specific slot time
+                title: nextSlot.session.course.title + (nextSlot.module ? ` - ${nextSlot.module.title}` : ""),
+                location: nextSlot.location || nextSlot.session.location
+            } : null,
+            recentBookings: teachingSlots.map(slot => ({ // Reusing recentBookings structure for "Upcoming Teaching"
+                id: slot.id,
+                date: slot.start.toISOString(),
+                title: slot.session.course.title + (slot.module ? ` - ${slot.module.title}` : ""),
+                location: slot.location || slot.session.location
+            }))
+        });
+    }
+
+    // Student Logic (Existing)
     // Calcul des statistiques
     const completedLessons = user.progress.filter(p => p.isCompleted);
     const completedHours = completedLessons.reduce((acc, curr) => acc + (curr.lesson.duration || 0), 0) / 3600; // En heures
@@ -72,6 +143,7 @@ export async function GET() {
         : 0;
 
     return NextResponse.json({
+      role: user.role,
       stats: {
         completedHours: Math.round(completedHours * 10) / 10,
         totalHours,
@@ -91,6 +163,7 @@ export async function GET() {
         location: b.session.location
       }))
     });
+
 
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);

@@ -12,7 +12,7 @@ if (!stripeSecretKey || !webhookSecret) {
 }
 
 const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })
+  ? new Stripe(stripeSecretKey)
   : null;
 
 export const dynamic = "force-dynamic";
@@ -42,6 +42,8 @@ export async function POST(request: Request) {
         const metadata = session.metadata || {};
         const userId = metadata.userId;
         const courseId = metadata.courseId;
+
+        console.log(`[Stripe Webhook] Paiement réussi pour Session=${session.id}, User=${userId}, Méthodes=${session.payment_method_types?.join(', ')}`);
 
         if (!userId || !courseId) {
           console.warn("Webhook Stripe: metadata manquante", metadata);
@@ -82,6 +84,12 @@ export async function POST(request: Request) {
             courseId,
             status: "ACTIVE",
           },
+        });
+
+        // Mettre à jour le lien de paiement s'il s'agit d'un lien manuel/dashboard
+        await prisma.paymentLink.updateMany({
+          where: { stripeSessionId: session.id },
+          data: { status: "PAID" }
         });
 
         break;

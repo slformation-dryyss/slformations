@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { Phone, Mail, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Phone, Mail, Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 interface ContactFormProps {
   defaultSubject?: string;
@@ -9,15 +11,28 @@ interface ContactFormProps {
 }
 
 export function ContactForm({ defaultSubject = "Renseignements - Permis de conduire", defaultProfile = "Particulier" }: ContactFormProps) {
-  const [profile, setProfile] = useState(defaultProfile); // New field
+  const searchParams = useSearchParams();
+  const urlSubject = searchParams.get('subject');
+
+  const [profile, setProfile] = useState(defaultProfile);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [subject, setSubject] = useState(defaultSubject); // Default subject
+  const [subject, setSubject] = useState(defaultSubject);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (urlSubject) {
+      setSubject(urlSubject);
+      // Pre-fill message for better UX
+      if (!message) {
+        setMessage(`Bonjour, je souhaite m'inscrire à la formation : ${urlSubject.replace('Inscription - ', '')}.`);
+      }
+    }
+  }, [urlSubject, message]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,26 +44,28 @@ export function ContactForm({ defaultSubject = "Renseignements - Permis de condu
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile, name, email, phone, subject, message }), // Added profile
+        body: JSON.stringify({ profile, name, email, phone, subject, message }),
       });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Erreur lors de l'envoi du message.");
+        // throw new Error(data.error || "Erreur lors de l'envoi du message."); // Replaced
+        toast.error(data.error || "Erreur lors de l'envoi du message.");
+      } else {
+        toast.success("Votre message a bien été envoyé. Nous vous répondrons rapidement.");
+        setName("");
+        setEmail("");
+        setPhone("");
+        setMessage("");
+        setSubject(defaultSubject);
       }
-
-      setSuccess("Votre message a bien été envoyé. Nous vous répondrons rapidement.");
-      setName("");
-      setEmail("");
-      setPhone("");
-      setMessage("");
-      // Keep defaults for selects
     } catch (err) {
       const message =
         err instanceof Error
           ? err.message
           : "Erreur lors de l'envoi du message.";
-      setError(message);
+      // setError(message); // Replaced
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -65,19 +82,8 @@ export function ContactForm({ defaultSubject = "Renseignements - Permis de condu
           Dites-nous en plus sur votre projet (permis, VTC, CACES, formation pro). Nous vous recontactons sous 24h ouvrées.
         </p>
 
-        {success && (
-          <div className="flex items-center space-x-2 px-4 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 text-sm">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>{success}</span>
-          </div>
-        )}
-
-        {error && (
-          <div className="flex items-center space-x-2 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/40 text-red-300 text-sm">
-            <AlertCircle className="w-4 h-4" />
-            <span>{error}</span>
-          </div>
-        )}
+        {/* Removed success alert section */}
+        {/* Removed error alert section */}
 
         {/* Row 1: Name | Email - 2 cols */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -137,6 +143,7 @@ export function ContactForm({ defaultSubject = "Renseignements - Permis de condu
               onChange={(e) => setSubject(e.target.value)}
               className="w-full px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-gold-500"
             >
+              {urlSubject && <option value={urlSubject}>{urlSubject}</option>}
               <option value="Demande d'accès (Compte élève)">Demande d&apos;accès (Compte élève)</option>
               <option value="Renseignements - Permis de conduire">Renseignements - Permis (B, Moto, Poids lourd)</option>
               <option value="Formation VTC / Taxi">Formation VTC / Taxi</option>

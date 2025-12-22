@@ -27,6 +27,11 @@ model User {
   postalCode       String?
   city             String?
   country          String?
+  
+  // Profil Formateur / Enrichi
+  bio              String?
+  diplomas         String[]         @default([])
+  badges           String[]         @default([])
 
   // Informations métier / formation
   profession       String?          // Métier actuel
@@ -48,6 +53,7 @@ model User {
 
   // Onboarding / profil
   isProfileComplete Boolean         @default(false)
+  onboardingStatus String           @default("NEW") // NEW, PENDING_DOCS, DOCS_VERIFIED, READY_TO_PAY, ACTIVE
 
   role             String           @default("STUDENT")
   createdAt        DateTime         @default(now())
@@ -61,11 +67,15 @@ model User {
   // Relations anciennes (legacy / présentiel)
   bookings         Booking[]
   sessionBookings  SessionBooking[]
+  courseSessionBookings CourseSessionBooking[]
+  teachingSlots    SessionSlot[]
   sessionsTeaching Session[]        @relation("TeacherSessions")
+  mainSessions     CourseSession[]  @relation("MainTeacher")
 
   // Relations annexes
   documents        UserDocument[]
   addresses        Address[]
+  paymentLinks     PaymentLink[]
 }
 
 model Course {
@@ -87,6 +97,7 @@ model Course {
   orders      Order[] // Un order peut être lié à un course spécifique (ou plusieurs via relation n-n si panier)
   categories  CourseOnCategory[]
   orderItems  OrderItem[]
+  paymentLinks PaymentLink[]
   
   // Relations anciennes
   bookings    Booking[]
@@ -134,6 +145,7 @@ model Module {
   course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   
   lessons     Lesson[]
+  sessionSlots SessionSlot[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -176,11 +188,87 @@ model CourseSession {
   
   isPublished Boolean  @default(true)
   
+  bookings    CourseSessionBooking[]
+  slots       SessionSlot[]
+
+  mainTeacherId String?
+  mainTeacher   User?    @relation("MainTeacher", fields: [mainTeacherId], references: [id])
+
+  meetingUrl  String?  // Global/Default meeting link (Teams/Skype)
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([courseId])
   @@index([startDate])
+  @@index([mainTeacherId])
+}
+
+model SessionSlot {
+  id        String   @id @default(cuid())
+  sessionId String
+  moduleId  String?  // Optional: Link to a specific module
+  teacherId String?  // Specific teacher for this slot
+  
+  start     DateTime
+  end       DateTime
+  location  String?  // Specific location (override session default)
+  meetingUrl String? // Specific link (override session default)
+  
+  session   CourseSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  module    Module?       @relation(fields: [moduleId], references: [id])
+  teacher   User?         @relation(fields: [teacherId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sessionId])
+  @@index([teacherId])
+  @@index([start])
+}
+
+model SystemSetting {
+  key   String @id
+  value String
+  
+  updatedAt DateTime @updatedAt
+}
+
+model CourseSessionBooking {
+  id              String        @id @default(cuid())
+  courseSessionId String
+  userId          String
+  status          String        @default("BOOKED") // BOOKED, CANCELLED, ATTENDED
+  
+  courseSession   CourseSession @relation(fields: [courseSessionId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([courseSessionId, userId]) // Prevent double booking
+  @@index([courseSessionId])
+  @@index([userId])
+}
+
+model PaymentLink {
+  id              String   @id @default(cuid())
+  userId          String
+  courseId        String
+  stripeSessionId String   @unique // Stripe Checkout Session ID
+  stripeUrl       String   // The payment URL
+  amount          Float    // Amount in EUR
+  status          String   @default("PENDING") // PENDING, PAID, EXPIRED, CANCELLED
+  expiresAt       DateTime? // Optional expiration
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course          Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
 }
 
 model LessonProgress {
@@ -364,6 +452,7 @@ model UserDocument {
   type        String   // ID_CARD, DRIVING_LICENSE, JUSTIF_DOMICILE, etc.
   fileUrl     String   // URL vers le stockage (S3, etc.)
   status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  rejectionReason String? // Motif du refus si REJECTED
   uploadedAt  DateTime @default(now())
   reviewedAt  DateTime?
 
