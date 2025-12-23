@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CreditCard, Send, X, Loader2 } from "lucide-react";
-import { createPaymentLinkAction } from "./payment-actions";
+import { createPaymentLinkAction } from "../../app/admin/participants/payment-actions";
 
 interface CreatePaymentLinkModalProps {
   userId: string;

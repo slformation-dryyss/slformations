@@ -84,7 +84,8 @@ export async function createPaymentLinkAction(formData: FormData) {
     const dbPaymentLink = await prisma.paymentLink.create({
       data: {
         userId,
-        ...(courseId && { courseId }),
+        courseId: courseId || null,
+        stripeSessionId: paymentLink.id,
         stripeUrl: paymentLink.url,
         amount,
         expiresAt,

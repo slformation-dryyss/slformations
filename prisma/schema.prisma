@@ -259,7 +259,7 @@ model CourseSessionBooking {
 model PaymentLink {
   id              String   @id @default(cuid())
   userId          String
-  courseId        String
+  courseId        String?
   stripeSessionId String   @unique // Stripe Checkout Session ID
   stripeUrl       String   // The payment URL
   amount          Float    // Amount in EUR
@@ -268,7 +268,7 @@ model PaymentLink {
   justification   String?   // Reason for price override
   
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course          Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course          Course?  @relation(fields: [courseId], references: [id], onDelete: Cascade)
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

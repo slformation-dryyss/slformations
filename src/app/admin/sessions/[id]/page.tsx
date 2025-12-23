@@ -19,9 +19,10 @@ import Link from "next/link";
 import SessionCapacityEditor from "./components/SessionCapacityEditor";
 import ParticipantList from "./components/ParticipantList";
 
-export default async function SessionDetailPage({ params }: { params: { id: string } }) {
+export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await prisma.courseSession.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       course: {
         include: {
@@ -210,7 +211,7 @@ export default async function SessionDetailPage({ params }: { params: { id: stri
 
             {/* Participants Table */}
             <ParticipantList 
-              bookings={session.bookings} 
+              bookings={session.bookings as any} 
               sessionId={session.id} 
             />
           </div>

@@ -4,9 +4,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   request: Request,
-  { params }: { params: { quizId: string } }
+  { params }: { params: Promise<{ quizId: string }> }
 ) {
-  const quizId = params.quizId;
+  const { quizId } = await params;
   const session = await auth0.getSession();
   const { answers } = await request.json(); // answers: { questionId: [selectedOptionIds] }
 
@@ -70,4 +70,3 @@ export async function POST(
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
- Broadway

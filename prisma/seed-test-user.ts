@@ -52,53 +52,49 @@ async function main() {
       courseId: course.id,
       status: 'ACTIVE',
       progress: 35,
-      enrolledAt: new Date(),
     },
   });
   console.log(`✅ Enrolled user in course. Progress set to 35%.`);
 
   // 4. Create a Session Booking (Future)
   // Find a session for this course or create one
-  let session = await prisma.session.findFirst({
+  let session = await prisma.courseSession.findFirst({
     where: { 
         courseId: course.id,
-        startsAt: { gt: new Date() }
+        startDate: { gt: new Date() }
     }
   });
 
   if (!session) {
     console.log('ℹ️ No future session found, creating one...');
-    session = await prisma.session.create({
+    session = await prisma.courseSession.create({
         data: {
-            title: 'Session Pratique CACES R489',
             courseId: course.id,
-            startsAt: new Date(Date.now() + 86400000 * 3), // +3 days
-            endsAt: new Date(Date.now() + 86400000 * 5),
+            startDate: new Date(Date.now() + 86400000 * 3), // +3 days
+            endDate: new Date(Date.now() + 86400000 * 5),
             location: 'Centre Épinay-sur-Seine',
-            instructorId: null, // Optional
-            availableSpots: 5,
+            maxSpots: 10,
         }
     });
   }
 
   // Book the user
-  await prisma.sessionBooking.upsert({
+  await prisma.courseSessionBooking.upsert({
       where: {
-          sessionId_userId: {
-              sessionId: session.id,
+          courseSessionId_userId: {
+              courseSessionId: session.id,
               userId: user.id
           }
       },
       update: {},
       create: {
-          sessionId: session.id,
+          courseSessionId: session.id,
           userId: user.id,
-          status: 'CONFIRMED',
-          bookedAt: new Date()
+          status: 'BOOKED',
       }
   });
   
-  console.log(`✅ Booked session for ${session.startsAt.toLocaleDateString()}`);
+  console.log(`✅ Booked session for ${session.startDate.toLocaleDateString()}`);
   console.log('--- Test Data Injection Complete ---');
 }
 

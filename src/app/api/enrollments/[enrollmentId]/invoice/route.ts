@@ -5,8 +5,9 @@ import { generateInvoice } from "@/lib/pdf/invoices";
 
 export async function GET(
   request: Request,
-  { params }: { params: { enrollmentId: string } }
+  { params }: { params: Promise<{ enrollmentId: string }> }
 ) {
+  const { enrollmentId } = await params;
   const session = await auth0.getSession();
   
   if (!session?.user) {
@@ -24,7 +25,7 @@ export async function GET(
     }
     
     const enrollment = await prisma.enrollment.findUnique({
-      where: { id: params.enrollmentId },
+      where: { id: enrollmentId },
       include: {
         course: true,
         user: true

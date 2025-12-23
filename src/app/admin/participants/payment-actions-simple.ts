@@ -101,8 +101,8 @@ export async function createPaymentLinkSimpleAction(formData: FormData) {
     await prisma.paymentLink.create({
       data: {
         userId,
-        courseId: courseId || "custom", // Handle custom payments without specific course
-        stripeSessionId: paymentLink.id, // Storing Payment Link ID instead of Session ID
+        courseId: courseId || null,
+        stripeSessionId: paymentLink.id,
         stripeUrl: paymentLink.url,
         amount: amount,
         status: "PENDING",

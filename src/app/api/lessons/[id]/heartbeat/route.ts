@@ -4,9 +4,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const lessonId = params.id;
+  const { id: lessonId } = await params;
   const session = await auth0.getSession();
 
   if (!session?.user) {
