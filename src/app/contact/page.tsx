@@ -19,9 +19,8 @@ export default function ContactPage() {
               Contactez <span className="text-gold-500">SL Formations</span>
             </h1>
             <p className="text-slate-600 max-w-2xl mx-auto text-sm md:text-base">
-              Une question sur une formation, un financement (CPF, France Travail),
-              ou besoin d&apos;un devis personnalisé ? Remplissez le formulaire ci-dessous,
-              notre équipe vous répond rapidement.
+              Une question sur une formation, un financement (CPF, France Travail), ou besoin d'envoyer des documents pour votre dossier ?
+              Utilisez le formulaire ci-dessous ou nos adresses spécifiques : <span className="text-gold-600 font-bold">contact@sl-formations.fr</span> (infos) ou <span className="text-blue-600 font-bold">secretariat@sl-formations.fr</span> (inscriptions & documents).
             </p>
           </div>
 

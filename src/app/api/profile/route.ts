@@ -54,8 +54,6 @@ export async function GET(request: NextRequest) {
       country: user.country,
       profession: user.profession,
       employerName: user.employerName,
-      wantsVtcTraining: user.wantsVtcTraining,
-      wantsTaxiTraining: user.wantsTaxiTraining,
       nationalIdNumber: user.nationalIdNumber,
       drivingLicenseNumber: user.drivingLicenseNumber,
       drivingLicenseType: user.drivingLicenseType,
@@ -117,14 +115,6 @@ export async function PUT(request: Request) {
       country: body.country ?? null,
       profession: body.profession ?? null,
       employerName: body.employerName ?? null,
-      wantsVtcTraining:
-        typeof body.wantsVtcTraining === "boolean"
-          ? body.wantsVtcTraining
-          : null,
-      wantsTaxiTraining:
-        typeof body.wantsTaxiTraining === "boolean"
-          ? body.wantsTaxiTraining
-          : null,
       nationalIdNumber: body.nationalIdNumber ?? null,
       drivingLicenseNumber: body.drivingLicenseNumber ?? null,
       drivingLicenseType: body.drivingLicenseType ?? null,

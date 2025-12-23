@@ -13,15 +13,46 @@ import {
   GraduationCap,
   CreditCard as CreditCardIcon,
   LayoutDashboard,
+  FileText,
   AlertTriangle,
 } from "lucide-react";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface UserProfile {
+  role: string;
+  isProfileComplete: boolean;
+}
 
 export function Header() {
-  const { user, isLoading } = useUser();
+  const { user, isLoading: isAuthLoading } = useUser();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isStudentMenuOpen, setIsStudentMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setIsProfileLoading(true);
+      fetch("/api/profile")
+        .then((res) => res.json())
+        .then((data) => {
+          setProfile(data);
+          setIsProfileLoading(false);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch profile in Header", err);
+          setIsProfileLoading(false);
+        });
+    } else {
+      setProfile(null);
+    }
+  }, [user]);
+
+  const isLoading = isAuthLoading || isProfileLoading;
+  const userRole = profile?.role || "STUDENT";
+  const isInstructor = userRole === "INSTRUCTOR";
+  const isAdmin = userRole === "ADMIN" || userRole === "OWNER";
 
   return (
     <header id="header" className="fixed w-full top-0 z-50 glass-effect">
@@ -45,6 +76,12 @@ export function Header() {
               className="text-slate-900 hover:text-gold-500 transition font-medium"
             >
               Accueil
+            </Link>
+            <Link
+              href="/nos-plannings"
+              className="text-slate-600 hover:text-gold-500 transition font-medium"
+            >
+              Plannings
             </Link>
 
             {/* Dropdown Formations */}
@@ -160,38 +197,86 @@ export function Header() {
                 </button>
 
                 {isStudentMenuOpen && (
-                  <div className="absolute right-0 top-11 w-56 rounded-xl bg-white border border-slate-200 shadow-xl py-2 text-sm">
+                  <div className="absolute right-0 top-11 w-56 rounded-xl bg-white border border-slate-200 shadow-xl py-2 text-sm z-50">
                     <Link
                       href="/dashboard"
                       className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
+                      onClick={() => setIsStudentMenuOpen(false)}
                     >
                       <LayoutDashboard className="w-4 h-4" />
                       <span>Tableau de bord</span>
                     </Link>
-                    <Link
-                      href="/dashboard/mes-formations"
-                      className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
-                    >
-                      <GraduationCap className="w-4 h-4" />
-                      <span>Mes formations</span>
-                    </Link>
-                    <Link
-                      href="/dashboard/planning"
-                      className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
-                    >
-                      <CalendarDays className="w-4 h-4" />
-                      <span>Mon planning</span>
-                    </Link>
-                    <Link
-                      href="/dashboard/paiement"
-                      className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
-                    >
-                      <CreditCardIcon className="w-4 h-4" />
-                      <span>Mes paiements</span>
-                    </Link>
+
+                    {isInstructor ? (
+                      <>
+                        <Link
+                          href="/dashboard/planning-prof"
+                          className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
+                          onClick={() => setIsStudentMenuOpen(false)}
+                        >
+                          <CalendarDays className="w-4 h-4" />
+                          <span>Mon planning</span>
+                        </Link>
+                        <Link
+                          href="/dashboard/students"
+                          className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
+                          onClick={() => setIsStudentMenuOpen(false)}
+                        >
+                          <User className="w-4 h-4" />
+                          <span>Mes élèves</span>
+                        </Link>
+                      </>
+                    ) : isAdmin ? (
+                       <Link
+                        href="/admin"
+                        className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
+                        onClick={() => setIsStudentMenuOpen(false)}
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-gold-500" />
+                        <span className="font-bold">Espace Admin</span>
+                      </Link>
+                    ) : (
+                      <>
+                        <Link
+                          href="/dashboard/mes-formations"
+                          className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
+                          onClick={() => setIsStudentMenuOpen(false)}
+                        >
+                          <GraduationCap className="w-4 h-4" />
+                          <span>Mes formations</span>
+                        </Link>
+                        <Link
+                          href="/dashboard/planning"
+                          className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
+                          onClick={() => setIsStudentMenuOpen(false)}
+                        >
+                          <CalendarDays className="w-4 h-4" />
+                          <span>Mon planning</span>
+                        </Link>
+                        <Link
+                          href="/dashboard/documents"
+                          className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
+                          onClick={() => setIsStudentMenuOpen(false)}
+                        >
+                          <FileText className="w-4 h-4" />
+                          <span>Mes documents</span>
+                        </Link>
+                        <Link
+                          href="/dashboard/paiement"
+                          className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
+                          onClick={() => setIsStudentMenuOpen(false)}
+                        >
+                          <CreditCardIcon className="w-4 h-4" />
+                          <span>Mes paiements</span>
+                        </Link>
+                      </>
+                    )}
+
+                    <div className="border-t border-slate-100 my-1"></div>
                     <Link
                       href="/dashboard/profile"
                       className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition"
+                      onClick={() => setIsStudentMenuOpen(false)}
                     >
                       <User className="w-4 h-4" />
                       <span>Mon profil</span>
@@ -201,6 +286,12 @@ export function Header() {
               </div>
             ) : (
               <>
+                <Link
+                  href="/contact?subject=recrutement"
+                  className="hidden md:block px-5 py-2 text-slate-600 hover:text-gold-500 transition font-medium text-sm border-r border-slate-200 pr-5 mr-3"
+                >
+                  Vous êtes formateur ?
+                </Link>
                 {/* Desktop : lien texte Demande d'accès à gauche */}
                 <Link
                   href="/demande-acces"
@@ -244,6 +335,13 @@ export function Header() {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Accueil
+            </Link>
+            <Link
+              href="/nos-plannings"
+              className="py-2 text-slate-600 hover:text-gold-500 transition"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Plannings
             </Link>
             <div className="py-2 space-y-1">
               <span className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Formations</span>
@@ -321,41 +419,66 @@ export function Header() {
 
             <div className="pt-2 border-t border-slate-200 mt-2">
               <p className="text-xs uppercase tracking-wide text-slate-500 mb-1">
-                Espace élève
+                {isAdmin ? "Espace Admin" : isInstructor ? "Espace Formateur" : "Espace élève"}
               </p>
               <div className="flex flex-col space-y-2">
                 <Link
-                  href="/dashboard"
+                  href={isAdmin ? "/admin" : "/dashboard"}
                   className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   <span>Tableau de bord</span>
                 </Link>
-                <Link
-                  href="/dashboard/mes-formations"
-                  className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <GraduationCap className="w-4 h-4" />
-                  <span>Mes formations</span>
-                </Link>
-                <Link
-                  href="/dashboard/planning"
-                  className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <CalendarDays className="w-4 h-4" />
-                  <span>Mon planning</span>
-                </Link>
-                <Link
-                  href="/dashboard/paiement"
-                  className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <CreditCardIcon className="w-4 h-4" />
-                  <span>Mes paiements</span>
-                </Link>
+
+                {isInstructor ? (
+                  <>
+                    <Link
+                      href="/dashboard/planning-prof"
+                      className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <CalendarDays className="w-4 h-4" />
+                      <span>Mon planning</span>
+                    </Link>
+                    <Link
+                      href="/dashboard/students"
+                      className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <User className="w-4 h-4" />
+                      <span>Mes élèves</span>
+                    </Link>
+                  </>
+                ) : !isAdmin && (
+                  <>
+                    <Link
+                      href="/dashboard/mes-formations"
+                      className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <GraduationCap className="w-4 h-4" />
+                      <span>Mes formations</span>
+                    </Link>
+                    <Link
+                      href="/dashboard/planning"
+                      className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <CalendarDays className="w-4 h-4" />
+                      <span>Mon planning</span>
+                    </Link>
+                    <Link
+                      href="/dashboard/paiement"
+                      className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <CreditCardIcon className="w-4 h-4" />
+                      <span>Mes paiements</span>
+                    </Link>
+                  </>
+                )}
+
                 <Link
                   href="/dashboard/profile"
                   className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"

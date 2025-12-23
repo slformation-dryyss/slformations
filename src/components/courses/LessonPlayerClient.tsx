@@ -1,18 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface LessonPlayerClientProps {
   lessonId: string;
   videoUrl?: string | null;
   title: string;
+  isCompleted?: boolean;
 }
 
-export function LessonPlayerClient({ lessonId, videoUrl, title }: LessonPlayerClientProps) {
+export function LessonPlayerClient({ lessonId, videoUrl, title, isCompleted }: LessonPlayerClientProps) {
+  const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState(isCompleted ?? false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!lessonId) return;
+
+    // First heartbeat on load
+    const sendHeartbeat = async () => {
+      try {
+        await fetch(`/api/lessons/${lessonId}/heartbeat`, { method: "POST" });
+      } catch (e) {
+        console.error("Heartbeat error", e);
+      }
+    };
+
+    sendHeartbeat();
+
+    // Regular heartbeat every 30 seconds
+    const interval = setInterval(sendHeartbeat, 30000);
+
+    return () => clearInterval(interval);
+  }, [lessonId]);
 
   async function markCompleted() {
     setSaving(true);
@@ -32,6 +55,7 @@ export function LessonPlayerClient({ lessonId, videoUrl, title }: LessonPlayerCl
         return;
       }
       setDone(true);
+      router.refresh();
     } catch (e) {
       console.error("Erreur progression leçon", e);
       setError("Erreur réseau. Réessayez plus tard.");
@@ -93,11 +117,3 @@ export function LessonPlayerClient({ lessonId, videoUrl, title }: LessonPlayerCl
     </div>
   );
 }
-
-
-
-
-
-
-
-

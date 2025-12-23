@@ -50,5 +50,45 @@ export async function updateLessonProgress(userId: string, lessonId: string, isC
     },
   });
 
+  // Calculate and Update Enrollment Progress
+  const allLessons = await prisma.lesson.findMany({
+    where: {
+      module: {
+        courseId: module.courseId,
+        isPublished: true,
+      },
+      isPublished: true,
+    },
+    select: { id: true },
+  });
+
+  const totalLessons = allLessons.length;
+  if (totalLessons > 0) {
+    const completedLessonsCount = await prisma.lessonProgress.count({
+      where: {
+        userId: userId,
+        lessonId: {
+          in: allLessons.map((l) => l.id),
+        },
+        isCompleted: true,
+      },
+    });
+
+    const progressPercentage = Math.round((completedLessonsCount / totalLessons) * 100);
+
+    await prisma.enrollment.update({
+      where: {
+        userId_courseId: {
+          userId: userId,
+          courseId: module.courseId,
+        },
+      },
+      data: {
+        progress: progressPercentage,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
   return progress;
 }

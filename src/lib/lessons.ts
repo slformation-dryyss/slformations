@@ -14,7 +14,19 @@ export async function getLessonWithCourseBySlug(
           lessons: {
             where: { isPublished: true },
             orderBy: { position: "asc" },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              videoUrl: true,
+              content: true,
+              position: true,
+              isFree: true,
+              duration: true,
+              moduleId: true,
+            }
           },
+          quiz: true
         },
       },
     },

@@ -1,191 +1,257 @@
-import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { ArrowLeft, Mail, Phone } from "lucide-react";
-// import { addParticipantAction } from "../actions"; // REPLACED
+import { 
+  Calendar, 
+  MapPin, 
+  Users, 
+  Plus, 
+  Trash2, 
+  Video, 
+  Clock,
+  UserPlus,
+  CheckCircle2,
+  ExternalLink
+} from "lucide-react";
+import { addSlotAction, deleteSlotAction, enrollStudentAction } from "./actions";
+import Link from "next/link";
+import SessionCapacityEditor from "./components/SessionCapacityEditor";
+import ParticipantList from "./components/ParticipantList";
 
-import { SessionPlanning } from "@/components/admin/SessionPlanning";
-import AddStudentForm from "../AddStudentForm";
-
-async function getSession(id: string) {
+export default async function SessionDetailPage({ params }: { params: { id: string } }) {
   const session = await prisma.courseSession.findUnique({
-    where: { id },
+    where: { id: params.id },
     include: {
-      course: true,
-      mainTeacher: true,
-      bookings: {
+      course: {
         include: {
-          user: true, 
+          modules: true,
         },
-        orderBy: {
-            createdAt: 'desc'
-        }
       },
       slots: {
-          include: {
-              teacher: true,
-              module: true,
-          },
-          orderBy: {
-              start: 'asc'
-          }
-      }
+        include: {
+          module: true,
+          teacher: true,
+        },
+        orderBy: {
+          start: "asc",
+        },
+      },
+      bookings: {
+        include: {
+          user: true,
+        },
+      },
+      mainTeacher: true,
     },
   });
-
-  if (!session) return null;
-  return session;
-}
-
-export default async function SessionDetailsPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  await requireAdmin();
-  const session = await getSession(id);
 
   if (!session) {
     notFound();
   }
 
-  // Fetch context data for planning
-  const modules = await prisma.module.findMany({
-      where: { courseId: session.courseId },
-      orderBy: { position: 'asc' },
-      select: { id: true, title: true }
-  });
-
   const teachers = await prisma.user.findMany({
-      where: {
-          role: { in: ['INSTRUCTOR', 'ADMIN', 'OWNER'] }
-      },
-      select: { id: true, name: true, firstName: true, lastName: true },
-      orderBy: { name: 'asc' }
+    where: { role: "TEACHER" },
   });
 
-  // Fetch students for the Add Form
-  const students = await prisma.user.findMany({
-      where: { role: "STUDENT" },
-      select: { id: true, email: true, firstName: true, lastName: true },
-      orderBy: { lastName: 'asc' }
+  const allUsers = await prisma.user.findMany({
+    where: { role: "STUDENT" },
+    orderBy: { name: "asc" },
   });
+
+  // Filter out users already booked
+  const enrolledUserIds = session.bookings.map((b) => b.userId);
+  const availableUsers = allUsers.filter((u) => !enrolledUserIds.includes(u.id));
 
   return (
-    <div>
-      <div className="mb-6">
-        <Link
-          href="/admin/sessions"
-          className="inline-flex items-center text-sm text-slate-500 hover:text-slate-900 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4 mr-1" />
-          Retour aux sessions
-        </Link>
-      </div>
-
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8">
+    <div className="p-6 max-w-7xl mx-auto space-y-8">
+      {/* Header */}
+      <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">{session.course.title}</h1>
-          <p className="mt-2 text-lg text-slate-600">
-            {format(session.startDate, "d MMMM yyyy", { locale: fr })} - {session.location || "Lieu non défini"}
-          </p>
-          {session.mainTeacher && (
-             <p className="text-sm text-slate-500 mt-1 flex items-center gap-1">
-                <span className="font-semibold">Formateur Principal :</span> {session.mainTeacher.firstName} {session.mainTeacher.lastName}
-             </p>
-          )}
-          <span className={`mt-3 inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            session.isPublished ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-          }`}>
-             {session.isPublished ? "Publié" : "Brouillon"}
-          </span>
+          <div className="flex items-center gap-4 mt-2 text-slate-600">
+            <span className="flex items-center gap-1">
+              <Calendar className="w-4 h-4" />
+              {format(session.startDate, "d MMMM yyyy", { locale: fr })}
+            </span>
+            <span className="flex items-center gap-1">
+              <MapPin className="w-4 h-4" />
+              {session.location || "Lieu non défini"}
+            </span>
+          </div>
+          <div className="mt-4 flex gap-2">
+            {session.isPublished ? (
+              <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Publié</span>
+            ) : (
+              <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">Brouillon</span>
+            )}
+            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full capitalize">
+              {(session as any).format.toLowerCase()}
+            </span>
+          </div>
         </div>
-
-        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm min-w-[200px]">
-          <p className="text-sm font-medium text-slate-500">Places occupées</p>
-          <p className="mt-1 text-3xl font-bold text-slate-900">
-            {session.bookedSpots} <span className="text-sm font-normal text-slate-400">/ {session.maxSpots}</span>
-          </p>
-        </div>
+        
+        <SessionCapacityEditor 
+          sessionId={session.id} 
+          currentBooked={session.bookedSpots} 
+          currentMax={session.maxSpots} 
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <div className="lg:col-span-2 space-y-8">
-             {/* Session Planning Section */}
-            <section className="bg-white shadow rounded-lg border border-slate-200 p-6">
-                <SessionPlanning 
-                    sessionId={session.id}
-                    slots={session.slots}
-                    modules={modules}
-                    teachers={teachers}
-                />
-            </section>
+        {/* Left Column: Planning */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Clock className="w-5 h-5 text-indigo-600" />
+                Planning Détaillé
+              </h2>
+              <a 
+                href="#add-slot-form"
+                className="btn btn-primary btn-sm flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" /> Ajouter un créneau
+              </a>
+            </div>
+            
+            <div className="p-6">
+              {session.slots.length === 0 ? (
+                <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-xl">
+                  <Calendar className="w-12 h-12 text-slate-200 mx-auto mb-3" />
+                  <p className="text-slate-400">Aucun créneau planifié pour le moment.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {session.slots.map((slot) => (
+                    <div key={slot.id} className="group flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-200">
+                      <div className="flex gap-4 items-center">
+                        <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">
+                          {slot.meetingUrl ? <Video className="w-6 h-6" /> : <MapPin className="w-6 h-6" />}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-slate-900">
+                            {slot.module?.title || "Session générale"}
+                          </div>
+                          <div className="text-sm text-slate-500 flex items-center gap-3 mt-1">
+                            <span className="flex items-center gap-1">
+                              {format(slot.start, "HH:mm")} - {format(slot.end, "HH:mm")}
+                            </span>
+                            {slot.teacher && (
+                              <span className="flex items-center gap-1 px-2 py-0.5 bg-slate-200 rounded text-slate-700 text-[10px] uppercase font-bold">
+                                {slot.teacher.name}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <form action={deleteSlotAction}>
+                        <input type="hidden" name="slotId" value={slot.id} />
+                        <input type="hidden" name="sessionId" value={session.id} />
+                        <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </form>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-             {/* Participants List */}
-            <section>
-                <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    Participants
-                    <span className="bg-slate-100 text-slate-600 text-xs font-semibold px-2 py-1 rounded-full">{session.bookedSpots}</span>
-                </h2>
+            {/* Quick Add Slot Form (Minimalist) */}
+            <div id="add-slot-form" className="p-6 bg-slate-50 border-t border-slate-100">
+              <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Nouveau créneau</h3>
+              <form action={addSlotAction} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" name="sessionId" value={session.id} />
                 
-              <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-slate-200">
-                 <ul className="divide-y divide-slate-200">
-                    {session.bookings.length === 0 ? (
-                        <li className="px-6 py-8 text-center text-slate-500">
-                            Aucun participant inscrit.
-                        </li>
-                    ) : (
-                        session.bookings.map((booking) => (
-                            <li key={booking.id} className="px-6 py-4 hover:bg-slate-50">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center">
-                                        <div className="flex-shrink-0 h-10 w-10 bg-gold-100 rounded-full flex items-center justify-center text-gold-700 font-bold text-sm">
-                                            {booking.user.firstName?.[0] || booking.user.name?.[0] || "?"}{booking.user.lastName?.[0] || ""}
-                                        </div>
-                                        <div className="ml-4">
-                                            <p className="text-sm font-medium text-slate-900">
-                                                {booking.user.firstName} {booking.user.lastName} <span className="text-slate-400 font-normal">({booking.user.name})</span>
-                                            </p>
-                                            <div className="flex items-center gap-3 mt-1">
-                                                 <div className="flex items-center text-xs text-slate-500">
-                                                    <Mail className="w-3 h-3 mr-1" />
-                                                    {booking.user.email}
-                                                 </div>
-                                                 {booking.user.phone && (
-                                                    <div className="flex items-center text-xs text-slate-500">
-                                                        <Phone className="w-3 h-3 mr-1" />
-                                                        {booking.user.phone}
-                                                    </div>
-                                                 )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                            booking.status === 'BOOKED' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                                        }`}>
-                                            {booking.status}
-                                        </span>
-                                    </div>
-                                </div>
-                            </li>
-                        ))
-                    )}
-                 </ul>
-              </div>
-            </section>
-        </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-500">Module</label>
+                  <select name="moduleId" className="w-full rounded-lg border-slate-200 text-sm">
+                    <option value="">-- Session sans module --</option>
+                    {session.course.modules.map(mod => (
+                      <option key={mod.id} value={mod.id}>{mod.title}</option>
+                    ))}
+                  </select>
+                </div>
 
-        {/* Add Participant Form */}
-        <div>
-           <div className="sticky top-6 space-y-6">
-                <AddStudentForm sessionId={session.id} users={students} />
-           </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-500">Formateur</label>
+                  <select name="teacherId" className="w-full rounded-lg border-slate-200 text-sm">
+                    <option value="">-- Par défaut (Session) --</option>
+                    {teachers.map(t => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-500">Début</label>
+                  <input type="datetime-local" name="start" required className="w-full rounded-lg border-slate-200 text-sm" />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-500">Fin</label>
+                  <input type="datetime-local" name="end" required className="w-full rounded-lg border-slate-200 text-sm" />
+                </div>
+
+                <div className="md:col-span-2 space-y-1">
+                  <label className="text-xs font-medium text-slate-500">Lieu / URL Visio</label>
+                  <input type="text" name="location" placeholder="Adresse physique ou lien meeting" className="w-full rounded-lg border-slate-200 text-sm" />
+                </div>
+
+                <div className="md:col-span-2 pt-2">
+                  <button type="submit" className="w-full bg-slate-900 text-white rounded-lg py-2 text-sm font-semibold hover:bg-slate-800 transition-colors">
+                    Ajouter le créneau
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+            {/* Participants Table */}
+            <ParticipantList 
+              bookings={session.bookings} 
+              sessionId={session.id} 
+            />
+          </div>
+
+        {/* Right Column: Actions */}
+        <div className="space-y-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h3 className="text-md font-semibold text-slate-900 mb-6 flex items-center gap-2">
+              <UserPlus className="w-5 h-5 text-indigo-600" />
+              Inscrire un élève manuellement
+            </h3>
+            
+            <form action={enrollStudentAction} className="space-y-4">
+              <input type="hidden" name="sessionId" value={session.id} />
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-500">Choisir un élève</label>
+                <select name="userId" required className="w-full rounded-xl border-slate-200 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm h-11">
+                  <option value="">-- Choisir un élève --</option>
+                  {availableUsers.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.name} ({u.email})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button type="submit" className="w-full bg-slate-900 text-white rounded-xl py-3 font-semibold hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                <Plus className="w-5 h-5" /> Ajouter
+              </button>
+            </form>
+
+            <div className="mt-6 pt-6 border-t border-slate-100">
+              <div className="bg-slate-50 p-4 rounded-xl space-y-3">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5" />
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    L'ajout manuel inscrit l'élève à la session et lui donne accès au contenu e-learning associé.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

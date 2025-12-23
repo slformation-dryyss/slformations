@@ -26,10 +26,14 @@ export function ContactForm({ defaultSubject = "Renseignements - Permis de condu
 
   useEffect(() => {
     if (urlSubject) {
-      setSubject(urlSubject);
-      // Pre-fill message for better UX
-      if (!message) {
-        setMessage(`Bonjour, je souhaite m'inscrire à la formation : ${urlSubject.replace('Inscription - ', '')}.`);
+      if (urlSubject === 'recrutement') {
+        setSubject("Recrutement (Formateur)");
+        setMessage("Bonjour, je suis formateur et je souhaite postuler pour rejoindre votre équipe. Voici mes informations...");
+      } else {
+        setSubject(urlSubject);
+        if (!message) {
+          setMessage(`Bonjour, je souhaite m'inscrire à la formation : ${urlSubject.replace('Inscription - ', '')}.`);
+        }
       }
     }
   }, [urlSubject, message]);
@@ -143,11 +147,12 @@ export function ContactForm({ defaultSubject = "Renseignements - Permis de condu
               onChange={(e) => setSubject(e.target.value)}
               className="w-full px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-gold-500"
             >
-              {urlSubject && <option value={urlSubject}>{urlSubject}</option>}
-              <option value="Demande d'accès (Compte élève)">Demande d&apos;accès (Compte élève)</option>
+              {urlSubject && <option value={subject}>{subject}</option>}
               <option value="Renseignements - Permis de conduire">Renseignements - Permis (B, Moto, Poids lourd)</option>
               <option value="Formation VTC / Taxi">Formation VTC / Taxi</option>
               <option value="Formation CACES / Sécurité">Formation CACES / Sécurité</option>
+              <option value="Recrutement (Formateur)">Recrutement (Formateur)</option>
+              <option value="Demande d'accès (Compte élève)">Demande d&apos;accès (Compte élève)</option>
               <option value="Questions Financement (CPF, etc.)">Questions Financement (CPF, etc.)</option>
               <option value="Partenariat / Presse">Partenariat / Presse</option>
               <option value="Autre demande">Autre demande</option>
@@ -203,13 +208,22 @@ export function ContactForm({ defaultSubject = "Renseignements - Permis de condu
                 <p className="font-semibold text-slate-900">01 23 45 67 89</p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-full bg-gold-500/15 flex items-center justify-center">
+            <div className="flex items-start space-x-3">
+              <div className="w-9 h-9 rounded-full bg-gold-500/15 flex items-center justify-center mt-1">
                 <Mail className="w-4 h-4 text-gold-500" />
               </div>
               <div>
-                <p className="text-slate-400 text-xs">Email</p>
-                <p className="font-semibold text-slate-900">contact@slformations.com</p>
+                <p className="text-slate-400 text-[10px] uppercase font-bold">Informations</p>
+                <p className="font-semibold text-slate-900 text-sm">contact@sl-formations.fr</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-9 h-9 rounded-full bg-blue-500/15 flex items-center justify-center mt-1">
+                <Mail className="w-4 h-4 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-slate-400 text-[10px] uppercase font-bold">Documents / Inscriptions</p>
+                <p className="font-semibold text-slate-900 text-sm">secretariat@sl-formations.fr</p>
               </div>
             </div>
           </div>

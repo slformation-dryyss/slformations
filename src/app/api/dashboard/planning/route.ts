@@ -31,6 +31,7 @@ export async function GET() {
         },
         teachingSlots: { // For instructors
              include: {
+                 module: true,
                  session: {
                      include: {
                          course: true
@@ -50,57 +51,123 @@ export async function GET() {
     
     let events = [];
 
-    if (user.role === "INSTRUCTOR" || user.role === "ADMIN") {
-        // Collect Main Teacher Sessions
-        const mainSessions = await prisma.courseSession.findMany({
-            where: { mainTeacherId: user.id },
-            include: { course: true }
-        });
+    // 1. Collect Learning Events (All roles can be students)
+    const legacyLearningEvents = user.sessionBookings.map(booking => {
+        const session = booking.session;
+        return {
+            id: booking.id,
+            title: session.course.title,
+            start: session.startsAt.toISOString(),
+            end: session.endsAt.toISOString(),
+            location: session.location,
+            type: "LEARNING",
+            courseType: session.course.type,
+            source: 'LEGACY'
+        };
+    });
 
-        // Map Main Sessions
-        const mainEvents = mainSessions.map(session => ({
-            id: session.id,
+    const modernBookings = await prisma.courseSessionBooking.findMany({
+        where: { 
+            userId: user.id,
+            status: { not: 'CANCELLED' }
+        },
+        include: {
+            courseSession: {
+                include: {
+                    course: true,
+                    slots: {
+                        include: {
+                            module: true
+                        },
+                        orderBy: {
+                            start: 'asc'
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    const modernLearningEvents = modernBookings.map(booking => {
+        const session = booking.courseSession as any;
+        return {
+            id: booking.id,
             title: session.course.title,
             start: session.startDate.toISOString(),
             end: session.endDate.toISOString(),
             location: session.location,
             meetingUrl: session.meetingUrl,
+            format: session.format,
+            type: "LEARNING",
+            courseType: session.course.type,
+            source: 'MODERN',
+            slots: session.slots.map((s: any) => ({
+                id: s.id,
+                title: s.module?.title || "Module",
+                start: s.start.toISOString(),
+                end: s.end.toISOString(),
+                location: s.location,
+                meetingUrl: s.meetingUrl,
+                dayNumber: s.module?.dayNumber,
+                duration: s.module?.duration
+            }))
+        };
+    });
+
+    // 2. Collect Teaching Events (For Instructors and Admins)
+    let teachingEvents: any[] = [];
+    if (user.role === "INSTRUCTOR" || user.role === "ADMIN") {
+        const mainSessions = await prisma.courseSession.findMany({
+            where: { mainTeacherId: user.id },
+            include: { 
+                course: true,
+                slots: {
+                    include: { module: true },
+                    orderBy: { start: 'asc' }
+                }
+            }
+        });
+
+        const mainTeacherEvents = mainSessions.map((session: any) => ({
+            id: session.id,
+            title: `[ENSEIGNANT] ${session.course.title}`,
+            start: session.startDate.toISOString(),
+            end: session.endDate.toISOString(),
+            location: session.location,
+            meetingUrl: session.meetingUrl,
+            format: session.format,
             type: "TEACHING",
             courseType: session.course.type,
-            role: "MAIN_TEACHER"
+            role: "MAIN_TEACHER",
+            slots: session.slots.map((s: any) => ({
+                id: s.id,
+                title: s.module?.title || "Module",
+                start: s.start.toISOString(),
+                end: s.end.toISOString(),
+                location: s.location,
+                meetingUrl: s.meetingUrl,
+                dayNumber: s.module?.dayNumber,
+                duration: s.module?.duration
+            }))
         }));
 
-        // Map Slots (Specific assignments)
-        const slotEvents = user.teachingSlots.map(slot => ({
+        const slotEvents = user.teachingSlots.map((slot: any) => ({
             id: slot.id,
-            title: `${slot.session.course.title} ${slot.module?.title ? `(${slot.module.title})` : ''}`,
+            title: `[SLOT] ${slot.session.course.title} ${slot.module?.title ? `(${slot.module.title})` : ''}`,
             start: slot.start.toISOString(),
             end: slot.end.toISOString(),
             location: slot.location || slot.session.location,
             meetingUrl: slot.meetingUrl || slot.session.meetingUrl,
+            format: slot.session.format,
             type: "TEACHING",
             courseType: slot.session.course.type,
             role: "INSTRUCTOR"
         }));
 
-        events = [...mainEvents, ...slotEvents];
-
-    } else {
-        // Student View
-        events = user.sessionBookings.map(booking => {
-            const session = booking.session;
-            return {
-                id: booking.id,
-                title: session.course.title,
-                start: session.startDate.toISOString(),
-                end: session.endDate.toISOString(),
-                location: session.location,
-                meetingUrl: session.meetingUrl,
-                type: "LEARNING",
-                courseType: session.course.type
-            };
-        });
+        teachingEvents = [...mainTeacherEvents, ...slotEvents];
     }
+
+    events = [...legacyLearningEvents, ...modernLearningEvents, ...teachingEvents];
 
     return NextResponse.json({ events });
 

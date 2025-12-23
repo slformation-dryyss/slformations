@@ -75,7 +75,7 @@ export default async function AdminDocumentDetailPage({ params }: PageProps) {
                              </div>
 
                              {/* ACTIONS */}
-                             {doc.status !== 'APPROVED' && (
+                             {doc.status === 'PENDING' && (
                                  <DocumentReviewForm documentId={doc.id} />
                              )}
                         </div>

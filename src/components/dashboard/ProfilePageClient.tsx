@@ -30,12 +30,13 @@ type ProfileResponse = {
   country: string | null;
   profession: string | null;
   employerName: string | null;
-  wantsVtcTraining: boolean | null;
-  wantsTaxiTraining: boolean | null;
   nationalIdNumber: string | null;
   drivingLicenseNumber: string | null;
   drivingLicenseType: string | null;
   drivingLicenseIssuedAt: string | null;
+  bio: string | null;
+  diplomas: string[];
+  badges: string[];
 };
 
 export function ProfilePageClient({
@@ -202,8 +203,6 @@ export function ProfilePageClient({
                 country: user.country,
                 profession: user.profession,
                 employerName: user.employerName,
-                wantsVtcTraining: user.wantsVtcTraining,
-                wantsTaxiTraining: user.wantsTaxiTraining,
                 nationalIdNumber: user.nationalIdNumber,
                 drivingLicenseNumber: user.drivingLicenseNumber,
                 drivingLicenseType: user.drivingLicenseType,

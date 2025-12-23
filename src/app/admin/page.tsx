@@ -224,22 +224,24 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Card 4: Sales */}
-        <div className="bg-white overflow-hidden shadow rounded-lg border border-slate-200">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Euro className="h-6 w-6 text-amber-500" aria-hidden="true" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-slate-500 truncate">Chiffre d&apos;affaires</dt>
-                  <dd className="text-lg font-medium text-slate-900">{stats.salesTotal.toLocaleString()} €</dd>
-                </dl>
+        {/* Card 4: Sales (Owner Only) */}
+        {isOwner && (
+          <div className="bg-white overflow-hidden shadow rounded-lg border border-slate-200">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Euro className="h-6 w-6 text-amber-500" aria-hidden="true" />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-slate-500 truncate">Chiffre d&apos;affaires</dt>
+                    <dd className="text-lg font-medium text-slate-900">{stats.salesTotal.toLocaleString()} €</dd>
+                  </dl>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Advanced Session Stats for Owner */}

@@ -2,6 +2,7 @@
 'use client';
 
 import { Calendar, MapPin, Clock } from 'lucide-react';
+import Link from 'next/link';
 
 interface Session {
   id: string;
@@ -103,9 +104,17 @@ export default function SessionCalendar({ sessions, courseTitle }: SessionCalend
       </div>
       
       <div className="mt-6 text-center">
-        <a href="/contact" className="inline-block text-sm font-medium text-gold-600 hover:text-gold-700 hover:underline">
-            Voir le calendrier complet →
-        </a>
+        {(() => {
+          const finalCourseTitle = courseTitle || (sessions.length > 0 && sessions[0].course?.title) || '';
+          return (
+            <Link 
+              href={`/nos-plannings?course=${encodeURIComponent(finalCourseTitle)}`} 
+              className="inline-block text-sm font-medium text-gold-600 hover:text-gold-700 hover:underline"
+            >
+                Voir le calendrier complet →
+            </Link>
+          );
+        })()}
       </div>
     </div>
   );

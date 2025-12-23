@@ -31,7 +31,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
     { href: "/admin/settings", label: "Paramètres", icon: Settings },
   ];
 
-  if (isOwner) {
+  if (isOwner || role === "ADMIN" || role === "SECRETARY") {
     adminLinks.push({ label: "Finance (Générateur)", href: "/admin/finance/payment-links", icon: Euro });
   }
 
@@ -68,6 +68,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
           })}
         </nav>
       </div>
+      {/* 
       <div className="flex-shrink-0 flex border-t border-slate-800 p-4">
         <Link
           href="/dashboard"
@@ -84,6 +85,18 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
             </div>
           </div>
         </Link>
+      */}
+      <div className="flex-shrink-0 flex border-t border-slate-800 p-4">
+        <a href="/api/auth/logout" className="flex-shrink-0 w-full group block">
+          <div className="flex items-center">
+            <LogOut className="text-slate-400 group-hover:text-red-400 w-5 h-5 mr-3" />
+            <div className="ml-3">
+              <p className="text-sm font-medium text-white group-hover:text-red-400">
+                Déconnexion
+              </p>
+            </div>
+          </div>
+        </a>
       </div>
     </div>
   );

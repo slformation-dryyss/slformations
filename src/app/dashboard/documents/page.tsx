@@ -50,16 +50,18 @@ export default async function DocumentsPage() {
                        const uploaded = documents.filter(d => d.type === reqDoc.type);
                        const isApproved = uploaded.some(d => d.status === "APPROVED");
                        const isPending = uploaded.some(d => d.status === "PENDING");
-                       const hasRejected = uploaded.some(d => d.status === "REJECTED");
-                       
-                       // Allow multiple uploads (recto + verso) unless already approved
-                       const canUpload = !isApproved;
                        
                        // Count uploads for this type
                        const uploadCount = uploaded.length;
 
+                       const latestDoc = uploaded[0];
+                       const isLatestRejected = latestDoc?.status === "REJECTED";
+                       const rejectionReason = latestDoc?.rejectionReason;
+
+                       const canUpload = !isApproved;
+
                        return (
-                           <div key={reqDoc.type} className={`bg-white p-6 rounded-lg shadow-sm border ${hasRejected ? 'border-red-300' : 'border-slate-200'}`}>
+                           <div key={reqDoc.type} className={`bg-white p-6 rounded-lg shadow-sm border ${isLatestRejected ? 'border-red-300 bg-red-50' : 'border-slate-200'}`}>
                                <div className="flex justify-between items-start mb-4">
                                    <div>
                                        <h3 className="font-bold text-lg text-slate-800">{reqDoc.label}</h3>
@@ -68,25 +70,29 @@ export default async function DocumentsPage() {
                                                {uploadCount} fichier{uploadCount > 1 ? 's' : ''} envoyé{uploadCount > 1 ? 's' : ''}
                                            </p>
                                        )}
-                                       {hasRejected && (
-                                           <div className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                                                <AlertTriangle className="w-4 h-4" />
-                                                <span>Dernier refus : {uploaded.find(d => d.status === "REJECTED")?.rejectionReason || "Problème de format"}</span>
-                                           </div>
-                                       )}
                                    </div>
                                    <div className="flex flex-col gap-1 items-end">
                                        {isApproved && getStatusBadge("APPROVED")}
                                        {isPending && !isApproved && getStatusBadge("PENDING")}
-                                       {hasRejected && !isPending && !isApproved && getStatusBadge("REJECTED")}
+                                       {isLatestRejected && !isPending && !isApproved && getStatusBadge("REJECTED")}
                                    </div>
                                </div>
+
+                               {isLatestRejected && (
+                                   <div className="mb-4 p-3 bg-red-100 border border-red-200 rounded-md text-red-800 text-sm flex items-start gap-2 animate-in fade-in slide-in-from-top-1">
+                                        <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+                                        <div>
+                                            <span className="font-bold block">Document refusé</span>
+                                            <p>{rejectionReason || "Le document n'est pas conforme. Veuillez vérifier la qualité et la validité du fichier."}</p>
+                                        </div>
+                                   </div>
+                               )}
 
                                {canUpload ? (
                                    <UploadZone docType={reqDoc.type} docLabel={reqDoc.label} />
                                ) : (
-                                   <div className="text-sm text-slate-500 italic mt-2">
-                                       Document validé par l'administration. ✓
+                                   <div className="text-sm text-green-700 font-medium mt-2 flex items-center gap-2">
+                                       <Check className="w-4 h-4" /> Document validé par l'administration.
                                    </div>
                                )}
                            </div>

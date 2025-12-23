@@ -16,6 +16,9 @@ export async function createSessionAction(formData: FormData) {
   const maxSpots = parseInt(formData.get("maxSpots") as string) || 10;
   const mainTeacherId = formData.get("mainTeacherId") as string;
   
+  const format = (formData.get("format") as string) || "IN_PERSON";
+  const meetingUrl = formData.get("meetingUrl") as string;
+  
   if (!courseId || !startDate || !endDate) {
     throw new Error("Missing required fields");
   }
@@ -44,6 +47,8 @@ export async function createSessionAction(formData: FormData) {
       maxSpots,
       mainTeacherId: mainTeacherId || null,
       isPublished: true, 
+      format,
+      meetingUrl: meetingUrl || null,
     },
   });
 

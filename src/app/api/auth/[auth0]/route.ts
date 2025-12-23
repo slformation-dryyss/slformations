@@ -1,5 +1,20 @@
 import { auth0 } from "@/lib/auth0";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const GET = (req: NextRequest) => auth0.middleware(req);
+export const GET = (req: NextRequest) => {
+  const url = new URL(req.url);
+
+  if (url.pathname === '/api/auth/login') {
+    // @ts-ignore
+    return auth0.startInteractiveLogin(req, {
+      authorizationParams: {
+        prompt: "login",
+      },
+      returnTo: "/dashboard"
+    });
+  }
+
+  return auth0.middleware(req);
+};
+
 export const POST = (req: NextRequest) => auth0.middleware(req);

@@ -11,14 +11,15 @@ export async function POST(request: NextRequest) {
     // 2. Parsing du body
     const body = await request.json().catch(() => null);
     const courseId = body?.courseId as string | undefined;
+    const sessionId = body?.sessionId as string | undefined;
 
     if (!courseId) {
       return NextResponse.json({ error: "courseId manquant." }, { status: 400 });
     }
 
     // 3. Appel de la logique du store
-    console.log(`[API /api/checkout] Demande de session pour User=${user.id}, Course=${courseId}`);
-    const session = await createCheckoutSession(user, courseId);
+    console.log(`[API /api/checkout] Demande de session pour User=${user.id}, Course=${courseId}, Session=${sessionId}`);
+    const session = await createCheckoutSession(user, courseId, sessionId);
 
     console.log("[API /api/checkout] Session créée avec succès", {
       checkoutSessionId: session.id,

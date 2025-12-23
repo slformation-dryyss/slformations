@@ -42,8 +42,9 @@ export async function POST(request: Request) {
         const metadata = session.metadata || {};
         const userId = metadata.userId;
         const courseId = metadata.courseId;
+        const sessionId = metadata.sessionId;
 
-        console.log(`[Stripe Webhook] Paiement réussi pour Session=${session.id}, User=${userId}, Méthodes=${session.payment_method_types?.join(', ')}`);
+        console.log(`[Stripe Webhook] Paiement réussi pour Session=${session.id}, User=${userId}, Course=${courseId}, PlannedSession=${sessionId}`);
 
         if (!userId || !courseId) {
           console.warn("Webhook Stripe: metadata manquante", metadata);
@@ -85,6 +86,36 @@ export async function POST(request: Request) {
             status: "ACTIVE",
           },
         });
+
+        // --- NOUVEAU: Auto-booking de la session ---
+        if (sessionId) {
+          try {
+            await prisma.courseSessionBooking.upsert({
+              where: {
+                courseSessionId_userId: {
+                  courseSessionId: sessionId,
+                  userId: userId,
+                }
+              },
+              update: { status: "BOOKED" },
+              create: {
+                courseSessionId: sessionId,
+                userId: userId,
+                status: "BOOKED",
+              }
+            });
+            
+            // Incrémenter les places réservées
+            await prisma.courseSession.update({
+              where: { id: sessionId },
+              data: { bookedSpots: { increment: 1 } }
+            });
+            
+            console.log(`[Stripe Webhook] Réservation automatique effectuée pour Session=${sessionId}`);
+          } catch (e) {
+            console.error(`[Stripe Webhook] Erreur lors de la réservation automatique de la session ${sessionId}:`, e);
+          }
+        }
 
         // Mettre à jour le lien de paiement s'il s'agit d'un lien manuel/dashboard
         await prisma.paymentLink.updateMany({

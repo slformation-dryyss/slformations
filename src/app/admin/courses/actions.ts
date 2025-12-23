@@ -82,6 +82,8 @@ export async function createModuleAction(formData: FormData) {
 
   const courseId = formData.get("courseId") as string;
   const title = formData.get("title") as string;
+  const dayNumber = parseInt(formData.get("dayNumber") as string) || 1;
+  const duration = parseInt(formData.get("duration") as string) || 7;
 
   if (!courseId || !title) return;
 
@@ -97,6 +99,31 @@ export async function createModuleAction(formData: FormData) {
       title,
       position: (lastModule?.position ?? -1) + 1,
       isPublished: true, 
+      dayNumber,
+      duration,
+    },
+  });
+
+  revalidatePath(`/admin/courses/${courseId}`);
+}
+
+export async function updateModuleAction(formData: FormData) {
+  await requireAdmin();
+
+  const moduleId = formData.get("moduleId") as string;
+  const courseId = formData.get("courseId") as string;
+  const title = formData.get("title") as string;
+  const dayNumber = parseInt(formData.get("dayNumber") as string) || 1;
+  const duration = parseInt(formData.get("duration") as string) || 7;
+
+  if (!moduleId || !title) return;
+
+  await prisma.module.update({
+    where: { id: moduleId },
+    data: {
+      title,
+      dayNumber,
+      duration,
     },
   });
 

@@ -16,6 +16,12 @@ export default async function PaymentLinksPage() {
             email: true,
             firstName: true,
             lastName: true,
+            enrollments: {
+                select: {
+                    courseId: true,
+                    status: true
+                }
+            }
         },
         orderBy: {
             email: "asc"
@@ -36,6 +42,16 @@ export default async function PaymentLinksPage() {
         }
     });
 
+    // Fetch previous generated links history
+    const previousLinks = await prisma.paymentLink.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 50,
+        include: {
+            user: { select: { email: true, firstName: true, lastName: true } },
+            course: { select: { title: true } }
+        }
+    });
+
     return (
         <div className="max-w-4xl mx-auto pb-10">
             <h1 className="text-3xl font-bold text-slate-900 mb-6 flex items-center gap-3">
@@ -49,7 +65,7 @@ export default async function PaymentLinksPage() {
                     la commande sera automatiquement créée et validée, et l&apos;accès à la formation débloqué.
                 </p>
 
-                <ClientPaymentForm users={users} courses={courses} />
+                <ClientPaymentForm users={users} courses={courses} previousLinks={previousLinks} />
             </div>
         </div>
     );

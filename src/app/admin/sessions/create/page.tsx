@@ -111,20 +111,18 @@ export default async function CreateSessionPage() {
           </div>
 
           <div>
-            <label htmlFor="mainTeacherId" className="block text-sm font-medium text-slate-700 mb-1">
-              Formateur Principal (Optionnel)
+            <label htmlFor="format" className="block text-sm font-medium text-slate-700 mb-1">
+              Modalité
             </label>
             <select
-              name="mainTeacherId"
-              id="mainTeacherId"
+              name="format"
+              id="format"
+              required
               className="block w-full rounded-md border-slate-300 shadow-sm focus:border-gold-500 focus:ring-gold-500 sm:text-sm p-2 border"
             >
-              <option value="">-- Aucun --</option>
-              {teachers.map(t => (
-                <option key={t.id} value={t.id}>
-                  {t.firstName} {t.lastName} ({t.email})
-                </option>
-              ))}
+              <option value="IN_PERSON">📍 Présentiel (Adresse)</option>
+              <option value="REMOTE">🌐 Distanciel (Teams/Zoom)</option>
+              <option value="VIDEO">🎥 Vidéo (E-learning)</option>
             </select>
           </div>
 
@@ -141,6 +139,21 @@ export default async function CreateSessionPage() {
               className="block w-full rounded-md border-slate-300 shadow-sm focus:border-gold-500 focus:ring-gold-500 sm:text-sm p-2 border"
             />
           </div>
+        </div>
+
+        {/* Meeting URL (Conditional-lite) */}
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <label htmlFor="meetingUrl" className="block text-sm font-medium text-slate-700 mb-1">
+            Lien de réunion (Teams, Zoom, etc.)
+          </label>
+          <input
+            type="url"
+            name="meetingUrl"
+            id="meetingUrl"
+            placeholder="https://teams.microsoft.com/l/meetup-join/..."
+            className="block w-full rounded-md border-slate-300 shadow-sm focus:border-gold-500 focus:ring-gold-500 sm:text-sm p-2 border"
+          />
+          <p className="mt-1 text-xs text-slate-500">Requis pour le format Distanciel ou Vidéo si différent du cours.</p>
         </div>
 
         <div className="pt-4 flex justify-end">

@@ -6,11 +6,10 @@ export const metadata = {
   title: "Mon profil | SL Formations",
 };
 
-export default function DashboardProfilePage({
-  searchParams,
-}: {
-  searchParams?: { onboarding?: string };
+export default async function DashboardProfilePage(props: {
+  searchParams: Promise<{ onboarding?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   return (
     <>
       <div className="pt-24 pb-12">

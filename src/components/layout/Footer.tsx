@@ -82,7 +82,7 @@ export async function Footer() {
             <h4 className="font-bold text-lg mb-4 text-slate-900">Services & Aide</h4>
             <ul className="space-y-2 text-slate-600">
               <li><Link href="/location" className="hover:text-gold-500 transition">Location Véhicules</Link></li>
-              <li><Link href="/dashboard/planning" className="hover:text-gold-500 transition">Planning & Réservation</Link></li>
+              <li><Link href="/nos-plannings" className="hover:text-gold-500 transition">Planning & Réservation</Link></li>
               <li><Link href="/dashboard" className="hover:text-gold-500 transition">Espace Élève</Link></li>
               <li><Link href="/faq" className="hover:text-gold-500 transition">FAQ & Support</Link></li>
               <li><Link href="/legal/cgv" className="hover:text-gold-500 transition">CGV</Link></li>
@@ -93,17 +93,31 @@ export async function Footer() {
           <div>
             <h4 className="font-bold text-lg mb-4 text-slate-900">Contact</h4>
             <ul className="space-y-3 text-slate-600">
-              <li className="flex items-center space-x-2">
-                <MapPin className="text-gold-500 w-5 h-5 flex-shrink-0" />
+              <li className="flex items-start space-x-2">
+                <MapPin className="text-gold-500 w-5 h-5 mt-1 flex-shrink-0" />
                 <span>{address}</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone className="text-gold-500 w-5 h-5 flex-shrink-0" />
                 <span>{phone}</span>
               </li>
-               <li className="flex items-center space-x-2">
-                <Mail className="text-gold-500 w-5 h-5 flex-shrink-0" />
-                <span>{email}</span>
+              <li className="flex flex-col space-y-1">
+                <div className="flex items-center space-x-2">
+                  <Mail className="text-gold-500 w-5 h-5 flex-shrink-0" />
+                  <a href="mailto:contact@sl-formations.fr" className="hover:text-gold-500 font-medium">contact@sl-formations.fr</a>
+                </div>
+                <p className="text-[10px] text-slate-400 pl-7 leading-tight italic">
+                  Informations générales & Commercial
+                </p>
+              </li>
+              <li className="flex flex-col space-y-1">
+                <div className="flex items-center space-x-2">
+                  <Mail className="text-blue-500 w-5 h-5 flex-shrink-0" />
+                  <a href="mailto:secretariat@sl-formations.fr" className="hover:text-gold-500 font-medium">secretariat@sl-formations.fr</a>
+                </div>
+                <p className="text-[10px] text-slate-400 pl-7 leading-tight italic">
+                  Inscriptions & Documents (Élèves/Profs)
+                </p>
               </li>
               <li className="mt-4">
                 <Link href="/contact" className="inline-block text-gold-500 hover:underline">

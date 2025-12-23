@@ -75,9 +75,87 @@ export async function getAllSessionsByType(type: string) {
 }
 
 
+export async function getPublicSessions(filters?: { search?: string; type?: string; courseId?: string }) {
+    return prisma.courseSession.findMany({
+        where: {
+            isPublished: true,
+            startDate: { gte: new Date() },
+            course: {
+                isPublished: true,
+                ...(filters?.type ? { type: filters.type.toUpperCase() } : {}),
+                ...(filters?.search ? {
+                    OR: [
+                        { title: { contains: filters.search, mode: 'insensitive' } },
+                        { description: { contains: filters.search, mode: 'insensitive' } }
+                    ]
+                } : {}),
+                ...(filters?.courseId ? { id: filters.courseId } : {})
+            }
+        },
+        include: {
+            course: {
+                select: {
+                    title: true,
+                    slug: true,
+                    type: true,
+                    imageUrl: true
+                }
+            }
+        },
+        orderBy: { startDate: 'asc' }
+    });
+}
 
+export async function getTeacherSessions(teacherId: string) {
+    return prisma.courseSession.findMany({
+        where: {
+            mainTeacherId: teacherId,
+        },
+        include: {
+            course: {
+                select: {
+                    title: true,
+                    slug: true,
+                    type: true,
+                }
+            },
+            bookings: {
+                select: {
+                    id: true,
+                }
+            }
+        },
+        orderBy: { startDate: 'asc' }
+    });
+}
 
-
-
+export async function getTeacherStudents(teacherId: string) {
+    return prisma.courseSessionBooking.findMany({
+        where: {
+            courseSession: {
+                mainTeacherId: teacherId,
+            }
+        },
+        include: {
+            user: {
+                select: {
+                    name: true,
+                    email: true,
+                }
+            },
+            courseSession: {
+                include: {
+                    course: {
+                        select: {
+                            title: true,
+                            type: true,
+                        }
+                    }
+                }
+            }
+        },
+        orderBy: { createdAt: 'desc' }
+    });
+}
 
 
