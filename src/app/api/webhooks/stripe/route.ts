@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { sendEnrollmentConfirmation, sendInvoice } from "@/lib/email/transactional";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -54,11 +55,12 @@ export async function POST(request: Request) {
         // Créer ou mettre à jour la commande
         await prisma.order.upsert({
           where: {
-            stripeSessionId: session.id,
+            stripeSessionId: session.id || "",
           },
           update: {
+            amount: (session.amount_total || 0) / 100,
+            currency: session.currency || "eur",
             status: "PAID",
-            stripePaymentId: session.payment_intent as string | null,
           },
           create: {
             userId,
@@ -66,8 +68,7 @@ export async function POST(request: Request) {
             amount: (session.amount_total || 0) / 100,
             currency: session.currency || "eur",
             status: "PAID",
-            stripeSessionId: session.id,
-            stripePaymentId: session.payment_intent as string | null,
+            stripeSessionId: session.id || "",
           },
         });
 
@@ -122,6 +123,60 @@ export async function POST(request: Request) {
           where: { stripeSessionId: session.id },
           data: { status: "PAID" }
         });
+
+        // --- NOUVEAU: Envoyer un email de confirmation à l'élève ---
+        try {
+          const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { name: true, email: true }
+          });
+          const course = await prisma.course.findUnique({
+            where: { id: courseId },
+            select: { title: true, slug: true }
+          });
+
+          if (user && course) {
+            await sendEnrollmentConfirmation({
+              userName: user.name || "Étudiant",
+              userEmail: user.email,
+              courseTitle: course.title,
+              courseSlug: course.slug || "",
+              enrollmentDate: new Date().toLocaleDateString('fr-FR'),
+            });
+            console.log(`[Stripe Webhook] Email de confirmation envoyé à ${user.email}`);
+
+            // --- NOUVEAU: Envoyer la facture ---
+            try {
+              await sendInvoice({
+                invoiceNumber: `FAC-${Date.now().toString().slice(-6)}`,
+                invoiceDate: new Date().toLocaleDateString('fr-FR'),
+                dueDate: new Date().toLocaleDateString('fr-FR'),
+                clientName: user.name || "Étudiant",
+                clientAddress: (user as any).addressLine1 || "",
+                clientPostal: (user as any).postalCode || "",
+                clientCity: (user as any).city || "",
+                companyName: "SL FORMATIONS",
+                companyAddress: "123 Avenue de Paris",
+                companyPostal: "75001",
+                companyCity: "Paris",
+                companySIRET: "123 456 789 00012",
+                companyTVA: "FR 12 345678901",
+                companyAPE: "8559A",
+                items: [{
+                  description: `Formation : ${course.title}`,
+                  quantity: 1,
+                  unitPrice: (session.amount_total || 0) / 100,
+                  vatRate: 0
+                }]
+              }, user.email);
+              console.log(`[Stripe Webhook] Facture envoyée à ${user.email}`);
+            } catch (invoiceError) {
+              console.error("[Stripe Webhook] Erreur lors de l'envoi de la facture:", invoiceError);
+            }
+          }
+        } catch (emailError) {
+          console.error("[Stripe Webhook] Erreur lors du workflow d'email:", emailError);
+        }
 
         break;
       }

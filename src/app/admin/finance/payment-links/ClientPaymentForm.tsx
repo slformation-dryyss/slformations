@@ -2,14 +2,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { createManualPaymentLinkAction } from "../actions";
-import { Copy, Check, Loader2, Send, Search, AlertCircle, X, History, FileDown, AlertTriangle } from "lucide-react";
+import { createManualPaymentLinkAction, validatePaymentLinkAction, syncPaymentLinkStatusAction } from "../actions";
+import { Copy, Check, Loader2, Send, Search, AlertCircle, X, History, FileDown, AlertTriangle, CheckCircle, RefreshCcw } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface User { 
     id: string; 
     email: string; 
     firstName: string | null; 
     lastName: string | null;
+    phone: string | null;
     enrollments: { 
         courseId: string;
         status: string; // "PENDING", "ACTIVE", "COMPLETED", "CANCELLED"
@@ -25,11 +27,12 @@ interface PaymentLink {
     status: string;
     stripeUrl: string;
     justification: string | null;
-    user: { email: string; firstName: string | null; lastName: string | null };
+    user: { email: string; firstName: string | null; lastName: string | null; phone: string | null };
     course: { title: string };
 }
 
 export default function ClientPaymentForm({ users, courses, previousLinks }: { users: User[], courses: Course[], previousLinks: PaymentLink[] }) {
+    const router = useRouter();
     const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -44,40 +47,40 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
     // Confirmation Modal State
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-    // Filter users based on search
+    // Filter users based on search (Name, Email, Phone)
     const filteredUsers = useMemo(() => {
         if (!searchQuery) return users;
         const lowerQuery = searchQuery.toLowerCase();
         return users.filter(user => 
             (user.firstName && user.firstName.toLowerCase().includes(lowerQuery)) ||
             (user.lastName && user.lastName.toLowerCase().includes(lowerQuery)) ||
-            user.email.toLowerCase().includes(lowerQuery)
+            user.email.toLowerCase().includes(lowerQuery) ||
+            (user.phone && user.phone.toLowerCase().includes(lowerQuery))
         );
     }, [users, searchQuery]);
 
-    // Filter courses based on selected user's enrollments AND exclusion of already paid courses
-    const filteredCourses = useMemo(() => {
+    // Enrichir la liste des cours avec le statut de l'élève sélectionné
+    const enrichedCourses = useMemo(() => {
         if (!selectedUserId) return [];
         const user = users.find(u => u.id === selectedUserId);
         if (!user) return [];
         
-        // Identify courses where user has an ACTIVE or COMPLETED enrollment (Already paid/validated)
+        const enrolledCourseIds = new Set(user.enrollments.map(e => e.courseId));
         const paidCourseIds = new Set(
             user.enrollments
                 .filter(e => e.status === "ACTIVE" || e.status === "COMPLETED")
                 .map(e => e.courseId)
         );
 
-        // Identify all courses where user is enrolled (regardless of status)
-        const enrolledCourseIds = new Set(
-            user.enrollments.map(e => e.courseId)
-        );
-
-        // Return courses that are enrolled BUT NOT paid
-        return courses.filter(course => 
-            enrolledCourseIds.has(course.id) && !paidCourseIds.has(course.id)
-        );
+        return courses.map(course => ({
+            ...course,
+            isEnrolled: enrolledCourseIds.has(course.id),
+            isPaid: paidCourseIds.has(course.id)
+        }));
     }, [courses, users, selectedUserId]);
+
+    // Conserver la liste des cours "impayés" uniquement pour l'affichage du compteur informatif
+    const unpaidCount = enrichedCourses.filter(c => c.isEnrolled && !c.isPaid).length;
 
     const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const courseId = e.target.value;
@@ -118,6 +121,76 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
         setLoading(false);
     };
 
+    // Search state for history
+    const [historySearchQuery, setHistorySearchQuery] = useState("");
+
+    const filteredHistory = useMemo(() => {
+        if (!historySearchQuery) return previousLinks;
+        const lowerQuery = historySearchQuery.toLowerCase();
+        return previousLinks.filter(link => 
+            (link.user?.firstName && link.user?.firstName.toLowerCase().includes(lowerQuery)) ||
+            (link.user?.lastName && link.user?.lastName.toLowerCase().includes(lowerQuery)) ||
+            link.user?.email.toLowerCase().includes(lowerQuery) ||
+            (link.user?.phone && link.user?.phone.toLowerCase().includes(lowerQuery)) ||
+            link.course?.title.toLowerCase().includes(lowerQuery)
+        );
+    }, [previousLinks, historySearchQuery]);
+
+    const [syncingId, setSyncingId] = useState<string | null>(null);
+
+    const handleSyncStatus = async (linkId: string) => {
+        setSyncingId(linkId);
+        const formData = new FormData();
+        formData.append("linkId", linkId);
+        
+        const result = await syncPaymentLinkStatusAction(formData) as any;
+        if (result.error) {
+            alert(result.error);
+        } else if (result.updated) {
+            alert("Paiement confirmé par Stripe ! Le statut a été mis à jour.");
+            router.refresh();
+        } else if (result.alreadyPaid) {
+            alert("Ce lien est déjà marqué comme payé.");
+        } else {
+            alert(`Stripe indique que le paiement est : ${result.currentStatus || "en attente"}`);
+        }
+        setSyncingId(null);
+    };
+
+    const handleExportCSV = () => {
+        if (previousLinks.length === 0) return;
+
+        // Header
+        const headers = ["Date", "Élève", "Email", "Téléphone", "Formation", "Montant", "Statut", "URL Stripe"];
+        
+        // Rows
+        const rows = previousLinks.map(link => [
+            new Date(link.createdAt).toLocaleDateString('fr-FR'),
+            `${link.user?.firstName || ""} ${link.user?.lastName || ""}`.trim(),
+            link.user?.email || "",
+            link.user?.phone || "",
+            link.course?.title || "",
+            link.amount.toFixed(2),
+            link.status === "PAID" ? "Payé" : "En attente",
+            link.stripeUrl
+        ]);
+
+        // Build CSV string (Excel friendly with semicolon)
+        const csvContent = [headers, ...rows]
+            .map(e => e.map(cell => `"${(cell || "").toString().replace(/"/g, '""')}"`).join(";"))
+            .join("\n");
+
+        // BOM for Excel UTF-8
+        const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `historique_paiements_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     const copyToClipboard = () => {
         if (generatedUrl) {
             navigator.clipboard.writeText(generatedUrl);
@@ -139,7 +212,7 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                             <input 
                                 type="text"
-                                placeholder="Nom, prénom ou email..."
+                                placeholder="Nom, prénom, email ou téléphone..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-9 border-slate-300 rounded-md shadow-sm focus:border-gold-500 focus:ring-gold-500 text-sm"
@@ -184,26 +257,26 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                             onChange={handleCourseChange}
                         >
                             <option value="">-- Sélectionner une formation --</option>
-                            {filteredCourses.length > 0 ? (
-                                filteredCourses.map(c => (
+                            {enrichedCourses.length > 0 ? (
+                                enrichedCourses.map((c: Course & { isEnrolled: boolean, isPaid: boolean }) => (
                                     <option key={c.id} value={c.id}>
-                                        {c.title} - {c.price}€
+                                        {c.title} - {c.price}€ {c.isPaid ? "✅" : c.isEnrolled ? "⏳" : ""}
                                     </option>
                                 ))
                             ) : (
-                                selectedUserId && <option value="" disabled>Aucune formation en attente de paiement</option>
+                                selectedUserId && <option value="" disabled>Aucune formation disponible</option>
                             )}
                         </select>
                         
                         {selectedUserId && (
                             <div className="mt-1">
-                                {filteredCourses.length > 0 ? (
+                                {unpaidCount > 0 ? (
                                     <p className="text-xs text-slate-500">
-                                        {filteredCourses.length} formation(s) en attente de paiement.
+                                        {unpaidCount} formation(s) en attente de paiement.
                                     </p>
                                 ) : (
                                     <p className="text-xs text-green-600 font-medium flex items-center gap-1">
-                                        <Check className="w-3 h-3" /> Cet élève est à jour de ses paiements.
+                                        <Check className="w-3 h-3" /> Cet élève est à jour (ou non inscrit).
                                     </p>
                                 )}
                             </div>
@@ -327,6 +400,120 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                     </div>
                 </div>
             )}
+
+            {/* HISTORY SECTION */}
+            <div className="mt-12 pt-8 border-t border-slate-200">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <History className="w-5 h-5 text-slate-400" />
+                        Historique des 50 derniers liens
+                    </h3>
+                    
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={handleExportCSV}
+                            title="Exporter en Excel (CSV)"
+                            className="p-2 text-slate-500 hover:text-slate-900 rounded-md border border-slate-200 hover:border-slate-300 transition-colors"
+                        >
+                            <FileDown className="w-4 h-4" />
+                        </button>
+                        <div className="relative w-full md:w-64">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input 
+                                type="text"
+                                placeholder="Rechercher un lien..."
+                                value={historySearchQuery}
+                                onChange={(e) => setHistorySearchQuery(e.target.value)}
+                                className="w-full pl-9 border-slate-300 rounded-md shadow-sm focus:border-gold-500 focus:ring-gold-500 text-sm py-2"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                <th className="py-3 px-4">Date</th>
+                                <th className="py-3 px-4">Élève</th>
+                                <th className="py-3 px-4">Formation</th>
+                                <th className="py-3 px-4">Montant</th>
+                                <th className="py-3 px-4">Statut</th>
+                                <th className="py-3 px-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            {filteredHistory.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="py-12 text-center text-slate-400 text-sm italic">
+                                        {historySearchQuery ? "Aucun lien ne correspond à votre recherche." : "Aucun lien généré pour le moment."}
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredHistory.map((link) => (
+                                    <tr key={link.id} className="hover:bg-slate-50 transition-colors text-sm">
+                                        <td className="py-3 px-4 text-slate-500">
+                                            {new Date(link.createdAt).toLocaleDateString('fr-FR')}
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <div className="font-medium text-slate-900">
+                                                {link.user?.firstName} {link.user?.lastName}
+                                            </div>
+                                            <div className="text-xs text-slate-400">{link.user?.email} {link.user?.phone && `• ${link.user.phone}`}</div>
+                                        </td>
+                                        <td className="py-3 px-4 text-slate-600">
+                                            {link.course?.title}
+                                        </td>
+                                        <td className="py-3 px-4 font-bold text-slate-900">
+                                            {link.amount.toFixed(2)} €
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            {link.status === "PAID" ? (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    Payé
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                    En attente
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="py-3 px-4 text-right">
+                                            <div className="flex items-center justify-end gap-2">
+                                                {link.status !== "PAID" && (
+                                                    <button 
+                                                        onClick={() => handleSyncStatus(link.id)}
+                                                        disabled={syncingId === link.id}
+                                                        className="p-1.5 text-blue-600 hover:text-blue-700 rounded border border-transparent hover:border-blue-100 transition-all flex items-center gap-1 text-xs font-bold"
+                                                        title="Vérifier maintenant"
+                                                    >
+                                                        {syncingId === link.id ? (
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                        ) : (
+                                                            <RefreshCcw className="w-4 h-4" />
+                                                        )}
+                                                        Vérifier
+                                                    </button>
+                                                )}
+                                                <button 
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(link.stripeUrl);
+                                                        alert("Lien Stripe copié !");
+                                                    }}
+                                                    className="p-1.5 text-slate-400 hover:text-slate-600 rounded border border-transparent hover:border-slate-200 transition-all"
+                                                    title="Copier le lien Stripe"
+                                                >
+                                                    <Copy className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 }

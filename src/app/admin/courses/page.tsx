@@ -9,11 +9,9 @@ import { CourseFilters } from "@/components/admin/CourseFilters";
 async function getCourses(params: { q?: string; type?: string; sort?: string }) {
   const { q, type, sort } = params;
 
-  let orderBy: any = { updatedAt: "desc" };
+  let orderBy: any = [{ type: "asc" }, { title: "asc" }];
 
-  if (sort === "category") {
-    orderBy = [{ type: "asc" }, { title: "asc" }];
-  } else if (sort === "recent") {
+  if (sort === "recent") {
     orderBy = { createdAt: "desc" };
   } else if (sort === "oldest") {
     orderBy = { createdAt: "asc" };
@@ -21,8 +19,7 @@ async function getCourses(params: { q?: string; type?: string; sort?: string }) 
     orderBy = { price: "asc" };
   } else if (sort === "price_desc") {
     orderBy = { price: "desc" };
-  } else {
-    // Default fallback
+  } else if (sort === "category") {
     orderBy = [{ type: "asc" }, { title: "asc" }];
   }
 
@@ -75,63 +72,77 @@ export default async function AdminCoursesPage({
 
       <CourseFilters />
 
-      <div className="bg-white shadow overflow-hidden sm:rounded-md border border-slate-200">
-        <ul role="list" className="divide-y divide-slate-200">
-          {courses.length === 0 ? (
-            <li className="px-6 py-12 text-center text-slate-500">
-              Aucune formation trouvée avec ces critères.
-            </li>
-          ) : (
-            courses.map((course) => (
-              <li key={course.id}>
-                <div className="block hover:bg-slate-50 transition duration-150 ease-in-out px-4 py-4 sm:px-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center truncate">
-                      <p className="text-lg font-medium text-slate-900 truncate mr-4">
-                        {course.title}
-                      </p>
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        course.isPublished ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                      }`}>
-                        {course.isPublished ? "Publié" : "Brouillon"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Link
-                            href={`/admin/courses/${course.id}`} // Edit CMS
-                            className="p-2 text-slate-400 hover:text-gold-600 transition-colors"
-                            title="Éditer le contenu"
-                        >
-                            <Edit className="w-5 h-5" />
-                        </Link>
-                         <Link
-                            href={`/formations/${course.slug}`} // Public View
-                            target="_blank"
-                            className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
-                            title="Voir la page publique"
-                        >
-                            <Eye className="w-5 h-5" />
-                        </Link>
-                    </div>
-                  </div>
-                  <div className="mt-2 sm:flex sm:justify-between">
-                    <div className="sm:flex sm:gap-6">
-                      <p className="flex items-center text-sm text-slate-500">
-                        Type: <span className="font-semibold ml-1">{course.type}</span>
-                      </p>
-                      <p className="mt-2 flex items-center text-sm text-slate-500 sm:mt-0 sm:ml-6">
-                        {course.price > 0 ? `${course.price} €` : "Gratuit / Sur devis"}
-                      </p>
-                       <p className="mt-2 flex items-center text-sm text-slate-500 sm:mt-0 sm:ml-6">
-                        {course._count.modules} Modules • {course._count.enrollments} Inscrits
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            ))
-          )}
-        </ul>
+      <div className="space-y-8">
+        {courses.length === 0 ? (
+          <div className="bg-white shadow rounded-lg border border-slate-200 px-6 py-12 text-center text-slate-500">
+            Aucune formation trouvée avec ces critères.
+          </div>
+        ) : (
+          Object.entries(
+            courses.reduce((acc: any, course) => {
+              const type = course.type || "AUTRE";
+              if (!acc[type]) acc[type] = [];
+              acc[type].push(course);
+              return acc;
+            }, {})
+          ).map(([type, typeCourses]: [string, any]) => (
+            <div key={type} className="space-y-4">
+              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 px-1">
+                <span className="w-2 h-2 bg-gold-500 rounded-full"></span>
+                {type} ({typeCourses.length})
+              </h2>
+              <div className="bg-white shadow overflow-hidden sm:rounded-md border border-slate-200">
+                <ul role="list" className="divide-y divide-slate-200">
+                  {typeCourses.map((course: any) => (
+                    <li key={course.id}>
+                      <div className="block hover:bg-slate-50 transition duration-150 ease-in-out px-4 py-4 sm:px-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center truncate">
+                            <p className="text-lg font-medium text-slate-900 truncate mr-4">
+                              {course.title}
+                            </p>
+                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              course.isPublished ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                            }`}>
+                              {course.isPublished ? "Publié" : "Brouillon"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                              <Link
+                                  href={`/admin/courses/${course.id}`} // Edit CMS
+                                  className="p-2 text-slate-400 hover:text-gold-600 transition-colors"
+                                  title="Éditer le contenu"
+                              >
+                                  <Edit className="w-5 h-5" />
+                              </Link>
+                               <Link
+                                  href={`/formations/${course.slug}`} // Public View
+                                  target="_blank"
+                                  className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
+                                  title="Voir la page publique"
+                              >
+                                  <Eye className="w-5 h-5" />
+                              </Link>
+                          </div>
+                        </div>
+                        <div className="mt-2 sm:flex sm:justify-between">
+                          <div className="sm:flex sm:gap-6">
+                            <p className="flex items-center text-sm text-slate-500">
+                              {course.price > 0 ? `${course.price} €` : "Gratuit / Sur devis"}
+                            </p>
+                             <p className="mt-2 flex items-center text-sm text-slate-500 sm:mt-0 sm:ml-6">
+                              {course._count.modules} Modules • {course._count.enrollments} Inscrits
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

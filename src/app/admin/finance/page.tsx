@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Euro, TrendingUp, ShoppingBag, CreditCard } from "lucide-react";
+import ExportOrdersButton from "@/components/admin/finance/ExportOrdersButton";
 
 async function getFinanceStats() {
   const totalRevenueAgg = await prisma.order.aggregate({
@@ -90,7 +91,10 @@ export default async function AdminFinancePage() {
       </div>
 
       {/* Recent Transactions List */}
-      <h2 className="text-lg font-bold text-slate-900 mb-4">Dernières Transactions</h2>
+      <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-slate-900">Dernières Transactions</h2>
+          <ExportOrdersButton orders={stats.recentOrders} />
+      </div>
       <div className="bg-white shadow overflow-hidden sm:rounded-md border border-slate-200">
         <ul role="list" className="divide-y divide-slate-200">
           {stats.recentOrders.length === 0 ? (

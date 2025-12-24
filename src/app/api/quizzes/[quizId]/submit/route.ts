@@ -1,6 +1,7 @@
 import { auth0 } from "@/lib/auth0";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { sendQuizResult } from "@/lib/email/transactional";
 
 export async function POST(
   request: Request,
@@ -63,6 +64,21 @@ export async function POST(
         completedAt: new Date(),
       }
     });
+
+    // NOUVEAU: Envoyer le résultat par mail à l'étudiant
+    try {
+        await sendQuizResult({
+            userName: session.user.name || session.user.email || "Étudiant",
+            userEmail: session.user.email!,
+            quizTitle: quiz.title,
+            score,
+            isPassed,
+            passingScore: quiz.passingScore,
+            courseSlug: "" // On pourrait récupérer le slug du cours lié si besoin
+        });
+    } catch (emailError) {
+        console.error("Failed to send quiz result email:", emailError);
+    }
 
     return NextResponse.json({ score, isPassed });
   } catch (error) {

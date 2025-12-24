@@ -87,7 +87,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
               <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">Brouillon</span>
             )}
             <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full capitalize">
-              {(session as any).format.toLowerCase()}
+              {((session as any).format || "Présentiel").toLowerCase()}
             </span>
           </div>
         </div>

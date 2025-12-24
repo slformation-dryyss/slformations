@@ -6,14 +6,17 @@ import Link from "next/link";
 export default async function AdminDocumentsPage() {
   await requireAdmin();
 
-  // Find users who have uploaded documents
-  // We want to group by user, and show status (New, Pending Review, Verified)
-  // Prisma groupBy is limited, so we fetch users with documents relationship
-  const usersWithDocs = await prisma.user.findMany({
+  // Find users who should have a dossier:
+  // 1. Have uploaded documents
+  // 2. OR are enrolled in a course
+  // 3. OR have a payment link generated for them
+  const usersWithDossier = await prisma.user.findMany({
     where: {
-       documents: {
-           some: {} // Only users with at least one doc
-       }
+       OR: [
+           { documents: { some: {} } },
+           { enrollments: { some: {} } },
+           { paymentLinks: { some: {} } }
+       ]
     },
     select: {
         id: true,
@@ -45,17 +48,17 @@ export default async function AdminDocumentsPage() {
                </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-200">
-               {usersWithDocs.length === 0 ? (
+               {usersWithDossier.length === 0 ? (
                    <tr>
                        <td colSpan={4} className="px-6 py-12 text-center text-slate-500">
                            Aucun dossier documentaire trouvé.
                        </td>
                    </tr>
                ) : (
-                   usersWithDocs.map(user => {
-                       const pendingCount = user.documents.filter(d => d.status === "PENDING").length;
-                       const rejectedCount = user.documents.filter(d => d.status === "REJECTED").length;
-                       const approvedCount = user.documents.filter(d => d.status === "APPROVED").length;
+                   (usersWithDossier as any[]).map(user => {
+                       const pendingCount = user.documents.filter((d: any) => d.status === "PENDING").length;
+                       const rejectedCount = user.documents.filter((d: any) => d.status === "REJECTED").length;
+                       const approvedCount = user.documents.filter((d: any) => d.status === "APPROVED").length;
                        const totalCount = user.documents.length;
                        
                        const REQUIRED_COUNT = 4; // Based on constants.ts

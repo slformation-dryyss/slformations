@@ -2,9 +2,23 @@ import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { DollarSign } from "lucide-react";
 import ClientPaymentForm from "./ClientPaymentForm";
+import { syncStripePaymentStatus } from "../actions";
 
 export default async function PaymentLinksPage() {
     await requireAdmin();
+
+    // Fetch previous generated links history (Pending only for sync)
+    const pendingLinks = await prisma.paymentLink.findMany({
+        where: { status: "PENDING" },
+        orderBy: { createdAt: "desc" },
+        take: 10 // Limit to avoid heavy processing on page load
+    });
+
+    // Auto-sync pending links with Stripe
+    if (pendingLinks.length > 0) {
+        console.log(`[Auto-Sync] checking ${pendingLinks.length} pending links...`);
+        await Promise.all(pendingLinks.map(link => syncStripePaymentStatus(link.id)));
+    }
 
     // Fetch only students (not admins, instructors, or owners)
     const users = await prisma.user.findMany({
@@ -16,6 +30,7 @@ export default async function PaymentLinksPage() {
             email: true,
             firstName: true,
             lastName: true,
+            phone: true,
             enrollments: {
                 select: {
                     courseId: true,
@@ -42,15 +57,15 @@ export default async function PaymentLinksPage() {
         }
     });
 
-    // Fetch previous generated links history
+    // Fetch refreshed previous generated links history
     const previousLinks = await prisma.paymentLink.findMany({
         orderBy: { createdAt: "desc" },
         take: 50,
         include: {
-            user: { select: { email: true, firstName: true, lastName: true } },
+            user: { select: { email: true, firstName: true, lastName: true, phone: true } },
             course: { select: { title: true } }
         }
-    });
+    }) as any; // Cast simple pour éviter les conflits complexes de types Prisma/Include ici
 
     return (
         <div className="max-w-4xl mx-auto pb-10">

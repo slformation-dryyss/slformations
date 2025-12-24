@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { generateInvoice } from '@/lib/pdf/invoices';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -220,6 +221,46 @@ export async function sendCertificate(data: CertificateEmailData) {
         </body>
         </html>
       `
+    });
+
+    if (error) {
+      console.error('Email sending error:', error);
+      return { success: false, error };
+    }
+
+    return { success: true, data: emailData };
+  } catch (error) {
+    console.error('Email sending exception:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendInvoice(data: any, userEmail: string) {
+  try {
+    const doc = generateInvoice(data);
+    const pdfBase64 = doc.output('datauristring').split(',')[1];
+
+    const { data: emailData, error } = await resend.emails.send({
+      from: 'SL Formations <factures@sl-formations.fr>',
+      to: [userEmail],
+      subject: `Votre facture - ${data.invoiceNumber}`,
+      attachments: [
+        {
+          filename: `facture-${data.invoiceNumber}.pdf`,
+          content: pdfBase64,
+        },
+      ],
+      html: `
+        <div style="font-family: sans-serif; color: #1e293b;">
+          <h2 style="color: #eab308;">Merci pour votre confiance !</h2>
+          <p>Bonjour,</p>
+          <p>Vous trouverez ci-joint la facture relative à votre inscription à la formation : <strong>${data.items[0].description}</strong>.</p>
+          <p>Votre règlement a bien été pris en compte.</p>
+          <p>À bientôt sur votre espace de formation !</p>
+          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #64748b;">SL FORMATIONS - Organisme de formation</p>
+        </div>
+      `,
     });
 
     if (error) {
