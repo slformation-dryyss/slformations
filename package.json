@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "export DATABASE_URL=$POSTGRESQL_ADDON_URI && npx prisma generate && next build",
-    "start": "export DATABASE_URL=$POSTGRESQL_ADDON_URI && next start",
+    "start": "export DATABASE_URL=$POSTGRESQL_ADDON_URI && next start -p $PORT",
     "lint": "eslint"
   },
   "dependencies": {
