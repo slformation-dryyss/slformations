@@ -1,0 +1,7 @@
+{
+  "deploy": {
+    "post_build": [
+      "npx prisma migrate deploy"
+    ]
+  }
+}
