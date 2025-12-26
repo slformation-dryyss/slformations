@@ -24,7 +24,6 @@ export async function addManualPaymentAction(formData: FormData) {
       courseId,
       amount,
       status: "PAID",
-      method,
     },
   });
 
