@@ -32,10 +32,11 @@ export async function addManualPaymentAction(formData: FormData) {
     data: {
       orderId: order.id,
       amount,
-      method,
+      // method, // Not in schema
       status: "SUCCEEDED",
-      provider: "MANUAL",
-      adminNote: `Ajouté par l'admin ${admin.name || admin.email}${adminNote ? `: ${adminNote}` : ""}`,
+      provider: method || "MANUAL", // Store method (ESPECE, VIREMENT) in provider
+      providerPaymentId: `MANUAL-${Date.now()}`, // Required field
+      // adminNote: ... // Not in schema, skipping for now
     },
   });
 
