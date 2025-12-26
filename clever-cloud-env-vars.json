@@ -1,0 +1,101 @@
+{
+  "comment": "Variables d'environnement pour Clever Cloud - SL Formations",
+  "application_url": "https://app-17ffc860-acff-4411-8b99-1a5684b8f08d.cleverapps.io",
+  "variables": {
+    "AUTH0_SECRET": {
+      "value": "GENERER_UN_SECRET_64_CARACTERES",
+      "description": "Secret pour Auth0 - Générer avec: -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 64 | ForEach-Object {[char]$_})",
+      "required": true
+    },
+    "AUTH0_BASE_URL": {
+      "value": "https://app-17ffc860-acff-4411-8b99-1a5684b8f08d.cleverapps.io",
+      "description": "URL de base de votre application Clever Cloud",
+      "required": true
+    },
+    "AUTH0_ISSUER_BASE_URL": {
+      "value": "VOTRE_TENANT_AUTH0",
+      "description": "URL de votre tenant Auth0 (ex: https://dev-xxxxx.eu.auth0.com) - Depuis Auth0 Dashboard > Applications > Settings",
+      "required": true
+    },
+    "AUTH0_CLIENT_ID": {
+      "value": "VOTRE_CLIENT_ID",
+      "description": "Client ID depuis Auth0 Dashboard > Applications > Settings",
+      "required": true
+    },
+    "AUTH0_CLIENT_SECRET": {
+      "value": "VOTRE_CLIENT_SECRET",
+      "description": "Client Secret depuis Auth0 Dashboard > Applications > Settings",
+      "required": true
+    },
+    "NEXT_PUBLIC_APP_URL": {
+      "value": "https://app-17ffc860-acff-4411-8b99-1a5684b8f08d.cleverapps.io",
+      "description": "URL publique de l'application (utilisé pour les emails et redirections)",
+      "required": true
+    },
+    "STRIPE_SECRET_KEY": {
+      "value": "sk_test_VOTRE_CLE",
+      "description": "Clé secrète Stripe (sk_test_... pour test, sk_live_... pour production) - Depuis Stripe Dashboard > Developers > API keys",
+      "required": true
+    },
+    "STRIPE_PUBLISHABLE_KEY": {
+      "value": "pk_test_VOTRE_CLE",
+      "description": "Clé publique Stripe (pk_test_... pour test, pk_live_... pour production) - Depuis Stripe Dashboard > Developers > API keys",
+      "required": true
+    },
+    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY": {
+      "value": "pk_test_VOTRE_CLE",
+      "description": "Même valeur que STRIPE_PUBLISHABLE_KEY (nécessaire côté client)",
+      "required": true
+    },
+    "STRIPE_WEBHOOK_SECRET": {
+      "value": "whsec_VOTRE_SECRET",
+      "description": "Secret du webhook Stripe - À configurer APRÈS le premier déploiement - Depuis Stripe Dashboard > Webhooks",
+      "required": false,
+      "note": "Ajouter cette variable après avoir créé le webhook Stripe pointant vers: https://app-17ffc860-acff-4411-8b99-1a5684b8f08d.cleverapps.io/api/webhooks/stripe"
+    },
+    "RESEND_API_KEY": {
+      "value": "re_VOTRE_CLE",
+      "description": "Clé API Resend pour l'envoi d'emails - Depuis Resend Dashboard > API Keys",
+      "required": true
+    },
+    "NODE_ENV": {
+      "value": "production",
+      "description": "Environnement Node.js",
+      "required": true
+    }
+  },
+  "variables_automatiques": {
+    "DATABASE_URL": {
+      "description": "NE PAS AJOUTER - Géré automatiquement par Clever Cloud via POSTGRESQL_ADDON_URI"
+    },
+    "POSTGRESQL_ADDON_URI": {
+      "description": "NE PAS AJOUTER - Créé automatiquement par l'add-on PostgreSQL"
+    },
+    "PORT": {
+      "description": "NE PAS AJOUTER - Géré automatiquement par Clever Cloud"
+    }
+  },
+  "auth0_configuration": {
+    "description": "URLs à configurer dans Auth0 Dashboard > Applications > [Votre App] > Settings",
+    "allowed_callback_urls": "https://app-17ffc860-acff-4411-8b99-1a5684b8f08d.cleverapps.io/api/auth/callback",
+    "allowed_logout_urls": "https://app-17ffc860-acff-4411-8b99-1a5684b8f08d.cleverapps.io",
+    "allowed_web_origins": "https://app-17ffc860-acff-4411-8b99-1a5684b8f08d.cleverapps.io"
+  },
+  "stripe_webhook_configuration": {
+    "description": "Configuration du webhook Stripe (à faire APRÈS le premier déploiement)",
+    "endpoint_url": "https://app-17ffc860-acff-4411-8b99-1a5684b8f08d.cleverapps.io/api/webhooks/stripe",
+    "events_to_select": [
+      "checkout.session.completed",
+      "payment_intent.succeeded",
+      "payment_intent.payment_failed"
+    ]
+  },
+  "ordre_configuration": [
+    "1. Ajouter l'add-on PostgreSQL sur Clever Cloud",
+    "2. Configurer toutes les variables d'environnement (y compris NEXT_PUBLIC_APP_URL)",
+    "3. Mettre à jour Auth0 avec les URLs ci-dessus",
+    "4. Déployer: git push clever main",
+    "5. Configurer le webhook Stripe et ajouter STRIPE_WEBHOOK_SECRET",
+    "6. Redémarrer l'application"
+  ]
+}
