@@ -25,14 +25,25 @@ export default async function middleware(request: NextRequest) {
     try {
       // DEBUG: Log request details
       console.log(`[Middleware] Processing request for: ${pathname}`);
-      
+
       const session = await auth0.getSession(request);
       console.log(`[Middleware] Session found: ${!!session}`);
 
-      // Prioritize AUTH0_BASE_URL as it is reliable in server environment.
-      // Fallback to NEXT_PUBLIC_APP_URL, then origin.
-      const appUrl = process.env.AUTH0_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
-      console.log(`[Middleware] Using AppURL: ${appUrl}`);
+      // Determine App URL with safety checks for internal IPs
+      let appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+      // Fallback to AUTH0_BASE_URL if it's NOT an internal bind address
+      const auth0Base = process.env.AUTH0_BASE_URL;
+      if (!appUrl && auth0Base && !auth0Base.includes('0.0.0.0') && !auth0Base.includes('localhost')) {
+        appUrl = auth0Base;
+      }
+
+      // Final fallback to request origin
+      if (!appUrl) {
+        appUrl = request.nextUrl.origin;
+      }
+
+      console.log(`[Middleware] Resolved AppURL: ${appUrl}`);
 
       // Si pas de session, redirection vers Login
       if (!session) {
