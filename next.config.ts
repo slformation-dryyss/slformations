@@ -37,6 +37,10 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '5mb',
     },
   },
+  env: {
+    // Force the Auth0 profile route to the public domain to prevent 0.0.0.0 errors
+    NEXT_PUBLIC_PROFILE_ROUTE: 'https://sl-formations.fr/api/auth/me',
+  },
 };
 
 export default nextConfig;

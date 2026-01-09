@@ -7,7 +7,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     console.log('[Providers] Mounting Auth0Provider. Origin:', window.location.origin);
   }
   return (
-    <Auth0Provider {...({ profileUrl: "https://sl-formations.fr/api/auth/me" } as any)}>
+    <Auth0Provider>
       {children}
     </Auth0Provider>
   );
