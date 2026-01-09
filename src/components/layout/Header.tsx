@@ -1,0 +1,526 @@
+'use client';
+
+import Link from "next/link";
+import Image from "next/image";
+import {
+  Menu,
+  X,
+  User,
+  LogOut,
+  Loader2,
+  ChevronDown,
+  CalendarDays,
+  GraduationCap,
+  CreditCard as CreditCardIcon,
+  LayoutDashboard,
+  FileText,
+  AlertTriangle,
+} from "lucide-react";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { useState, useEffect } from "react";
+
+interface UserProfile {
+  role: string;
+  isProfileComplete: boolean;
+}
+
+export function Header() {
+  const { user, isLoading: isAuthLoading } = useUser();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [isStudentMenuOpen, setIsStudentMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
+
+  const toggleDropdown = (name: string) => {
+    setActiveDropdown(activeDropdown === name ? null : name);
+  };
+
+  useEffect(() => {
+    if (user) {
+      setIsProfileLoading(true);
+      fetch("/api/profile")
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          setProfile(data);
+          setIsProfileLoading(false);
+        })
+        .catch((err) => {
+          setIsProfileLoading(false);
+        });
+    } else {
+      setProfile(null);
+    }
+  }, [user]);
+
+  const isLoading = isAuthLoading || isProfileLoading;
+  // Fallback to session role (set by afterCallback) to ensure instant Admin access
+  const userRole = profile?.role || (user as any)?.role || "STUDENT";
+  const isInstructor = userRole === "INSTRUCTOR";
+  const isAdmin = userRole === "ADMIN" || userRole === "OWNER";
+
+  return (
+    <header id="header" className="fixed w-full top-0 z-50 glass-effect">
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="flex items-center justify-between gap-8">
+          <Link href="/" className="flex items-center space-x-3 flex-shrink-0">
+            <div className="relative h-12 w-48 md:w-56">
+              <Image
+                src="/logo.svg"
+                alt="SL Formations"
+                fill
+                className="object-contain drop-shadow-md"
+                priority
+              />
+            </div>
+          </Link>
+
+          <nav className="hidden xl:flex items-center space-x-6">
+            {/* Link 'Accueil' removed to save space */}
+            <Link
+              href="/nos-plannings"
+              className="text-slate-600 hover:text-gold-500 transition font-medium"
+            >
+              Plannings
+            </Link>
+            
+            {/* Dropdown Nos Permis */}
+            <div 
+              className="relative group"
+              onMouseEnter={() => setActiveDropdown("permis")}
+              onMouseLeave={() => setActiveDropdown(null)}
+            >
+              <button 
+                className={`flex items-center space-x-1 transition focus:outline-none ${activeDropdown === "permis" ? "text-gold-500" : "text-slate-600 group-hover:text-gold-500"}`}
+                onClick={() => toggleDropdown("permis")}
+              >
+                <span>Nos Permis</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === "permis" ? "rotate-180" : "group-hover:rotate-180"}`} />
+              </button>
+              
+              <div className={`absolute top-full left-0 w-64 pt-2 transition-all duration-200 transform ${
+                activeDropdown === "permis" 
+                  ? "opacity-100 visible translate-y-0" 
+                  : "opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0"
+              }`}>
+                <div className="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden py-2">
+                  <Link
+                    href="/formations/permis-b"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span>Permis B (Auto)</span>
+                  </Link>
+                  <Link
+                    href="/formations/permis-moto"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span>Permis Moto A2</span>
+                  </Link>
+                   <div className="my-2 border-t border-slate-100"></div>
+                  <Link
+                    href="/formations/recuperation-points"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-red-600 font-medium hover:text-red-700 transition"
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                    <span>Récupération de Points</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Dropdown Formations (Pro) */}
+            <div 
+              className="relative group"
+              onMouseEnter={() => setActiveDropdown("pro")}
+              onMouseLeave={() => setActiveDropdown(null)}
+            >
+              <button 
+                className={`flex items-center space-x-1 transition focus:outline-none ${activeDropdown === "pro" ? "text-gold-500" : "text-slate-600 group-hover:text-gold-500"}`}
+                onClick={() => toggleDropdown("pro")}
+              >
+                <span>Formations Pro</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === "pro" ? "rotate-180" : "group-hover:rotate-180"}`} />
+              </button>
+              
+              <div className={`absolute top-full left-0 w-64 pt-2 transition-all duration-200 transform ${
+                activeDropdown === "pro" 
+                  ? "opacity-100 visible translate-y-0" 
+                  : "opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0"
+              }`}>
+                <div className="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden py-2">
+                   <Link
+                    href="/formations/catalogue"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-gold-500"></span>
+                    <span>Tout le catalogue</span>
+                  </Link>
+                  <div className="my-2 border-t border-slate-100"></div>
+                   <Link
+                    href="/formations/vtc"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span>VTC / Taxi</span>
+                  </Link>
+                  <Link
+                    href="/formations/caces"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                  >
+                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span>CACES®</span>
+                  </Link>
+                   <Link
+                    href="/formations/secourisme"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                  >
+                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span>Secourisme (SST)</span>
+                  </Link>
+                   <Link
+                    href="/formations/incendie"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                  >
+                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span>Sécurité Incendie</span>
+                  </Link>
+                  <Link
+                    href="/formations/habilitation-electrique"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                  >
+                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span>Habilitation Élec.</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </nav>
+
+          <div className="flex items-center space-x-4">
+            {isLoading ? (
+              <Loader2 className="w-6 h-6 animate-spin text-gold-500" />
+            ) : user ? (
+              <div className="flex items-center space-x-4 relative">
+                <Link
+                  href="/profile"
+                  className="flex items-center space-x-2 text-slate-900 hover:text-gold-500 transition"
+                >
+                  {user.picture ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={user.picture}
+                      alt={user.name || "User"}
+                      className="w-8 h-8 rounded-full border border-gold-500"
+                    />
+                  ) : (
+                    <User className="w-6 h-6" />
+                  )}
+                  <span className="hidden xl:block text-sm font-medium">
+                    {user?.name}
+                  </span>
+                </Link>
+                <a
+                  href="/api/auth/logout"
+                  className="p-2 text-slate-500 hover:text-slate-900 transition"
+                  title="Se déconnecter"
+                >
+                  <LogOut className="w-5 h-5" />
+                </a>
+
+                {/* Icône profil avec menu déroulant espace élève */}
+                <button
+                  type="button"
+                  onClick={() => setIsStudentMenuOpen((open) => !open)}
+                  className="p-2 rounded-lg text-slate-600 hover:text-gold-500 hover:bg-slate-100 transition flex items-center justify-center"
+                  aria-label="Menu espace élève"
+                >
+                  <User className="w-5 h-5" />
+                  <ChevronDown className="w-4 h-4 ml-0.5" />
+                </button>
+                {/* Dropdown Menu Desktop */}
+                <div
+                  className={`absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden transition-all duration-200 transform origin-top-right ${
+                    isStudentMenuOpen
+                      ? "opacity-100 visible scale-100"
+                      : "opacity-0 invisible scale-95"
+                  }`}
+                >
+                  <div className="py-2">
+                    <div className="px-4 py-2 border-b border-slate-50 mb-1">
+                       <p className="text-sm font-bold text-slate-900 truncate">{user?.name}</p>
+                       <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                    </div>
+
+                    <Link
+                      href={isAdmin ? "/admin" : "/dashboard"}
+                      className="flex items-center space-x-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-gold-600 transition"
+                      onClick={() => setIsStudentMenuOpen(false)}
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      <span>{isAdmin ? "Administration" : "Tableau de bord"}</span>
+                    </Link>
+
+                    <Link
+                      href="/profile"
+                      className="flex items-center space-x-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-gold-600 transition"
+                      onClick={() => setIsStudentMenuOpen(false)}
+                    >
+                       <User className="w-4 h-4" />
+                       <span>Mon Profil</span>
+                    </Link>
+
+                    {isAdmin && (
+                        <Link
+                        href="/admin/finance"
+                        className="flex items-center space-x-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-gold-600 transition"
+                        onClick={() => setIsStudentMenuOpen(false)}
+                        >
+                        <CreditCardIcon className="w-4 h-4" />
+                        <span>Finances</span>
+                        </Link>
+                    )}
+
+                    <div className="border-t border-slate-50 my-1"></div>
+
+                    <a
+                      href="/api/auth/logout"
+                      className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
+                      onClick={() => setIsStudentMenuOpen(false)}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Se déconnecter</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/contact?subject=recrutement"
+                  className="hidden xl:block px-5 py-2 text-slate-600 hover:text-gold-500 transition font-medium text-sm border-r border-slate-200 pr-5 mr-3"
+                >
+                  Vous êtes formateur ?
+                </Link>
+                {/* Desktop : lien texte Demande d'accès à gauche */}
+                <Link
+                  href="/demande-acces"
+                  className="hidden xl:block px-5 py-2 text-slate-900 hover:text-gold-500 transition font-medium"
+                >
+                  Demande d&apos;accès
+                </Link>
+                {/* CTA principal : Accéder à mon espace (redirige vers le login) */}
+                <a
+                  href="/api/auth/login?returnTo=/dashboard"
+                  className="hidden xl:block px-6 py-2.5 bg-gradient-to-r from-gold-500 to-gold-600 text-slate-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/50 transition"
+                >
+                  Accéder à mon espace
+                </a>
+              </>
+            )}
+            <button
+              className="xl:hidden text-slate-900"
+              type="button"
+              onClick={() => setIsMobileMenuOpen((open) => !open)}
+              aria-label={isMobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              aria-expanded={isMobileMenuOpen}
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Menu mobile */}
+      {isMobileMenuOpen && (
+        <div className="xl:hidden bg-white/95 border-t border-slate-200 backdrop-blur px-6 pb-4 pt-2 h-[calc(100vh-80px)] overflow-y-auto">
+          <nav className="flex flex-col space-y-3 pt-2 text-sm">
+            <Link
+              href="/"
+              className="py-2 text-slate-900 hover:text-gold-500 transition"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Accueil
+            </Link>
+            <Link
+              href="/nos-plannings"
+              className="py-2 text-slate-600 hover:text-gold-500 transition"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Plannings
+            </Link>
+            
+            {/* Mobile Dropdowns */}
+            <div className="py-2 space-y-1">
+              <span className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Nos Permis</span>
+              <Link
+                href="/formations/permis-b"
+                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Permis B (Auto)
+              </Link>
+              <Link
+                href="/formations/permis-moto"
+                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Permis Moto A2
+              </Link>
+              <Link
+                href="/formations/recuperation-points"
+                 className="block py-2 px-3 rounded-lg text-red-600 font-medium hover:bg-red-50 hover:text-red-700 transition ml-2 border-l border-red-100"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Récupération de Points
+              </Link>
+            </div>
+
+            <div className="py-2 space-y-1">
+              <span className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Formations Pro</span>
+               <Link
+                href="/formations/catalogue"
+                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Tout le catalogue
+              </Link>
+              <Link
+                href="/formations/vtc"
+                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                VTC / Taxi
+              </Link>
+               <Link
+                href="/formations/caces"
+                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                CACES®
+              </Link>
+               <Link
+                href="/formations/secourisme"
+                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Secourisme
+              </Link>
+               <Link
+                href="/formations/incendie"
+                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Incendie
+              </Link>
+               <Link
+                href="/formations/habilitation-electrique"
+                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Habilitation Élec.
+              </Link>
+            </div>
+            
+            <div className="py-2 border-t border-slate-100 my-2"></div>
+            
+            <Link
+              href="/#testimonials"
+              className="py-2 text-slate-600 hover:text-gold-500 transition"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Témoignages
+            </Link>
+            <Link
+              href="/contact"
+              className="py-2 text-slate-600 hover:text-gold-500 transition"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+
+            <div className="pt-2 border-t border-slate-200 mt-2">
+              <p className="text-xs uppercase tracking-wide text-slate-500 mb-1">
+                {isAdmin ? "Espace Admin" : isInstructor ? "Espace Formateur" : "Espace élève"}
+              </p>
+              
+               {/* Mobile User Menu Items (Dashboard etc) */}
+              <div className="flex flex-col space-y-2">
+                 {/* ... existing mobile user items ... */}
+                  <Link
+                  href={isAdmin ? "/admin" : "/dashboard"}
+                  className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>Tableau de bord</span>
+                </Link>
+                {/* ... other items are handled by existing logic but ensure Login is present if !user ... */}
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-200 mt-2 pb-8">
+              {isLoading ? (
+                <div className="flex items-center space-x-2 text-slate-500 py-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-gold-500" />
+                  <span>Chargement...</span>
+                </div>
+              ) : user ? (
+                <div className="flex items-center justify-between py-2">
+                  <Link
+                    href="/profile"
+                    className="flex items-center space-x-2 text-slate-900 hover:text-gold-500 transition"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                     {/* User Info */}
+                    <span className="text-sm font-medium truncate max-w-[140px]">
+                      {user?.name}
+                    </span>
+                  </Link>
+                  <a
+                    href="/api/auth/logout"
+                    className="p-2 text-slate-500 hover:text-slate-900 transition"
+                    title="Se déconnecter"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <LogOut className="w-5 h-5" />
+                  </a>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3 pt-1">
+                  <a
+                    href="/api/auth/login?returnTo=/dashboard"
+                    className="w-full px-4 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-gold-500 hover:text-white transition text-center shadow-lg"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Se connecter / Espace élève
+                  </a>
+                  <div className="grid grid-cols-1 gap-3">
+                     <Link
+                        href="/demande-acces"
+                        className="px-4 py-2 text-sm text-slate-900 border border-slate-200 rounded-lg hover:border-gold-500 hover:text-gold-500 transition text-center"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        Demande d&apos;accès
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}
+

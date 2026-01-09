@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'navy': {
+                            900: '#0F172A',
+                            800: '#1E293B',
+                            700: '#334155'
+                        },
+                        'gold': {
+                            500: '#FBBF24',
+                            600: '#F59E0B'
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { font-family: 'Inter', sans-serif; }
+        .glass-effect { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(251, 191, 36, 0.2); border-color: #FBBF24; }
+    </style>
+</head>
+<body class="bg-navy-900 text-white">
+
+<header id="header" class="fixed w-full top-0 z-50 glass-effect">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-graduation-cap text-navy-900 text-xl"></i>
+                </div>
+                <span class="text-xl font-bold">DriveAcademy<span class="text-gold-500">Pro</span></span>
+            </div>
+            
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-gray-300 hover:text-gold-500 transition">Accueil</a>
+                <a href="#formations" class="text-white font-medium border-b-2 border-gold-500">Formations</a>
+                <a href="#location" class="text-gray-300 hover:text-gold-500 transition">Location</a>
+                <a href="#testimonials" class="text-gray-300 hover:text-gold-500 transition">Témoignages</a>
+                <a href="#" class="text-gray-300 hover:text-gold-500 transition">Contact</a>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <button class="hidden md:block px-5 py-2 text-white hover:text-gold-500 transition font-medium">Connexion</button>
+                <button class="px-6 py-2.5 bg-gradient-to-r from-gold-500 to-gold-600 text-navy-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/50 transition">S'inscrire</button>
+                <button class="md:hidden text-white">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section id="catalog-hero" class="pt-32 pb-16 bg-gradient-to-b from-navy-800 to-navy-900">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                Catalogue des <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-500 to-gold-600">Formations</span>
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                Découvrez nos formations professionnelles pour réussir dans le transport et la sécurité
+            </p>
+        </div>
+    </div>
+</section>
+
+<section id="catalog-main" class="py-8 bg-navy-900">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <aside id="filters-sidebar" class="lg:w-80 space-y-6">
+                <div class="glass-effect rounded-2xl p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fa-solid fa-filter text-gold-500 mr-2"></i>
+                        Affiner votre recherche
+                    </h3>
+                    
+                    <div class="mb-6">
+                        <div class="relative">
+                            <input type="text" placeholder="Rechercher une thématique, un code formation..." class="w-full bg-navy-800 border border-navy-700 rounded-lg px-4 py-3 pl-10 text-white focus:border-gold-500 focus:outline-none">
+                            <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-semibold mb-3">Type de Formation</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3 accent-gold-500" checked>
+                                <span>Toutes les formations</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>Permis (A, B, C, EB)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>VTC & Taxi</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>Sécurité & SSIAP</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-semibold mb-3">Durée</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="duration" class="mr-3 accent-gold-500">
+                                <span>Moins de 30h</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="duration" class="mr-3 accent-gold-500">
+                                <span>30h - 50h</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="duration" class="mr-3 accent-gold-500">
+                                <span>Plus de 50h</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-semibold mb-3">Dispositif de financement</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>Éligible CPF</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>Financement entreprise</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>Financement personnel</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-semibold mb-3">Niveau</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>Débutant</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>Intermédiaire</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3 accent-gold-500">
+                                <span>Avancé</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full py-3 bg-gradient-to-r from-gold-500 to-gold-600 text-navy-900 rounded-lg font-bold hover:shadow-lg hover:shadow-gold-500/50 transition">
+                        Appliquer les filtres
+                    </button>
+                </div>
+            </aside>
+            
+            <main id="courses-grid" class="flex-1">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="text-gray-400">
+                        <span class="font-semibold text-white">24 formations</span> disponibles
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-400">Trier les résultats :</span>
+                        <select class="bg-navy-800 border border-navy-700 rounded-lg px-4 py-2 text-white focus:border-gold-500 focus:outline-none">
+                            <option>Pertinence (par défaut)</option>
+                            <option>Prochaine session</option>
+                            <option>Intitulé A-Z</option>
+                            <option>Durée croissante</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    
+                    <div id="course-card-1" class="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover">
+                        <div class="h-48 overflow-hidden">
+                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/fc6207cbc0-64789b144a16ff4f1f8d.png" alt="modern motorcycle on road, professional driving school, high quality photography" />
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="inline-block px-3 py-1 bg-gold-500/20 text-gold-500 rounded-full text-sm font-semibold">Permis A</div>
+                                <div class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Débutant</div>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">Permis Moto A2</h3>
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Formation complète pour obtenir votre permis moto A2, avec un suivi pédagogique individualisé, ateliers pratiques et accompagnement aux examens.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <span>20h de formation</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : conducteurs débutants</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">890€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span>📅 Prochaine session : 15 Jan</span>
+                                <span class="text-gray-400">Certification interne</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-gold-500 hover:text-gold-500 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="course-card-2" class="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover">
+                        <div class="h-48 overflow-hidden">
+                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/2c2b07b86f-caef7f9e7b84aa8117b4.png" alt="modern car driving lesson, auto school, professional instructor" />
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="inline-block px-3 py-1 bg-gold-500/20 text-gold-500 rounded-full text-sm font-semibold">Permis B</div>
+                                <div class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Débutant</div>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">Permis Voiture B</h3>
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Parcours complet pour le permis B : code, conduite, mises en situation réelles et temps d’échanges avec votre formateur pour consolider les acquis.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <span>35h de formation</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : nouveaux conducteurs</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">1200€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span>📅 Sessions continues</span>
+                                <span class="text-gray-400">Préparation examen officiel</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-gold-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-gold-500 hover:text-gold-500 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
+                        </div>
+                    </div>
+                    
+                    <div id="course-card-3" class="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover">
+                        <div class="h-48 overflow-hidden">
+                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/3eeb01f1b1-24bc748e251ee386a5d3.png" alt="professional taxi driver with luxury car, VTC service, urban setting" />
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm font-semibold">VTC</div>
+                                <div class="px-2 py-1 bg-orange-500/20 text-orange-400 rounded text-xs">Professionnel</div>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">Formation VTC Complète</h3>
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Parcours professionnalisant pour devenir chauffeur VTC : réglementation, relation client, gestion d’activité et conduite en milieu urbain.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <span>50h de formation</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel / terrain</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : futurs chauffeurs VTC</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">1800€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span>📅 Prochaine session : 22 Jan</span>
+                                <span class="text-gray-400">Certification professionnelle</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-blue-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-blue-400 hover:text-blue-400 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
+                        </div>
+                    </div>
+                    
+                    <div id="course-card-4" class="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover">
+                        <div class="h-48 overflow-hidden">
+                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/af9a0550ea-7c4efe01cf88d0747eea.png" alt="fire safety training, SSIAP professional with fire extinguisher, modern facility" />
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="inline-block px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm font-semibold">SSIAP 1</div>
+                                <div class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs">Intermédiaire</div>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">SSIAP 1 - Agent de Sécurité</h3>
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Acquérir les compétences nécessaires pour assurer la sécurité incendie et l’assistance aux personnes au sein des ERP et IGH.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <span>67h de formation</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : futurs agents SSIAP 1</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">950€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span>📅 Prochaine session : 5 Fév</span>
+                                <span class="text-gray-400">Diplôme SSIAP 1</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-red-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-red-400 hover:text-red-400 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
+                        </div>
+                    </div>
+                    
+                    <div id="course-card-5" class="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover">
+                        <div class="h-48 overflow-hidden">
+                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/b83e3e70c9-0d1cd687f14b60ecde2d.png" alt="taxi professional training, city driving, professional instructor" />
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm font-semibold">Taxi</div>
+                                <div class="px-2 py-1 bg-orange-500/20 text-orange-400 rounded text-xs">Professionnel</div>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">Formation Chauffeur Taxi</h3>
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Préparation complète à l’examen de chauffeur de taxi : réglementation, topographie, relation client et gestion de course.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <span>45h de formation</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : futurs chauffeurs de taxi</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">1650€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span>📅 Prochaine session : 12 Fév</span>
+                                <span class="text-gray-400">Préparation carte pro</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-blue-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-blue-400 hover:text-blue-400 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
+                        </div>
+                    </div>
+                    
+                    <div id="course-card-6" class="bg-navy-800 rounded-2xl overflow-hidden border border-navy-700 card-hover">
+                        <div class="h-48 overflow-hidden">
+                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/3665ad5540-77ae61ea5dddd6121294.png" alt="truck driving lesson, heavy vehicle training, professional instructor" />
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="inline-block px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm font-semibold">Permis C</div>
+                                <div class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs">Intermédiaire</div>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">Permis Poids Lourd C</h3>
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-3">Programme complet pour maîtriser la conduite de véhicules de transport de marchandises et la réglementation associée.</p>
+                            <div class="flex items-center justify-between mb-3 text-sm text-gray-300">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <span>105h de formation</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Présentiel</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mb-3 text-sm">
+                                <span class="text-gray-400">Public visé : conducteurs poids lourd</span>
+                                <span class="text-gray-300">À partir de <span class="font-semibold text-gold-500/90">2200€</span></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-4 text-sm text-gray-300">
+                                <span class="text-orange-400">📅 Sessions sur demande</span>
+                                <span class="text-gray-400">Préparation examen permis C</span>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full py-3 bg-navy-700 hover:bg-purple-500 hover:text-navy-900 text-white rounded-lg font-semibold transition">Voir la fiche formation</button>
+                                <button class="w-full py-2 border border-navy-600 text-gray-200 hover:border-purple-400 hover:text-purple-400 rounded-lg text-sm font-medium transition">Demander un devis / Inscription</button>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div id="pagination" class="flex items-center justify-center mt-12 space-x-2">
+                    <button class="px-3 py-2 bg-navy-800 rounded-lg hover:bg-gold-500 hover:text-navy-900 transition">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button class="px-4 py-2 bg-gold-500 text-navy-900 rounded-lg font-semibold">1</button>
+                    <button class="px-4 py-2 bg-navy-800 rounded-lg hover:bg-gold-500 hover:text-navy-900 transition">2</button>
+                    <button class="px-4 py-2 bg-navy-800 rounded-lg hover:bg-gold-500 hover:text-navy-900 transition">3</button>
+                    <span class="px-4 py-2 text-gray-400">...</span>
+                    <button class="px-4 py-2 bg-navy-800 rounded-lg hover:bg-gold-500 hover:text-navy-900 transition">8</button>
+                    <button class="px-3 py-2 bg-navy-800 rounded-lg hover:bg-gold-500 hover:text-navy-900 transition">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+</section>
+
+<footer id="footer" class="bg-navy-900 border-t border-navy-700 py-16">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+                <div class="flex items-center space-x-2 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-graduation-cap text-navy-900 text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold">DriveAcademy<span class="text-gold-500">Pro</span></span>
+                </div>
+                <p class="text-gray-400 mb-4">Votre partenaire formation et location pour réussir dans le transport professionnel.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-10 h-10 bg-navy-800 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-navy-900 transition">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-navy-800 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-navy-900 transition">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-navy-800 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-navy-900 transition">
+                        <i class="fa-brands fa-linkedin-in"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="font-bold text-lg mb-4">Formations</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-gold-500 transition">Permis Moto</a></li>
+                    <li><a href="#" class="hover:text-gold-500 transition">Permis Auto</a></li>
+                    <li><a href="#" class="hover:text-gold-500 transition">Formation VTC</a></li>
+                    <li><a href="#" class="hover:text-gold-500 transition">Formation Taxi</a></li>
+                    <li><a href="#" class="hover:text-gold-500 transition">SSIAP</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="font-bold text-lg mb-4">Services</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-gold-500 transition">Location Véhicules</a></li>
+                    <li><a href="#" class="hover:text-gold-500 transition">Planning & Réservation</a></li>
+                    <li><a href="#" class="hover:text-gol

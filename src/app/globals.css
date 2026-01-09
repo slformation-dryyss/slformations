@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+:root {
+  /* Palette Light & Gold : fond clair + or */
+  /* Fond légèrement grisé pour réduire l'effet blanc pur */
+  --background: #e2e8f0; /* Slate 200 - Slightly darker to reduce glare */
+  --foreground: #020617; /* Slate 950 - MAX CONTRAST TEXT */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  
+  /* Redéfinition des variables 'navy' pour un Thème Clair Logique */
+  /* Fond : Slate 100 (léger gris) | Cartes : White | Bordures : Slate 200/300 */
+  --color-navy-900: #e2e8f0; /* Page Background (Slate 200) */
+  --color-navy-800: #ffffff; /* Card Background (White) */
+  --color-navy-700: #e2e8f0; /* Borders (Slate 200) */
+  --color-navy-600: #cbd5e1; /* Stronger Element Borders (Slate 300) */
+
+  /* Or inspiré du logo */
+  --color-gold-500: #fbbf24;
+  --color-gold-600: #f59e0b;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+}
+
+/* Glass effect utility (Light Mode) */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.05);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-hover {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card-hover:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 25px 50px -12px rgba(251, 191, 36, 0.25);
+  border-color: rgba(251, 191, 36, 0.5);
+}
+
+/* Scroll reveal (apparition douce au scroll) */
+.sr-base {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s ease-out;
+  will-change: opacity, transform;
+}
+
+.sr-visible {
+  opacity: 1;
+  transform: translateY(0);
+}

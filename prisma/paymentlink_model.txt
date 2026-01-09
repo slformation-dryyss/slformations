@@ -1,0 +1,40 @@
+// RGPD: Demandes d'export de données
+model DataExportRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  status      String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  exportUrl   String?  // URL du fichier ZIP généré
+  expiresAt   DateTime? // Date d'expiration du lien (7 jours)
+  
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+
+  @@index([userId])
+  @@index([status])
+}
+
+// Liens de paiement Stripe pour paiements différés
+model PaymentLink {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  courseId    String?
+  course      Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  
+  stripeUrl   String   // URL du Stripe Payment Link
+  amount      Float    // Montant en euros
+  status      String   @default("PENDING") // PENDING, PAID, EXPIRED, CANCELLED
+  
+  expiresAt   DateTime?
+  paidAt      DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([courseId])
+}
