@@ -66,10 +66,10 @@ export function Header() {
 
   return (
     <header id="header" className="fixed w-full top-0 z-50 glass-effect">
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between gap-8">
-          <Link href="/" className="flex items-center space-x-3 flex-shrink-0">
-            <div className="relative h-12 w-48 md:w-56">
+      <div className="max-w-7xl mx-auto px-4 py-2">
+        <div className="flex items-center justify-between gap-4">
+          <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
+            <div className="relative h-10 w-40 md:w-48">
               <Image
                 src="/logo.svg"
                 alt="SL Formations"
@@ -80,11 +80,11 @@ export function Header() {
             </div>
           </Link>
 
-          <nav className="hidden xl:flex items-center space-x-6">
+          <nav className="hidden lg:flex items-center space-x-4">
             {/* Link 'Accueil' removed to save space */}
             <Link
               href="/nos-plannings"
-              className="text-slate-600 hover:text-gold-500 transition font-medium"
+              className="text-slate-600 hover:text-gold-500 transition font-medium text-sm"
             >
               Plannings
             </Link>
@@ -96,11 +96,11 @@ export function Header() {
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <button 
-                className={`flex items-center space-x-1 transition focus:outline-none ${activeDropdown === "permis" ? "text-gold-500" : "text-slate-600 group-hover:text-gold-500"}`}
+                className={`flex items-center space-x-1 transition focus:outline-none text-sm ${activeDropdown === "permis" ? "text-gold-500" : "text-slate-600 group-hover:text-gold-500"}`}
                 onClick={() => toggleDropdown("permis")}
               >
                 <span>Nos Permis</span>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === "permis" ? "rotate-180" : "group-hover:rotate-180"}`} />
+                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${activeDropdown === "permis" ? "rotate-180" : "group-hover:rotate-180"}`} />
               </button>
               
               <div className={`absolute top-full left-0 w-64 pt-2 transition-all duration-200 transform ${
@@ -156,11 +156,11 @@ export function Header() {
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <button 
-                className={`flex items-center space-x-1 transition focus:outline-none ${activeDropdown === "pro" ? "text-gold-500" : "text-slate-600 group-hover:text-gold-500"}`}
+                className={`flex items-center space-x-1 transition focus:outline-none text-sm ${activeDropdown === "pro" ? "text-gold-500" : "text-slate-600 group-hover:text-gold-500"}`}
                 onClick={() => toggleDropdown("pro")}
               >
                 <span>Formations Pro</span>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === "pro" ? "rotate-180" : "group-hover:rotate-180"}`} />
+                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${activeDropdown === "pro" ? "rotate-180" : "group-hover:rotate-180"}`} />
               </button>
               
               <div className={`absolute top-full left-0 w-64 pt-2 transition-all duration-200 transform ${
@@ -217,7 +217,7 @@ export function Header() {
             </div>
           </nav>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             {isLoading ? (
               <Loader2 className="w-6 h-6 animate-spin text-gold-500" />
             ) : user ? (
@@ -318,28 +318,28 @@ export function Header() {
               <>
                 <Link
                   href="/contact?subject=recrutement"
-                  className="hidden xl:block px-5 py-2 text-slate-600 hover:text-gold-500 transition font-medium text-sm border-r border-slate-200 pr-5 mr-3"
+                  className="hidden lg:block px-3 py-1.5 text-slate-600 hover:text-gold-500 transition font-medium text-xs border-r border-slate-200 pr-3 mr-2"
                 >
                   Vous êtes formateur ?
                 </Link>
                 {/* Desktop : lien texte Demande d'accès à gauche */}
                 <Link
                   href="/demande-acces"
-                  className="hidden xl:block px-5 py-2 text-slate-900 hover:text-gold-500 transition font-medium"
+                  className="hidden xl:block px-3 py-1.5 text-slate-900 hover:text-gold-500 transition font-medium text-xs"
                 >
                   Demande d&apos;accès
                 </Link>
                 {/* CTA principal : Accéder à mon espace (redirige vers le login) */}
                 <a
                   href="/api/auth/login?returnTo=/dashboard"
-                  className="hidden xl:block px-6 py-2.5 bg-gradient-to-r from-gold-500 to-gold-600 text-slate-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/50 transition"
+                  className="hidden lg:block px-4 py-2 bg-gradient-to-r from-gold-500 to-gold-600 text-slate-900 rounded-lg font-semibold text-xs hover:shadow-lg hover:shadow-gold-500/50 transition"
                 >
                   Accéder à mon espace
                 </a>
               </>
             )}
             <button
-              className="xl:hidden text-slate-900"
+              className="lg:hidden text-slate-900"
               type="button"
               onClick={() => setIsMobileMenuOpen((open) => !open)}
               aria-label={isMobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
@@ -357,7 +357,7 @@ export function Header() {
 
       {/* Menu mobile */}
       {isMobileMenuOpen && (
-        <div className="xl:hidden bg-white/95 border-t border-slate-200 backdrop-blur px-6 pb-4 pt-2 h-[calc(100vh-80px)] overflow-y-auto">
+        <div className="lg:hidden bg-white/95 border-t border-slate-200 backdrop-blur px-6 pb-4 pt-2 h-[calc(100vh-80px)] overflow-y-auto">
           <nav className="flex flex-col space-y-3 pt-2 text-sm">
             <Link
               href="/"
