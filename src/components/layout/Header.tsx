@@ -123,6 +123,20 @@ export function Header() {
                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                     <span>Permis Moto A2</span>
                   </Link>
+                  <Link
+                    href="/formations/permis-accelere"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span>Permis en Accéléré</span>
+                  </Link>
+                  <Link
+                    href="/formations/conduite-supervisee"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span>Conduite Supervisée</span>
+                  </Link>
                    <div className="my-2 border-t border-slate-100"></div>
                   <Link
                     href="/formations/recuperation-points"

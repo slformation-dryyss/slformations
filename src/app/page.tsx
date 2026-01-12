@@ -394,6 +394,68 @@ export default function Home() {
                   </div>
                 </div>
               </article>
+
+              {/* Permis Accéléré */}
+              <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
+                <div className="h-48 overflow-hidden">
+                  <img
+                    className="w-full h-full object-cover"
+                    src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=800"
+                    alt="Permis Accéléré"
+                  />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-block px-3 py-1 mb-3 rounded-full bg-gold-500/15 text-gold-500 text-xs font-semibold">
+                    Permis Accéléré
+                  </span>
+                  <h3 className="text-2xl font-bold mb-3 text-slate-900">
+                    Permis en Accéléré
+                  </h3>
+                  <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+                    Obtenez votre permis en un temps record grâce à notre stage intensif. Idéal pour les emplois du temps serrés.
+                  </p>
+                  <div className="mt-auto flex items-center justify-between text-sm text-gray-400">
+                    <span className="flex items-center space-x-1">
+                      <Clock className="w-4 h-4" />
+                      <span>Stage Intensif</span>
+                    </span>
+                    <Link href="/contact" className="text-gold-500 font-semibold hover:underline">
+                      Sur devis
+                    </Link>
+                  </div>
+                </div>
+              </article>
+
+              {/* Conduite Supervisée */}
+              <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
+                <div className="h-48 overflow-hidden">
+                  <img
+                    className="w-full h-full object-cover"
+                    src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=800"
+                    alt="Conduite Supervisée"
+                  />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-block px-3 py-1 mb-3 rounded-full bg-gold-500/15 text-gold-500 text-xs font-semibold">
+                    Conduite Supervisée
+                  </span>
+                  <h3 className="text-2xl font-bold mb-3 text-slate-900">
+                    Conduite Supervisée
+                  </h3>
+                  <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+                    Gagnez en expérience à moindre coût avant l'examen avec la conduite supervisée. Dès 18 ans.
+                  </p>
+                  <div className="mt-auto flex items-center justify-between text-sm text-gray-400">
+                    <span className="flex items-center space-x-1">
+                      <Clock className="w-4 h-4" />
+                      <span>Dès 18 ans</span>
+                    </span>
+                    <Link href="/contact" className="text-gold-500 font-semibold hover:underline">
+                      Sur devis
+                    </Link>
+                  </div>
+                </div>
+              </article>
             </div>
           </div>
         </section>

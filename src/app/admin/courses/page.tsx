@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Edit, Eye, Trash } from "lucide-react";
 
 import { CourseFilters } from "@/components/admin/CourseFilters";
+import { DeleteCourseButton } from "@/components/admin/courses/DeleteCourseButton";
 
 async function getCourses(params: { q?: string; type?: string; sort?: string }) {
   const { q, type, sort } = params;
@@ -123,6 +124,7 @@ export default async function AdminCoursesPage({
                               >
                                   <Eye className="w-5 h-5" />
                               </Link>
+                              <DeleteCourseButton courseId={course.id} courseName={course.title} />
                           </div>
                         </div>
                         <div className="mt-2 sm:flex sm:justify-between">

@@ -294,6 +294,11 @@ export default async function CMSCoursePage({
                  </div>
 
                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Limite de Participants (0 = illimité)</label>
+                    <input type="number" name="maxStudents" defaultValue={course.maxStudents || 0} className="w-full text-sm border-slate-300 rounded p-2 border" />
+                 </div>
+
+                 <div>
                      <label className="block text-sm font-medium text-slate-700 mb-2">Statut</label>
                      <div className="flex items-center gap-2 p-3 bg-slate-50 rounded border border-slate-200">
                         <input type="checkbox" name="isPublished" defaultChecked={course.isPublished} className="h-4 w-4 text-gold-600 rounded border-gray-300" />

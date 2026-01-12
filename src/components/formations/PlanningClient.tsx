@@ -162,14 +162,14 @@ export default function PlanningClient() {
             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 block px-1">
               Catégories de formation
             </label>
-            <div className="flex flex-nowrap lg:flex-wrap gap-2 pb-2 lg:pb-0">
+            <div className="flex flex-nowrap gap-2 pb-2 overflow-x-auto">
               {categories.map((cat) => (
                 <button
                   key={cat.label}
                   onClick={() => setType(cat.value)}
-                  className={`px-5 py-3 rounded-2xl text-xs font-black transition-all border-2 shrink-0 ${
+                  className={`px-4 py-2 rounded-xl text-[10px] uppercase font-black transition-all border shrink-0 ${
                     type === cat.value
-                      ? "bg-gold-500 text-slate-900 border-gold-500 shadow-lg shadow-gold-500/20 -translate-y-0.5"
+                      ? "bg-gold-500 text-slate-900 border-gold-500 shadow-md shadow-gold-500/20"
                       : "bg-white text-slate-500 border-slate-100 hover:border-gold-200 hover:text-gold-600"
                   }`}
                 >

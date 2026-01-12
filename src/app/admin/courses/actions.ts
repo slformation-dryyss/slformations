@@ -70,6 +70,7 @@ export async function updateCourseAction(formData: FormData) {
       type,
       isPublished,
       imageUrl,
+      maxStudents: parseInt(formData.get("maxStudents") as string) || 0,
     },
   });
 
@@ -185,3 +186,18 @@ export async function deleteLessonAction(formData: FormData) {
     }
 }
 
+export async function deleteCourseAction(formData: FormData) {
+  await requireAdmin();
+  const courseId = formData.get("courseId") as string;
+  if (!courseId) return;
+
+  try {
+    await prisma.course.delete({
+      where: { id: courseId },
+    });
+    revalidatePath("/admin/courses");
+  } catch (error) {
+    console.error("Failed to delete course:", error);
+    // On pourrait retourner une erreur ici pour l'afficher côté client
+  }
+}
