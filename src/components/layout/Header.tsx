@@ -137,6 +137,13 @@ export function Header() {
                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                     <span>Conduite Supervisée</span>
                   </Link>
+                  <Link
+                    href="/formations/permis-aac"
+                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span>Conduite Accompagnée (AAC)</span>
+                  </Link>
                    <div className="my-2 border-t border-slate-100"></div>
                   <Link
                     href="/formations/recuperation-points"

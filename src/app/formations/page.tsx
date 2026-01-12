@@ -122,6 +122,31 @@ export default function FormationsPage() {
                                     </Link>
                                 </div>
                             </div>
+                            <div className="bg-white rounded-2xl overflow-hidden border border-slate-200 card-hover shadow-sm hover:shadow-md transition-all flex flex-col">
+                                <Link href="/formations/permis-aac" className="h-48 overflow-hidden block">
+                                    <img className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" src="https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?q=80&w=2070&auto=format&fit=crop" alt="Permis AAC" />
+                                </Link>
+                                <div className="p-6 flex-1 flex flex-col">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="inline-block px-3 py-1 bg-gold-500/20 text-gold-600 rounded-full text-sm font-semibold">Permis AAC</div>
+                                        <div className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">Dès 15 ans</div>
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-2 text-slate-900">
+                                        <Link href="/formations/permis-aac" className="hover:text-gold-500 transition">Conduite Accompagnée (AAC)</Link>
+                                    </h3>
+                                    <p className="text-slate-500 text-sm mb-4 line-clamp-2">Le moyen le plus sûr de réussir son permis. Possible dès 15 ans.</p>
+                                    <div className="flex items-center justify-between mb-4 mt-auto">
+                                        <div className="flex items-center space-x-2 text-slate-400 text-sm">
+                                            <Clock className="w-4 h-4" />
+                                            <span>13h min</span>
+                                        </div>
+                                        <div className="text-slate-900 font-bold text-lg">Dès 1255€</div>
+                                    </div>
+                                    <Link href="/formations/permis-aac" className="w-full py-3 bg-slate-900 hover:bg-gold-500 hover:text-white text-white rounded-lg font-semibold transition text-center block">
+                                        Voir les forfaits
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
                     </main>
                 </div>

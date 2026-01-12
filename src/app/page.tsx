@@ -450,8 +450,39 @@ export default function Home() {
                       <Clock className="w-4 h-4" />
                       <span>Dès 18 ans</span>
                     </span>
-                    <Link href="/contact" className="text-gold-500 font-semibold hover:underline">
+                    <Link href="/formations/conduite-supervisee" className="text-gold-500 font-semibold hover:underline">
                       Sur devis
+                    </Link>
+                  </div>
+                </div>
+              </article>
+
+              {/* Permis AAC */}
+              <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
+                <div className="h-48 overflow-hidden">
+                  <img
+                    className="w-full h-full object-cover"
+                    src="https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?auto=format&fit=crop&q=80&w=800"
+                    alt="Permis AAC"
+                  />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-block px-3 py-1 mb-3 rounded-full bg-gold-500/15 text-gold-500 text-xs font-semibold">
+                    Dès 15 ans
+                  </span>
+                  <h3 className="text-2xl font-bold mb-3 text-slate-900">
+                    Permis AAC
+                  </h3>
+                  <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+                    Apprenez à conduire en toute sérénité dès 15 ans avec la conduite accompagnée.
+                  </p>
+                  <div className="mt-auto flex items-center justify-between text-sm text-gray-400">
+                    <span className="flex items-center space-x-1">
+                      <Clock className="w-4 h-4" />
+                      <span>Expérience</span>
+                    </span>
+                    <Link href="/formations/permis-aac" className="text-gold-500 font-semibold hover:underline">
+                      Dès 1255€
                     </Link>
                   </div>
                 </div>

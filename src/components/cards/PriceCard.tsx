@@ -13,6 +13,7 @@ interface PriceCardProps {
   onButtonClick?: () => void;
   badge?: string;
   link?: string;
+  footerText?: string;
 }
 
 export function PriceCard({
@@ -25,7 +26,8 @@ export function PriceCard({
   color = "navy",
   buttonText = "Choisir cette formule",
   badge,
-  link
+  link,
+  footerText
 }: PriceCardProps) {
   const getColors = () => {
     switch (color) {
@@ -130,6 +132,11 @@ export function PriceCard({
         <button className={`w-full py-4 rounded-xl font-bold uppercase tracking-wide transition-all ${style.button}`}>
           {buttonText}
         </button>
+      )}
+      {footerText && (
+        <p className={`mt-4 text-center text-xs font-medium italic ${color === "navy" ? "text-slate-500" : "text-gray-400"}`}>
+          {footerText}
+        </p>
       )}
     </div>
   );
