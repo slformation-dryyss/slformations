@@ -49,7 +49,7 @@ export default async function middleware(request: NextRequest) {
       if (!session) {
         console.log(`[Middleware] No session, redirecting to login...`);
         const loginUrl = new URL("/api/auth/login", appUrl);
-        loginUrl.searchParams.set("returnTo", "/dashboard");
+        loginUrl.searchParams.set("returnTo", request.nextUrl.pathname);
         return NextResponse.redirect(loginUrl);
       }
 
