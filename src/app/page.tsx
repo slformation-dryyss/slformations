@@ -151,29 +151,21 @@ export default function Home() {
         <section id="formations-pro" className="py-20 bg-slate-50">
           <div className="max-w-7xl mx-auto px-6">
               <div className="text-center mb-10">
-              <h2 className="text-3xl md:text-4xl font-bold mb-3 text-slate-900">
-                Nos <span className="text-gold-500">Pôles d'Expertise</span>
-              </h2>
-              <p className="text-lg text-slate-600 mb-4 max-w-3xl mx-auto">
-                Logistique, CACES, Sécurité, Informatique... Développez votre employabilité.
-              </p>
-              <p className="text-slate-600 max-w-2xl mx-auto">
-                <span className="font-semibold text-slate-900">
-                  Votre avenir commence ici.
-                  <span className="text-gold-500"> Certifié Qualiopi.</span>
-                </span>
-                <br />
-                Formez-vous aux métiers qui recrutent : agent de sécurité, CACES, numérique... 
-                Financement CPF, France Travail et OPCO.
-              </p>
-              <div className="mt-6">
-                <Link
-                  href="/formations"
-                  className="inline-flex items-center px-6 py-3 rounded-lg bg-gold-500 text-white font-semibold hover:bg-gold-600 transition shadow-lg hover:shadow-gold-500/20"
-                >
-                  formation professionnelle
-                </Link>
-              </div>
+                <p className="text-sm font-bold text-slate-800 mb-1">
+                  Votre avenir commence ici. <span className="text-gold-500 italic">Certifié Qualiopi.</span>
+                </p>
+                <p className="text-sm text-slate-600 mb-4 max-w-2xl mx-auto">
+                  Formez-vous aux métiers qui recrutent : agent de sécurité, CACES, numérique... <br />
+                  Financement CPF, France Travail et OPCO.
+                </p>
+                <div className="mt-6">
+                  <Link
+                    href="/formations"
+                    className="inline-flex items-center px-8 py-3 rounded-lg bg-gold-500 text-white font-bold text-sm uppercase tracking-wide hover:bg-gold-600 transition shadow-lg hover:shadow-gold-500/20"
+                  >
+                    formation professionnelle
+                  </Link>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -194,7 +186,7 @@ export default function Home() {
                     Certifications TOSA pour valoriser votre CV digital.
                   </p>
                   <Link
-                    href="/formations"
+                    href="/formations/catalogue?category=tech"
                     className="mt-auto inline-flex items-center text-gold-500 text-sm font-semibold hover:text-gold-400"
                   >
                     Découvrir le pôle IT
@@ -207,7 +199,7 @@ export default function Home() {
               <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
                 <div className="h-48 overflow-hidden">
                   <img
-                    src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80&w=800"
+                    src="/formation-travaux-publics.jpg"
                     alt="Formation travaux publics"
                     className="w-full h-full object-cover"
                   />
@@ -221,7 +213,7 @@ export default function Home() {
                     Formations réglementaires pour travailler en toute sécurité.
                   </p>
                   <Link
-                    href="/formations"
+                    href="/formations/catalogue?category=securite"
                     className="mt-auto inline-flex items-center text-gold-500 text-sm font-semibold hover:text-gold-400"
                   >
                     En savoir plus
@@ -234,7 +226,7 @@ export default function Home() {
               <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
                 <div className="h-48 overflow-hidden">
                   <img
-                    src="https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?auto=format&fit=crop&q=80&w=800"
+                    src="/formation-caces.jpg"
                     alt="Formation CACES"
                     className="w-full h-full object-cover"
                   />
@@ -246,7 +238,7 @@ export default function Home() {
                     Nous vous guidons vers la certification adaptée à vos besoins.
                   </p>
                   <Link
-                    href="/formations"
+                    href="/formations/catalogue?category=securite"
                     className="mt-auto inline-flex items-center text-gold-500 text-sm font-semibold hover:text-gold-400"
                   >
                     En savoir plus
@@ -273,7 +265,7 @@ export default function Home() {
                     Des diplômes reconnus pour des métiers en tension.
                   </p>
                   <Link
-                    href="/formations"
+                    href="/formations/catalogue?category=securite"
                     className="mt-auto inline-flex items-center text-gold-500 text-sm font-semibold hover:text-gold-400"
                   >
                     Formations Sécurité
@@ -363,13 +355,13 @@ export default function Home() {
                 </div>
               </article>
 
-              {/* Formation VTC */}
+              {/* Formation VTC & Taxi */}
               <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
                 <div className="h-48 overflow-hidden">
                   <img
                     className="w-full h-full object-cover"
-                    src="https://ls-formation.fr/wp-content/uploads/2025/03/taxis-2304w.webp"
-                    alt="Formation VTC"
+                    src="/formation-vtc-taxi.jpg"
+                    alt="Formation VTC & Taxi"
                   />
                 </div>
                 <div className="p-6 flex flex-col flex-1">
@@ -380,17 +372,109 @@ export default function Home() {
                     Formation VTC & Taxi
                   </h3>
                   <p className="text-slate-600 mb-4 text-sm leading-relaxed">
-                    Préparez votre examen théorique et pratique avec nos experts. Formation complète incluant réglementation, gestion et sécurité pour lancer votre carrière.
+                    Préparez votre examen théorique et pratique avec nos experts. Formation complète incluant réglementation et sécurité.
                   </p>
                   <div className="mt-auto flex items-center justify-between text-sm text-gray-400">
                     <span className="flex items-center space-x-1">
                       <Clock className="w-4 h-4" />
                       <span>Formation intensive</span>
                     </span>
-                    <span className="flex items-center space-x-1 text-gold-500 font-semibold">
-                      <Euro className="w-4 h-4" />
-                      <span>à partir de 399€</span>
+                    <Link href="/formations/catalogue?category=vtc" className="text-gold-500 font-semibold hover:underline">
+                      En savoir plus
+                    </Link>
+                  </div>
+                </div>
+              </article>
+
+              {/* Permis Accéléré */}
+              <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
+                <div className="h-48 overflow-hidden">
+                  <img
+                    className="w-full h-full object-cover"
+                    src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=800"
+                    alt="Permis Accéléré"
+                  />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-block px-3 py-1 mb-3 rounded-full bg-gold-500/15 text-gold-500 text-xs font-semibold">
+                    Permis Accéléré
+                  </span>
+                  <h3 className="text-2xl font-bold mb-3 text-slate-900">
+                    Permis en Accéléré
+                  </h3>
+                  <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+                    Obtenez votre permis en un temps record grâce à notre stage intensif. Idéal pour les emplois du temps serrés.
+                  </p>
+                  <div className="mt-auto flex items-center justify-between text-sm text-gray-400">
+                    <span className="flex items-center space-x-1">
+                      <Clock className="w-4 h-4" />
+                      <span>Stage Intensif</span>
                     </span>
+                    <Link href="/contact" className="text-gold-500 font-semibold hover:underline">
+                      Sur devis
+                    </Link>
+                  </div>
+                </div>
+              </article>
+
+              {/* Conduite Supervisée */}
+              <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
+                <div className="h-48 overflow-hidden">
+                  <img
+                    className="w-full h-full object-cover"
+                    src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=800"
+                    alt="Conduite Supervisée"
+                  />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-block px-3 py-1 mb-3 rounded-full bg-gold-500/15 text-gold-500 text-xs font-semibold">
+                    Conduite Supervisée
+                  </span>
+                  <h3 className="text-2xl font-bold mb-3 text-slate-900">
+                    Conduite Supervisée
+                  </h3>
+                  <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+                    Gagnez en expérience à moindre coût avant l'examen avec la conduite supervisée. Dès 18 ans.
+                  </p>
+                  <div className="mt-auto flex items-center justify-between text-sm text-gray-400">
+                    <span className="flex items-center space-x-1">
+                      <Clock className="w-4 h-4" />
+                      <span>Dès 18 ans</span>
+                    </span>
+                    <Link href="/formations/conduite-supervisee" className="text-gold-500 font-semibold hover:underline">
+                      Sur devis
+                    </Link>
+                  </div>
+                </div>
+              </article>
+
+              {/* Permis AAC */}
+              <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
+                <div className="h-48 overflow-hidden">
+                  <img
+                    className="w-full h-full object-cover"
+                    src="https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?auto=format&fit=crop&q=80&w=800"
+                    alt="Permis AAC"
+                  />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-block px-3 py-1 mb-3 rounded-full bg-gold-500/15 text-gold-500 text-xs font-semibold">
+                    Dès 15 ans
+                  </span>
+                  <h3 className="text-2xl font-bold mb-3 text-slate-900">
+                    Permis AAC
+                  </h3>
+                  <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+                    Apprenez à conduire en toute sérénité dès 15 ans avec la conduite accompagnée.
+                  </p>
+                  <div className="mt-auto flex items-center justify-between text-sm text-gray-400">
+                    <span className="flex items-center space-x-1">
+                      <Clock className="w-4 h-4" />
+                      <span>Expérience</span>
+                    </span>
+                    <Link href="/formations/permis-aac" className="text-gold-500 font-semibold hover:underline">
+                      Dès 1255€
+                    </Link>
                   </div>
                 </div>
               </article>
