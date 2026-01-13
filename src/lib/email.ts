@@ -21,11 +21,12 @@ export async function sendEmail({ to, subject, html }: EmailPayload) {
   const fromAddress = settings["MAIL_FROM_ADDRESS"] || "ne-pas-repondre@sl-formations.fr";
 
   if (!resend) {
-    console.log("⚠️ RESEND_API_KEY missing. Mocking email send:");
-    console.log(`From: ${fromName} <${fromAddress}>`);
-    console.log(`To: ${to}`);
-    console.log(`Subject: ${subject}`);
-    // console.log(`HTML: ${html}`);
+    console.log("--------------------------------------------------");
+    console.log("⚠️ RESEND_API_KEY MOCK MODE (Key missing)");
+    console.log(`FROM: ${fromName} <${fromAddress}>`);
+    console.log(`TO: ${to}`);
+    console.log(`SUBJECT: ${subject}`);
+    console.log("--------------------------------------------------");
     return { success: true, id: 'mock-id' };
   }
 

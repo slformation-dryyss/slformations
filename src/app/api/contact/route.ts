@@ -27,15 +27,19 @@ export async function POST(req: NextRequest) {
     try {
       await sendEmail({
         to: "info@sl-formations.fr", // L'adresse de réception admin
-        subject: `[Nouveau Contact] ${subject || "Demande d'informations"}`,
+        subject: `[Contact Site] ${subject || "Demande d'informations"} - ${name}`,
         html: `
-          <div style="font-family: sans-serif; color: #1e293b;">
-            <h2 style="color: #eab308;">Nouveau message reçu</h2>
-            <p><strong>De :</strong> ${name} (<a href="mailto:${email}">${email}</a>)</p>
-            <p><strong>Téléphone :</strong> ${phone || "Non renseigné"}</p>
-            <p><strong>Sujet :</strong> ${subject || "Renseignements"}</p>
-            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
-            <p style="white-space: pre-wrap;">${message}</p>
+          <div style="font-family: sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+            <div style="background-color: #f8fafc; padding: 20px; border-bottom: 1px solid #e2e8f0;">
+              <h2 style="color: #eab308; margin: 0;">Nouveau message reçu</h2>
+            </div>
+            <div style="padding: 20px;">
+              <p style="margin: 0 0 10px 0;"><strong>Expéditeur :</strong> ${name}</p>
+              <p style="margin: 0 0 10px 0;"><strong>Email :</strong> <a href="mailto:${email}" style="color: #3b82f6;">${email}</a></p>
+              <p style="margin: 0 0 10px 0;"><strong>Téléphone :</strong> ${phone || "Non renseigné"}</p>
+              <p style="margin: 0 0 10px 0;"><strong>Sujet :</strong> ${subject || "Renseignements"}</p>
+              <div style="margin: 20px 0; padding: 15px; background-color: #f1f5f9; border-radius: 8px; white-space: pre-wrap;">${message}</div>
+            </div>
           </div>
         `
       });
