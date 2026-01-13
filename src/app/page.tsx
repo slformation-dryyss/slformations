@@ -636,7 +636,7 @@ export default function Home() {
                   </li>
                 </ul>
                 <Link
-                  href="/financement"
+                  href="/financement#cpf"
                   className="inline-flex items-center space-x-2 text-blue-600 font-semibold hover:underline"
                 >
                   <span>Vérifier mes droits</span>
@@ -672,7 +672,7 @@ export default function Home() {
                   </li>
                 </ul>
                 <Link
-                  href="/financement"
+                  href="/financement#france-travail"
                   className="inline-flex items-center space-x-2 text-green-600 font-semibold hover:underline"
                 >
                   <span>Monter mon dossier</span>
@@ -706,7 +706,7 @@ export default function Home() {
                   </li>
                 </ul>
                 <Link
-                  href="/contact"
+                  href="/financement#opco"
                   className="inline-flex items-center space-x-2 text-purple-600 font-semibold hover:underline"
                 >
                   <span>Demander un devis</span>

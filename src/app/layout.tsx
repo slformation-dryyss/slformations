@@ -13,7 +13,13 @@ export const metadata: Metadata = {
   title: "SL Formations",
   description: "SL Formations - Formations Permis, VTC, Taxi et Sécurité",
   icons: {
-    icon: '/favicon.png',
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon.png', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/favicon.png' },
+    ],
   },
 };
 
