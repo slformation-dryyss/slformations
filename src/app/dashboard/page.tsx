@@ -110,8 +110,8 @@ export default function Dashboard() {
         // Load Stats
         const statsRes = await fetch("/api/dashboard/stats", { cache: "no-store" });
         if (statsRes.ok) {
-            const statsData = await statsRes.json();
-            setStats(statsData);
+          const statsData = await statsRes.json();
+          setStats(statsData);
         }
 
       } catch (e) {
@@ -136,8 +136,8 @@ export default function Dashboard() {
 
   const user = profile;
   // Priorité au Prénom, sinon Nom complet, sinon "Élève"
-  const displayName = user.firstName 
-    ? user.firstName 
+  const displayName = user.firstName
+    ? user.firstName
     : (user.name || "Élève");
 
   const completedHours = stats?.stats.completedHours || 0;
@@ -168,12 +168,18 @@ export default function Dashboard() {
               </button>
               <Link href="/dashboard/profile" className="flex items-center space-x-3 hover:opacity-80 transition">
                 <div className="relative w-9 h-9">
-                  <Image
-                    src={user.picture || "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg"}
-                    alt={displayName}
-                    fill
-                    className="rounded-full object-cover border border-gold-500"
-                  />
+                  {user.picture ? (
+                    <Image
+                      src={user.picture}
+                      alt={displayName}
+                      fill
+                      className="rounded-full object-cover border border-gold-500"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-slate-100 border border-gold-500 flex items-center justify-center text-slate-500">
+                      <User className="w-5 h-5" />
+                    </div>
+                  )}
                 </div>
                 <div className="hidden sm:block text-xs text-left">
                   <div className="font-semibold">{displayName}</div>
@@ -198,15 +204,15 @@ export default function Dashboard() {
               </div>
               <p className="text-xs text-slate-500 mb-1">{isInstructor ? "Heures dispensées" : "Heures effectuées"}</p>
               {!isInstructor && (
-                  <>
-                    <div className="w-full bg-slate-100 rounded-full h-2 mb-1">
-                        <div
-                        className="bg-blue-500 h-2 rounded-full"
-                        style={{ width: `${Math.min(progressPct, 100)}%` }}
-                        />
-                    </div>
-                    <p className="text-xs text-blue-500">{progressPct}% completé (moy.)</p>
-                  </>
+                <>
+                  <div className="w-full bg-slate-100 rounded-full h-2 mb-1">
+                    <div
+                      className="bg-blue-500 h-2 rounded-full"
+                      style={{ width: `${Math.min(progressPct, 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-blue-500">{progressPct}% completé (moy.)</p>
+                </>
               )}
             </div>
 
@@ -217,12 +223,12 @@ export default function Dashboard() {
                 </div>
                 <div className="text-right text-sm">
                   {nextSession ? (
-                      <>
-                          <div className="text-lg font-bold text-slate-900 truncate max-w-[120px]" title={nextSession.title}>{nextSession.title}</div>
-                          <div className="text-gold-600 text-xs font-semibold">{new Date(nextSession.date).toLocaleDateString()}</div>
-                      </>
+                    <>
+                      <div className="text-lg font-bold text-slate-900 truncate max-w-[120px]" title={nextSession.title}>{nextSession.title}</div>
+                      <div className="text-gold-600 text-xs font-semibold">{new Date(nextSession.date).toLocaleDateString()}</div>
+                    </>
                   ) : (
-                      <div className="text-lg font-bold text-slate-400">Aucun</div>
+                    <div className="text-lg font-bold text-slate-400">Aucun</div>
                   )}
                 </div>
               </div>
@@ -292,29 +298,29 @@ export default function Dashboard() {
             <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
               <h2 className="text-lg font-semibold mb-3 text-slate-900">{isInstructor ? "Mon planning d'enseignement" : "Mes sessions à venir"}</h2>
               {stats?.recentBookings && stats.recentBookings.length > 0 ? (
-                  <div className="space-y-3">
-                      {stats.recentBookings.map((session) => (
-                            <div key={session.id} className="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-100">
-                              <div className="flex items-center gap-3">
-                                  <div className="bg-white p-2 rounded text-gold-500 border border-slate-100">
-                                      <CalendarDays className="w-5 h-5" />
-                                  </div>
-                                  <div>
-                                      <div className="font-bold text-sm text-slate-900">{session.title}</div>
-                                      <div className="text-xs text-slate-400">{session.location || "Lieu non précisé"}</div>
-                                  </div>
-                              </div>
-                              <div className="text-right">
-                                  <div className="font-mono text-sm font-bold text-slate-700">{new Date(session.date).toLocaleDateString()}</div>
-                                  <div className="text-xs text-slate-500">{new Date(session.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
-                              </div>
-                            </div>
-                      ))}
-                  </div>
+                <div className="space-y-3">
+                  {stats.recentBookings.map((session) => (
+                    <div key={session.id} className="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-100">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-white p-2 rounded text-gold-500 border border-slate-100">
+                          <CalendarDays className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-sm text-slate-900">{session.title}</div>
+                          <div className="text-xs text-slate-400">{session.location || "Lieu non précisé"}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-mono text-sm font-bold text-slate-700">{new Date(session.date).toLocaleDateString()}</div>
+                        <div className="text-xs text-slate-500">{new Date(session.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : (
-                  <p className="text-slate-500 italic text-sm">
+                <p className="text-slate-500 italic text-sm">
                   {isInstructor ? "Aucun cours programmé prochainement." : "Aucune réservation trouvée. Consultez le planning pour réserver une session."}
-                  </p>
+                </p>
               )}
             </div>
           </div>

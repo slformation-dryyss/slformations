@@ -121,7 +121,7 @@ export function ProfilePageClient({
                 {user.role === "INSTRUCTOR" ? "Bienvenue sur votre espace formateur 🎓" : "Bienvenue sur votre espace élève 🎓"}
               </p>
               <p>
-                {user.role === "INSTRUCTOR" 
+                {user.role === "INSTRUCTOR"
                   ? "Merci de compléter votre profil pour faciliter la gestion administrative et le planning."
                   : "Pour accéder à toutes les fonctionnalités du tableau de bord, merci de compléter votre profil ci-dessous."}
               </p>
@@ -135,12 +135,18 @@ export function ProfilePageClient({
             <div className="bg-navy-800 rounded-2xl p-6 md:p-8 border border-navy-700 text-center">
               <div className="relative inline-block mb-6">
                 <div className="relative w-28 h-28 md:w-32 md:h-32">
-                  <Image
-                    src={auth0User.picture || "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg"}
-                    alt="Profil utilisateur"
-                    fill
-                    className="rounded-full border-4 border-gold-500 object-cover"
-                  />
+                  {auth0User.picture ? (
+                    <Image
+                      src={auth0User.picture}
+                      alt="Profil utilisateur"
+                      fill
+                      className="rounded-full border-4 border-gold-500 object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-full border-4 border-gold-500 bg-navy-700 flex items-center justify-center">
+                      <User className="w-12 h-12 text-gray-500" />
+                    </div>
+                  )}
                 </div>
                 <button className="absolute bottom-0 right-0 w-9 h-9 bg-gold-500 rounded-full flex items-center justify-center text-navy-900 hover:bg-gold-600 transition text-sm">
                   ✎
@@ -151,8 +157,8 @@ export function ProfilePageClient({
                 {[user.firstName, user.lastName].filter(Boolean).length > 0
                   ? [user.firstName, user.lastName].filter(Boolean).join(" ")
                   : user.name && user.name !== user.email
-                  ? user.name
-                  : "Bienvenue"}
+                    ? user.name
+                    : "Bienvenue"}
               </h2>
               <p className="text-gray-400 text-sm mb-3">{user.email}</p>
               {/* <div className="inline-flex items-center px-4 py-1.5 bg-blue-500/20 text-blue-400 rounded-full text-xs font-semibold mb-6">
@@ -216,25 +222,25 @@ export function ProfilePageClient({
 
             {/* Badges Section for Instructors (or everyone if we gameify later) */}
             {(user.role === "INSTRUCTOR" || (user.badges && user.badges.length > 0)) && (
-                <div className="bg-navy-800 rounded-2xl p-6 border border-navy-700 text-xs md:text-sm">
-                    <h3 className="font-bold text-base mb-4">Badges & Certifications</h3>
-                    {(!user.badges || user.badges.length === 0) ? (
-                        <div className="text-center text-gray-500 py-4 italic">
-                            Aucun badge obtenu pour le moment.
+              <div className="bg-navy-800 rounded-2xl p-6 border border-navy-700 text-xs md:text-sm">
+                <h3 className="font-bold text-base mb-4">Badges & Certifications</h3>
+                {(!user.badges || user.badges.length === 0) ? (
+                  <div className="text-center text-gray-500 py-4 italic">
+                    Aucun badge obtenu pour le moment.
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-4">
+                    {user.badges.map((badge: string, idx: number) => (
+                      <div key={idx} className="flex flex-col items-center gap-2 p-3 bg-navy-900 rounded-lg border border-navy-600 min-w-[100px]">
+                        <div className="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center text-gold-500 text-xl">
+                          🏆
                         </div>
-                    ) : (
-                        <div className="flex flex-wrap gap-4">
-                            {user.badges.map((badge: string, idx: number) => (
-                                <div key={idx} className="flex flex-col items-center gap-2 p-3 bg-navy-900 rounded-lg border border-navy-600 min-w-[100px]">
-                                    <div className="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center text-gold-500 text-xl">
-                                        🏆
-                                    </div>
-                                    <span className="text-xs font-semibold capitalize">{badge.replace(/_/g, " ")}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                        <span className="text-xs font-semibold capitalize">{badge.replace(/_/g, " ")}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
 
 
