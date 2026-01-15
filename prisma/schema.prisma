@@ -839,6 +839,9 @@ model DrivingLesson {
   // Décompte des heures
   isDeducted      Boolean  @default(false) // true si annulation tardive
   
+  // Rappels
+  reminderSent    Boolean  @default(false)
+
   // Notes
   instructorNotes String?
   studentNotes    String?

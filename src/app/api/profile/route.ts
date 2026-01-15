@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   try {
     // Import dynamique pour éviter les cycles si nécessaire, ou usage direct
     const { getOrCreateUser } = await import("@/lib/auth");
-    
+
     // On passe la request pour que getSession fonctionne en Route Handler (Next 15)
     const user = await getOrCreateUser(request);
 
@@ -62,14 +62,14 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     // Allow Next.js internal redirects to propagate
     if (error?.digest?.startsWith("NEXT_REDIRECT")) {
-        throw error;
+      throw error;
     }
 
     try {
-        const msg = error instanceof Error ? error.message : String(error);
-        console.error("API Profile Error:", msg);
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error("API Profile Error:", msg);
     } catch (e) {
-        console.error("API Profile: Failed to log error");
+      console.error("API Profile: Failed to log error");
     }
 
     return NextResponse.json(
@@ -175,6 +175,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(updated);
 
   } catch (error: any) {
+    console.error("[ONBOARDING ERROR]", error);
     return NextResponse.json(
       { error: "Erreur serveur" },
       { status: 500 }

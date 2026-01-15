@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { assignInstructorToStudent, changeInstructor } from "@/lib/lessons/assignment";
+import { notifyChangeRequestApproved, notifyChangeRequestRejected } from "@/lib/lessons/notifications";
 
 /**
  * Attribuer manuellement un instructeur à un élève
@@ -105,6 +106,25 @@ export async function approveChangeRequest(requestId: string, newInstructorId?: 
             },
         });
 
+        // Notifications
+        const student = await prisma.user.findUnique({
+            where: { id: request.studentId },
+            select: { email: true, firstName: true, lastName: true }
+        });
+
+        const newInstructor = await prisma.instructorProfile.findUnique({
+            where: { id: targetInstructorId },
+            include: { user: { select: { firstName: true, lastName: true } } }
+        });
+
+        if (student && newInstructor) {
+            await notifyChangeRequestApproved(
+                student.email!,
+                `${student.firstName} ${student.lastName}`,
+                `${newInstructor.user.firstName} ${newInstructor.user.lastName}`
+            );
+        }
+
         revalidatePath("/admin/driving-lessons");
         return { success: true };
     } catch (error: any) {
@@ -141,6 +161,20 @@ export async function rejectChangeRequest(requestId: string, reviewNotes?: strin
                 reviewNotes,
             },
         });
+
+        // Notifications
+        const student = await prisma.user.findUnique({
+            where: { id: request.studentId },
+            select: { email: true, firstName: true, lastName: true }
+        });
+
+        if (student) {
+            await notifyChangeRequestRejected(
+                student.email!,
+                `${student.firstName} ${student.lastName}`,
+                reviewNotes
+            );
+        }
 
         revalidatePath("/admin/driving-lessons");
         return { success: true };

@@ -8,6 +8,7 @@ import {
     validateRecurringSlot,
     type RecurrencePattern,
 } from "@/lib/lessons/recurrence";
+import { notifyLessonConfirmed, notifyLessonCancelled } from "@/lib/lessons/notifications";
 
 /**
  * Créer un créneau de disponibilité (ponctuel ou récurrent)
@@ -269,6 +270,22 @@ export async function confirmLesson(lessonId: string) {
             },
         });
 
+        // Notification à l'élève
+        const student = await prisma.user.findUnique({
+            where: { id: lesson.studentId },
+            select: { email: true, firstName: true, lastName: true }
+        });
+
+        if (student && updated.status === "CONFIRMED") {
+            await notifyLessonConfirmed(student.email!, {
+                date: lesson.date,
+                startTime: lesson.startTime,
+                endTime: lesson.endTime,
+                studentName: `${student.firstName} ${student.lastName}`,
+                instructorName: `${user.firstName} ${user.lastName}`,
+            });
+        }
+
         revalidatePath("/instructor/lessons");
         return { success: true, data: updated };
     } catch (error: any) {
@@ -315,6 +332,28 @@ export async function rejectLesson(lessonId: string, reason?: string) {
                 cancellationReason: reason || "Refusé par l'instructeur",
             },
         });
+
+        // Notification à l'élève
+        const student = await prisma.user.findUnique({
+            where: { id: lesson.studentId },
+            select: { email: true, firstName: true, lastName: true }
+        });
+
+        if (student) {
+            await notifyLessonCancelled(
+                student.email!,
+                `${student.firstName} ${student.lastName}`,
+                {
+                    date: lesson.date,
+                    startTime: lesson.startTime,
+                    endTime: lesson.endTime,
+                    studentName: `${student.firstName} ${student.lastName}`,
+                    instructorName: `${user.firstName} ${user.lastName}`,
+                },
+                `${user.firstName} ${user.lastName}`,
+                reason || "Refusé par l'instructeur"
+            );
+        }
 
         // Libérer le créneau
         if (lesson.availabilityId) {

@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { canCancelLesson, shouldDeductHour, isSlotAvailable } from "@/lib/lessons/validation";
 import { getStudentInstructor } from "@/lib/lessons/assignment";
+import { notifyLessonBooked, notifyLessonCancelled, notifyChangeRequest } from "@/lib/lessons/notifications";
 
 /**
  * Récupérer les créneaux disponibles de l'instructeur attitré
@@ -140,6 +141,27 @@ export async function bookLesson(data: {
             data: { isBooked: true },
         });
 
+        // Notifications
+        const instructor = await prisma.user.findUnique({
+            where: { id: assignment.instructorId },
+            select: { email: true, firstName: true, lastName: true }
+        });
+
+        if (instructor) {
+            await notifyLessonBooked(
+                user.email!,
+                instructor.email,
+                {
+                    date: new Date(data.date),
+                    startTime: data.startTime,
+                    endTime: data.endTime,
+                    studentName: `${user.firstName} ${user.lastName}`,
+                    instructorName: `${instructor.firstName} ${instructor.lastName}`,
+                    meetingPoint: data.meetingPoint,
+                }
+            );
+        }
+
         revalidatePath("/dashboard/driving-lessons");
         return { success: true, data: lesson };
     } catch (error: any) {
@@ -201,6 +223,28 @@ export async function cancelLesson(lessonId: string, reason?: string) {
                 where: { id: lesson.availabilityId },
                 data: { isBooked: false },
             });
+        }
+
+        // Notification à l'instructeur
+        const instructor = await prisma.instructorProfile.findUnique({
+            where: { id: lesson.instructorId },
+            include: { user: { select: { email: true, firstName: true, lastName: true } } }
+        });
+
+        if (instructor) {
+            await notifyLessonCancelled(
+                instructor.user.email,
+                `${instructor.user.firstName} ${instructor.user.lastName}`,
+                {
+                    date: lesson.date,
+                    startTime: lesson.startTime,
+                    endTime: lesson.endTime,
+                    studentName: `${user.firstName} ${user.lastName}`,
+                    instructorName: `${instructor.user.firstName} ${instructor.user.lastName}`,
+                },
+                `${user.firstName} ${user.lastName}`,
+                reason
+            );
         }
 
         revalidatePath("/dashboard/driving-lessons");
@@ -273,6 +317,20 @@ export async function requestInstructorChange(data: {
                 status: "PENDING",
             },
         });
+
+        // Notification aux administrateurs
+        const admins = await prisma.user.findMany({
+            where: { role: "ADMIN" },
+            select: { email: true }
+        });
+
+        for (const admin of admins) {
+            await notifyChangeRequest(
+                admin.email,
+                `${user.firstName} ${user.lastName}`,
+                data.reason
+            );
+        }
 
         revalidatePath("/dashboard/driving-lessons");
         return { success: true, data: changeRequest };
