@@ -16,10 +16,8 @@ if (!fs.existsSync(nextDir)) {
 
 console.log('🚀 Starting Next.js application...');
 try {
-    // Run DB migrations or push schema
-    console.log('🔄 Syncing database schema...');
-    // Using db push to ensure schema is in sync even if migrations are missing (fixes P2022)
-    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+    // Simplified start: build if missing, then run server
+    // We remove redundant DB sync here as it's handled in the build script
 
     // Pass all arguments and environment variables
     // IMPORTANT: On Clever Cloud with output: 'standalone', we must run the standalone server
