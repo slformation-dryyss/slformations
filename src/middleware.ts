@@ -23,11 +23,7 @@ export default async function middleware(request: NextRequest) {
 
     // Auth0 v4: Récupération de la session via le client Edge-compatible
     try {
-      // DEBUG: Log request details
-      console.log(`[Middleware] Processing request for: ${pathname}`);
-
       const session = await auth0.getSession(request);
-      console.log(`[Middleware] Session found: ${!!session}`);
 
       // Determine App URL with safety checks for internal IPs
       let appUrl = process.env.NEXT_PUBLIC_APP_URL;
@@ -38,16 +34,12 @@ export default async function middleware(request: NextRequest) {
         appUrl = auth0Base;
       }
 
-      // Final fallback to request origin
       if (!appUrl) {
         appUrl = request.nextUrl.origin;
       }
 
-      console.log(`[Middleware] Resolved AppURL: ${appUrl}`);
-
       // Si pas de session, redirection vers Login
       if (!session) {
-        console.log(`[Middleware] No session, redirecting to login...`);
         const loginUrl = new URL("/api/auth/login", appUrl);
         loginUrl.searchParams.set("returnTo", request.nextUrl.pathname);
         return NextResponse.redirect(loginUrl);
@@ -59,7 +51,6 @@ export default async function middleware(request: NextRequest) {
 
       // 1. Si non vérifié et tente d'accéder à autre chose que la page de verif
       if (!isVerified && !isVerifyPage) {
-        console.log(`[Middleware] User not verified, redirecting to verify-email`);
         const url = new URL("/dashboard/verify-email", appUrl);
         return NextResponse.redirect(url);
       }

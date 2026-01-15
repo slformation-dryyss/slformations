@@ -37,6 +37,35 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '5mb',
     },
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.stripe.com *.auth0.com; connect-src 'self' *.stripe.com *.auth0.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' *.stripe.com *.auth0.com;",
+          },
+        ],
+      },
+    ];
+  },
   env: {
     // Force the Auth0 profile route to the public domain to prevent 0.0.0.0 errors
     NEXT_PUBLIC_PROFILE_ROUTE: 'https://sl-formations.fr/api/auth/me',

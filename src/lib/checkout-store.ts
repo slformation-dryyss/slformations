@@ -25,12 +25,6 @@ export async function createCheckoutSession(user: User, courseId: string, sessio
     throw new Error("Formation introuvable ou non publiée.");
   }
 
-  console.log("[Store:Checkout] Création session Stripe", {
-    userId: user.id,
-    courseId: course.id,
-    sessionId: sessionId,
-    amount: course.price,
-  });
 
   const session = await (stripe.checkout.sessions.create as any)({
     mode: "payment",

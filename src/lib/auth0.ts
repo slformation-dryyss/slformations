@@ -35,26 +35,19 @@ export const auth0 = new Auth0Client({
           return session;
         }
       }
-      
+
       const namespace = "https://sl-formations.fr/roles";
       const roles = (token[namespace] || []) as string[];
-      
-      // DEBUG: Afficher ce qu'on reçoit d'Auth0
-      console.log("🔍 [AUTH0] Token type:", typeof idToken);
-      console.log("🔍 [AUTH0] Token claims:", Object.keys(token));
-      console.log("🔍 [AUTH0] Roles from namespace:", roles);
-      
+
       let computedRole = "STUDENT";
       // 1. Try to get role from Token
       const rolesList = Array.isArray(roles) ? roles : [roles];
       const lowerRoles = rolesList.map(r => String(r).toLowerCase());
-      
+
       if (lowerRoles.includes("owner")) computedRole = "OWNER";
       else if (lowerRoles.includes("admin")) computedRole = "ADMIN";
       else if (lowerRoles.includes("secretary") || lowerRoles.includes("secretaire")) computedRole = "SECRETARY";
       else if (lowerRoles.includes("instructor") || lowerRoles.includes("teacher")) computedRole = "INSTRUCTOR";
-
-      console.log("✅ [AUTH0] Computed role:", computedRole);
 
       session.user = {
         ...session.user,

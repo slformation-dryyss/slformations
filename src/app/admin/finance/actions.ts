@@ -8,18 +8,33 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
 
 const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey)
-  : null;
+    ? new Stripe(stripeSecretKey)
+    : null;
+
+import { z } from "zod";
+
+const ManualPaymentSchema = z.object({
+    userId: z.string().min(1, "ID Utilisateur requis"),
+    courseId: z.string().min(1, "ID Formation requis"),
+    amount: z.coerce.number().positive("Le montant doit être supérieur à 0").max(10000, "Montant maximum autorisé dépassé (10,000€)"),
+});
 
 export async function createManualPaymentLinkAction(formData: FormData) {
     await requireAdmin();
 
-    const userId = formData.get("userId") as string;
-    const courseId = formData.get("courseId") as string;
+    const rawData = {
+        userId: formData.get("userId"),
+        courseId: formData.get("courseId"),
+        amount: formData.get("amount"),
+    };
 
-    if (!userId || !courseId) {
-        return { error: "Utilisateur et Formation requis." };
+    const validatedFields = ManualPaymentSchema.safeParse(rawData);
+
+    if (!validatedFields.success) {
+        return { error: validatedFields.error.flatten().fieldErrors };
     }
+
+    const { userId, courseId, amount } = validatedFields.data;
 
     if (!stripe) {
         return { error: "Stripe non configuré." };
@@ -76,10 +91,10 @@ export async function createManualPaymentLinkAction(formData: FormData) {
             }
         });
 
-        return { 
-            success: true, 
+        return {
+            success: true,
             url: session.url,
-            userEmail: user.email 
+            userEmail: user.email
         };
 
     } catch (error: any) {
@@ -91,7 +106,7 @@ export async function createManualPaymentLinkAction(formData: FormData) {
 export async function validatePaymentLinkAction(formData: FormData) {
     await requireAdmin();
     const linkId = formData.get("linkId") as string;
-    
+
     if (!linkId) return { error: "ID manquant." };
 
     try {
@@ -171,7 +186,7 @@ export async function syncStripePaymentStatus(linkId: string) {
 export async function syncPaymentLinkStatusAction(formData: FormData) {
     await requireAdmin();
     const linkId = formData.get("linkId") as string;
-    
+
     if (!linkId) return { error: "ID manquant." };
 
     try {

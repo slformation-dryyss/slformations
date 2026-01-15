@@ -73,7 +73,6 @@ export function hasRole(userRole: Role | string, requiredRole: Role): boolean {
   const requiredLevel = levels[requiredRole] || 0;
 
   const isAllowed = userLevel >= requiredLevel;
-  // console.log(`[AUTH] hasRole check: User=${userRole} (${userLevel}) >= Required=${requiredRole} (${requiredLevel}) -> ${isAllowed}`);
   return isAllowed;
 }
 
