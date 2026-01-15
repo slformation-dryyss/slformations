@@ -1,18 +1,17 @@
-
 "use client";
 
 import { useState, useMemo } from "react";
-import { createManualPaymentLinkAction, validatePaymentLinkAction, syncPaymentLinkStatusAction } from "../actions";
-import { Copy, Check, Loader2, Send, Search, AlertCircle, X, History, FileDown, AlertTriangle, CheckCircle, RefreshCcw } from "lucide-react";
+import { createManualPaymentLinkAction } from "../actions";
+import { Copy, Check, Loader2, Send, Search, AlertCircle, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface User { 
-    id: string; 
-    email: string; 
-    firstName: string | null; 
+interface User {
+    id: string;
+    email: string;
+    firstName: string | null;
     lastName: string | null;
     phone: string | null;
-    enrollments: { 
+    enrollments: {
         courseId: string;
         status: string; // "PENDING", "ACTIVE", "COMPLETED", "CANCELLED"
     }[];
@@ -20,24 +19,13 @@ interface User {
 
 interface Course { id: string; title: string; price: number; }
 
-interface PaymentLink {
-    id: string;
-    createdAt: Date;
-    amount: number;
-    status: string;
-    stripeUrl: string;
-    justification: string | null;
-    user: { email: string; firstName: string | null; lastName: string | null; phone: string | null };
-    course: { title: string };
-}
-
-export default function ClientPaymentForm({ users, courses, previousLinks }: { users: User[], courses: Course[], previousLinks: PaymentLink[] }) {
+export default function ClientPaymentForm({ users, courses }: { users: User[], courses: Course[] }) {
     const router = useRouter();
     const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
-    
+
     // Search state
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedUserId, setSelectedUserId] = useState("");
@@ -51,7 +39,7 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
     const filteredUsers = useMemo(() => {
         if (!searchQuery) return users;
         const lowerQuery = searchQuery.toLowerCase();
-        return users.filter(user => 
+        return users.filter(user =>
             (user.firstName && user.firstName.toLowerCase().includes(lowerQuery)) ||
             (user.lastName && user.lastName.toLowerCase().includes(lowerQuery)) ||
             user.email.toLowerCase().includes(lowerQuery) ||
@@ -64,7 +52,7 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
         if (!selectedUserId) return [];
         const user = users.find(u => u.id === selectedUserId);
         if (!user) return [];
-        
+
         const enrolledCourseIds = new Set(user.enrollments.map(e => e.courseId));
         const paidCourseIds = new Set(
             user.enrollments
@@ -121,76 +109,6 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
         setLoading(false);
     };
 
-    // Search state for history
-    const [historySearchQuery, setHistorySearchQuery] = useState("");
-
-    const filteredHistory = useMemo(() => {
-        if (!historySearchQuery) return previousLinks;
-        const lowerQuery = historySearchQuery.toLowerCase();
-        return previousLinks.filter(link => 
-            (link.user?.firstName && link.user?.firstName.toLowerCase().includes(lowerQuery)) ||
-            (link.user?.lastName && link.user?.lastName.toLowerCase().includes(lowerQuery)) ||
-            link.user?.email.toLowerCase().includes(lowerQuery) ||
-            (link.user?.phone && link.user?.phone.toLowerCase().includes(lowerQuery)) ||
-            link.course?.title.toLowerCase().includes(lowerQuery)
-        );
-    }, [previousLinks, historySearchQuery]);
-
-    const [syncingId, setSyncingId] = useState<string | null>(null);
-
-    const handleSyncStatus = async (linkId: string) => {
-        setSyncingId(linkId);
-        const formData = new FormData();
-        formData.append("linkId", linkId);
-        
-        const result = await syncPaymentLinkStatusAction(formData) as any;
-        if (result.error) {
-            alert(result.error);
-        } else if (result.updated) {
-            alert("Paiement confirmé par Stripe ! Le statut a été mis à jour.");
-            router.refresh();
-        } else if (result.alreadyPaid) {
-            alert("Ce lien est déjà marqué comme payé.");
-        } else {
-            alert(`Stripe indique que le paiement est : ${result.currentStatus || "en attente"}`);
-        }
-        setSyncingId(null);
-    };
-
-    const handleExportCSV = () => {
-        if (previousLinks.length === 0) return;
-
-        // Header
-        const headers = ["Date", "Élève", "Email", "Téléphone", "Formation", "Montant", "Statut", "URL Stripe"];
-        
-        // Rows
-        const rows = previousLinks.map(link => [
-            new Date(link.createdAt).toLocaleDateString('fr-FR'),
-            `${link.user?.firstName || ""} ${link.user?.lastName || ""}`.trim(),
-            link.user?.email || "",
-            link.user?.phone || "",
-            link.course?.title || "",
-            link.amount.toFixed(2),
-            link.status === "PAID" ? "Payé" : "En attente",
-            link.stripeUrl
-        ]);
-
-        // Build CSV string (Excel friendly with semicolon)
-        const csvContent = [headers, ...rows]
-            .map(e => e.map(cell => `"${(cell || "").toString().replace(/"/g, '""')}"`).join(";"))
-            .join("\n");
-
-        // BOM for Excel UTF-8
-        const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `historique_paiements_${new Date().toISOString().split('T')[0]}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
     const copyToClipboard = () => {
         if (generatedUrl) {
             navigator.clipboard.writeText(generatedUrl);
@@ -210,7 +128,7 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                         <label className="block text-sm font-medium text-slate-700">Rechercher un élève</label>
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input 
+                            <input
                                 type="text"
                                 placeholder="Nom, prénom, email ou téléphone..."
                                 value={searchQuery}
@@ -218,19 +136,19 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                                 className="w-full pl-9 border-slate-300 rounded-md shadow-sm focus:border-gold-500 focus:ring-gold-500 text-sm"
                             />
                         </div>
-                        
+
                         <label className="block text-sm font-medium text-slate-700 mt-2">Sélectionner l'élève</label>
-                        <select 
-                            name="userId" 
-                            required 
+                        <select
+                            name="userId"
+                            required
                             className="w-full border-slate-300 rounded-md shadow-sm focus:border-gold-500 focus:ring-gold-500"
                             value={selectedUserId}
                             onChange={(e) => setSelectedUserId(e.target.value)}
                         >
                             <option value="">-- Sélectionner un élève ({filteredUsers.length}) --</option>
                             {filteredUsers.map(u => {
-                                const displayName = u.firstName && u.lastName 
-                                    ? `${u.firstName} ${u.lastName}` 
+                                const displayName = u.firstName && u.lastName
+                                    ? `${u.firstName} ${u.lastName}`
                                     : u.email;
                                 return (
                                     <option key={u.id} value={u.id}>
@@ -243,14 +161,14 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                             <p className="text-xs text-red-500">Aucun élève trouvé pour "{searchQuery}"</p>
                         )}
                     </div>
-                    
+
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">
                             Formation (Formations impayées)
                         </label>
-                        <select 
-                            name="courseId" 
-                            required 
+                        <select
+                            name="courseId"
+                            required
                             className="w-full border-slate-300 rounded-md shadow-sm focus:border-gold-500 focus:ring-gold-500 disabled:bg-slate-100 disabled:text-slate-400"
                             disabled={!selectedUserId}
                             value={selectedCourseId}
@@ -258,7 +176,7 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                         >
                             <option value="">-- Sélectionner une formation --</option>
                             {enrichedCourses.length > 0 ? (
-                                enrichedCourses.map((c: Course & { isEnrolled: boolean, isPaid: boolean }) => (
+                                enrichedCourses.map((c: any) => (
                                     <option key={c.id} value={c.id}>
                                         {c.title} - {c.price}€ {c.isPaid ? "✅" : c.isEnrolled ? "⏳" : ""}
                                     </option>
@@ -267,7 +185,7 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                                 selectedUserId && <option value="" disabled>Aucune formation disponible</option>
                             )}
                         </select>
-                        
+
                         {selectedUserId && (
                             <div className="mt-1">
                                 {unpaidCount > 0 ? (
@@ -286,11 +204,11 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
 
                 <div className="pt-2">
                     <label className="block text-sm font-medium text-slate-700 mb-1">Montant (€)</label>
-                    <input 
-                        type="number" 
-                        name="amount" 
-                        step="0.01" 
-                        required 
+                    <input
+                        type="number"
+                        name="amount"
+                        step="0.01"
+                        required
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder="Ex: 1500.00"
@@ -298,8 +216,8 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                     />
                 </div>
 
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     disabled={loading || !selectedUserId || !amount}
                     className="w-full bg-slate-900 text-white py-2 px-4 rounded-md hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center font-bold transition-colors"
                 >
@@ -318,14 +236,14 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                                 <AlertCircle className="w-5 h-5 text-gold-500" />
                                 Confirmer la génération
                             </h3>
-                            <button 
+                            <button
                                 onClick={() => setShowConfirmModal(false)}
                                 className="text-slate-400 hover:text-slate-600 transition-colors"
                             >
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
-                        
+
                         <div className="bg-slate-50 p-4 rounded-lg space-y-3 mb-6">
                             <div>
                                 <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">Élève</span>
@@ -334,9 +252,9 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                                 </p>
                                 <p className="text-sm text-slate-500">{selectedUser.email}</p>
                             </div>
-                            
+
                             <div className="h-px bg-slate-200" />
-                            
+
                             <div>
                                 <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">Formation</span>
                                 <p className="font-medium text-slate-900">
@@ -376,12 +294,12 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                         <Check className="w-5 h-5" /> Lien créé avec succès
                     </h3>
                     <div className="flex items-center gap-2">
-                        <input 
-                            readOnly 
-                            value={generatedUrl} 
+                        <input
+                            readOnly
+                            value={generatedUrl}
                             className="flex-1 bg-white border-green-300 text-slate-600 text-sm p-2 rounded focus:ring-0"
                         />
-                        <button 
+                        <button
                             onClick={copyToClipboard}
                             className="bg-green-100 hover:bg-green-200 text-green-800 p-2 rounded transition-colors"
                             title="Copier"
@@ -389,9 +307,9 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                             {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                         </button>
                     </div>
-                    
+
                     <div className="mt-4 flex gap-3">
-                        <a 
+                        <a
                             href={`mailto:?subject=Lien de paiement - Formation&body=Bonjour, voici le lien pour régler votre formation : ${generatedUrl}`}
                             className="text-sm font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1"
                         >
@@ -400,121 +318,6 @@ export default function ClientPaymentForm({ users, courses, previousLinks }: { u
                     </div>
                 </div>
             )}
-
-            {/* HISTORY SECTION */}
-            <div className="mt-12 pt-8 border-t border-slate-200">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <History className="w-5 h-5 text-slate-400" />
-                        Historique des 50 derniers liens
-                    </h3>
-                    
-                    <div className="flex gap-2">
-                        <button 
-                            onClick={handleExportCSV}
-                            title="Exporter en Excel (CSV)"
-                            className="p-2 text-slate-500 hover:text-slate-900 rounded-md border border-slate-200 hover:border-slate-300 transition-colors"
-                        >
-                            <FileDown className="w-4 h-4" />
-                        </button>
-                        <div className="relative w-full md:w-64">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input 
-                                type="text"
-                                placeholder="Rechercher un lien..."
-                                value={historySearchQuery}
-                                onChange={(e) => setHistorySearchQuery(e.target.value)}
-                                className="w-full pl-9 border-slate-300 rounded-md shadow-sm focus:border-gold-500 focus:ring-gold-500 text-sm py-2"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                                <th className="py-3 px-4">Date</th>
-                                <th className="py-3 px-4">Élève</th>
-                                <th className="py-3 px-4">Formation</th>
-                                <th className="py-3 px-4">Montant</th>
-                                <th className="py-3 px-4">Statut</th>
-                                <th className="py-3 px-4 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50">
-                            {filteredHistory.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="py-12 text-center text-slate-400 text-sm italic">
-                                        {historySearchQuery ? "Aucun lien ne correspond à votre recherche." : "Aucun lien généré pour le moment."}
-                                    </td>
-                                </tr>
-                            ) : (
-                                filteredHistory.map((link) => (
-                                    <tr key={link.id} className="hover:bg-slate-50 transition-colors text-sm">
-                                        <td className="py-3 px-4 text-slate-500">
-                                            {new Date(link.createdAt).toLocaleDateString('fr-FR')}
-                                        </td>
-                                        <td className="py-3 px-4">
-                                            <div className="font-medium text-slate-900">
-                                                {link.user?.firstName} {link.user?.lastName}
-                                            </div>
-                                            <div className="text-xs text-slate-400">{link.user?.email} {link.user?.phone && `• ${link.user.phone}`}</div>
-                                        </td>
-                                        <td className="py-3 px-4 text-slate-600">
-                                            {link.course?.title}
-                                        </td>
-                                        <td className="py-3 px-4 font-bold text-slate-900">
-                                            {link.amount.toFixed(2)} €
-                                        </td>
-                                        <td className="py-3 px-4">
-                                            {link.status === "PAID" ? (
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                    Payé
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                    En attente
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="py-3 px-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                {link.status !== "PAID" && (
-                                                    <button 
-                                                        onClick={() => handleSyncStatus(link.id)}
-                                                        disabled={syncingId === link.id}
-                                                        className="p-1.5 text-blue-600 hover:text-blue-700 rounded border border-transparent hover:border-blue-100 transition-all flex items-center gap-1 text-xs font-bold"
-                                                        title="Vérifier maintenant"
-                                                    >
-                                                        {syncingId === link.id ? (
-                                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                                        ) : (
-                                                            <RefreshCcw className="w-4 h-4" />
-                                                        )}
-                                                        Vérifier
-                                                    </button>
-                                                )}
-                                                <button 
-                                                    onClick={() => {
-                                                        navigator.clipboard.writeText(link.stripeUrl);
-                                                        alert("Lien Stripe copié !");
-                                                    }}
-                                                    className="p-1.5 text-slate-400 hover:text-slate-600 rounded border border-transparent hover:border-slate-200 transition-all"
-                                                    title="Copier le lien Stripe"
-                                                >
-                                                    <Copy className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     );
 }
-
