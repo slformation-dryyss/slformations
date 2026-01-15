@@ -172,6 +172,25 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // 4. Si c'est un instructeur, on s'assure qu'il a son InstructorProfile
+    if (updated.role === "INSTRUCTOR") {
+      await prisma.instructorProfile.upsert({
+        where: { userId: updated.id },
+        update: {
+          city: body.city || "À définir",
+          department: body.postalCode ? body.postalCode.substring(0, 2) : "À définir",
+          postalCode: body.postalCode || null,
+        },
+        create: {
+          userId: updated.id,
+          city: body.city || "À définir",
+          department: body.postalCode ? body.postalCode.substring(0, 2) : "À définir",
+          postalCode: body.postalCode || null,
+          specialty: "DRIVING",
+        },
+      });
+    }
+
     return NextResponse.json(updated);
 
   } catch (error: any) {
