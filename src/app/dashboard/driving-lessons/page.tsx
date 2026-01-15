@@ -1,0 +1,488 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+    Calendar,
+    Clock,
+    User,
+    MapPin,
+    Car,
+    Phone,
+    Mail,
+    AlertCircle,
+    CheckCircle,
+    XCircle,
+    RefreshCw,
+} from "lucide-react";
+import {
+    getAvailableSlots,
+    bookLesson,
+    cancelLesson,
+    getMyLessonsAsStudent,
+    requestInstructorChange,
+} from "./actions";
+
+type Instructor = {
+    id: string;
+    city: string;
+    department: string;
+    licenseTypes: string[];
+    vehicleType: string | null;
+    user: {
+        firstName: string | null;
+        lastName: string | null;
+        email: string;
+        phone: string | null;
+    };
+};
+
+type Availability = {
+    id: string;
+    date: Date | null;
+    startTime: string;
+    endTime: string;
+    isRecurring: boolean;
+    recurrencePattern: string | null;
+    recurrenceDays: number[];
+};
+
+type Lesson = {
+    id: string;
+    date: Date;
+    startTime: string;
+    endTime: string;
+    duration: number;
+    status: string;
+    studentConfirmed: boolean;
+    instructorConfirmed: boolean;
+    city: string;
+    meetingPoint: string | null;
+    isDeducted: boolean;
+    instructor: {
+        user: {
+            firstName: string | null;
+            lastName: string | null;
+        };
+    };
+};
+
+export default function DrivingLessonsPage() {
+    const [instructor, setInstructor] = useState<Instructor | null>(null);
+    const [availabilities, setAvailabilities] = useState<Availability[]>([]);
+    const [lessons, setLessons] = useState<Lesson[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [showBookingForm, setShowBookingForm] = useState(false);
+    const [selectedSlot, setSelectedSlot] = useState<Availability | null>(null);
+    const [bookingDate, setBookingDate] = useState("");
+    const [duration, setDuration] = useState<1 | 2>(1);
+    const [meetingPoint, setMeetingPoint] = useState("");
+    const [notes, setNotes] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    async function loadData() {
+        setLoading(true);
+
+        // Charger l'instructeur et ses disponibilités
+        const slotsResult = await getAvailableSlots();
+        if (slotsResult.success && slotsResult.data) {
+            setInstructor(slotsResult.data.instructor as any);
+            setAvailabilities(slotsResult.data.availabilities as any);
+        }
+
+        // Charger les cours de l'élève
+        const lessonsResult = await getMyLessonsAsStudent();
+        if (lessonsResult.success && lessonsResult.data) {
+            setLessons(lessonsResult.data as any);
+        }
+
+        setLoading(false);
+    }
+
+    async function handleBooking(e: React.FormEvent) {
+        e.preventDefault();
+        if (!selectedSlot) return;
+
+        setSubmitting(true);
+        setError(null);
+
+        const [hours, minutes] = selectedSlot.startTime.split(":").map(Number);
+        const endHours = hours + duration;
+        const endTime = `${endHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+
+        const result = await bookLesson({
+            availabilityId: selectedSlot.id,
+            date: bookingDate,
+            startTime: selectedSlot.startTime,
+            endTime,
+            duration,
+            meetingPoint: meetingPoint || undefined,
+            notes: notes || undefined,
+        });
+
+        if (result.success) {
+            setShowBookingForm(false);
+            setSelectedSlot(null);
+            setBookingDate("");
+            setMeetingPoint("");
+            setNotes("");
+            loadData();
+        } else {
+            setError(result.error || "Erreur lors de la réservation");
+        }
+
+        setSubmitting(false);
+    }
+
+    async function handleCancel(lessonId: string) {
+        if (!confirm("Êtes-vous sûr de vouloir annuler ce cours ?")) return;
+
+        const reason = prompt("Raison de l'annulation (optionnel) :");
+        const result = await cancelLesson(lessonId, reason || undefined);
+
+        if (result.success) {
+            if (result.warning) {
+                alert(result.warning);
+            }
+            loadData();
+        } else {
+            alert(result.error);
+        }
+    }
+
+    const upcomingLessons = lessons.filter(
+        (l) => new Date(l.date) >= new Date() && l.status !== "CANCELLED"
+    );
+    const pastLessons = lessons.filter(
+        (l) => new Date(l.date) < new Date() || l.status === "CANCELLED"
+    );
+
+    return (
+        <div className="max-w-6xl mx-auto p-6">
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-slate-900">Mes Cours de Conduite</h1>
+                <p className="text-slate-500 mt-1">Réservez vos heures avec votre instructeur</p>
+            </div>
+
+            {loading ? (
+                <div className="text-center py-12">
+                    <RefreshCw className="w-8 h-8 animate-spin text-gold-500 mx-auto mb-4" />
+                    <p className="text-slate-500">Chargement...</p>
+                </div>
+            ) : !instructor ? (
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
+                    <div className="flex items-start gap-3">
+                        <AlertCircle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-1" />
+                        <div>
+                            <h3 className="font-bold text-orange-900 mb-2">Aucun instructeur attitré</h3>
+                            <p className="text-orange-700 mb-4">
+                                Vous n'avez pas encore d'instructeur assigné. Veuillez contacter l'administration.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    {/* Carte Instructeur */}
+                    <div className="bg-white rounded-xl border border-slate-200 p-6 mb-8 shadow-sm">
+                        <div className="flex items-start gap-4">
+                            <div className="w-16 h-16 rounded-full bg-gold-100 flex items-center justify-center flex-shrink-0">
+                                <User className="w-8 h-8 text-gold-600" />
+                            </div>
+                            <div className="flex-1">
+                                <h2 className="text-xl font-bold text-slate-900 mb-1">
+                                    {instructor.user.firstName} {instructor.user.lastName}
+                                </h2>
+                                <p className="text-slate-600 mb-3">Votre instructeur de conduite</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                    <div className="flex items-center gap-2 text-slate-600">
+                                        <MapPin className="w-4 h-4" />
+                                        <span>
+                                            {instructor.city} ({instructor.department})
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-slate-600">
+                                        <Car className="w-4 h-4" />
+                                        <span>
+                                            Véhicule:{" "}
+                                            {instructor.vehicleType === "MANUAL"
+                                                ? "Manuelle"
+                                                : instructor.vehicleType === "AUTOMATIC"
+                                                    ? "Automatique"
+                                                    : "Les deux"}
+                                        </span>
+                                    </div>
+                                    {instructor.user.email && (
+                                        <div className="flex items-center gap-2 text-slate-600">
+                                            <Mail className="w-4 h-4" />
+                                            <span>{instructor.user.email}</span>
+                                        </div>
+                                    )}
+                                    {instructor.user.phone && (
+                                        <div className="flex items-center gap-2 text-slate-600">
+                                            <Phone className="w-4 h-4" />
+                                            <span>{instructor.user.phone}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    const reason = prompt("Raison du changement :");
+                                    if (reason) {
+                                        requestInstructorChange({
+                                            currentInstructorId: instructor.id,
+                                            reason: "OTHER",
+                                            details: reason,
+                                        }).then(() => alert("Demande envoyée à l'administration"));
+                                    }
+                                }}
+                                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition text-sm"
+                            >
+                                Demander un changement
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Créneaux disponibles */}
+                    <div className="bg-white rounded-xl border border-slate-200 p-6 mb-8 shadow-sm">
+                        <h2 className="text-xl font-bold text-slate-900 mb-4">Créneaux Disponibles</h2>
+                        {availabilities.length === 0 ? (
+                            <p className="text-slate-500 text-center py-8">
+                                Aucun créneau disponible pour le moment
+                            </p>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {availabilities.slice(0, 9).map((slot) => (
+                                    <button
+                                        key={slot.id}
+                                        onClick={() => {
+                                            setSelectedSlot(slot);
+                                            setShowBookingForm(true);
+                                            if (!slot.isRecurring && slot.date) {
+                                                setBookingDate(new Date(slot.date).toISOString().split("T")[0]);
+                                            }
+                                        }}
+                                        className="p-4 border border-slate-200 rounded-lg hover:border-gold-500 hover:bg-gold-50 transition text-left"
+                                    >
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Clock className="w-4 h-4 text-gold-600" />
+                                            <span className="font-bold text-slate-900">
+                                                {slot.startTime} - {slot.endTime}
+                                            </span>
+                                        </div>
+                                        {slot.isRecurring ? (
+                                            <p className="text-sm text-slate-600">Créneau récurrent</p>
+                                        ) : (
+                                            <p className="text-sm text-slate-600">
+                                                {slot.date
+                                                    ? new Date(slot.date).toLocaleDateString("fr-FR", {
+                                                        weekday: "short",
+                                                        day: "numeric",
+                                                        month: "short",
+                                                    })
+                                                    : "Date à définir"}
+                                            </p>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Formulaire de réservation */}
+                    {showBookingForm && selectedSlot && (
+                        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                            <div className="bg-white rounded-xl max-w-md w-full p-6">
+                                <h3 className="text-xl font-bold mb-4">Réserver un cours</h3>
+                                {error && (
+                                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                                        {error}
+                                    </div>
+                                )}
+                                <form onSubmit={handleBooking} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                                            Date
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={bookingDate}
+                                            onChange={(e) => setBookingDate(e.target.value)}
+                                            required
+                                            min={new Date().toISOString().split("T")[0]}
+                                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                                            Heure
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={`${selectedSlot.startTime} - ${selectedSlot.endTime}`}
+                                            disabled
+                                            className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                                            Durée
+                                        </label>
+                                        <select
+                                            value={duration}
+                                            onChange={(e) => setDuration(Number(e.target.value) as 1 | 2)}
+                                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500"
+                                        >
+                                            <option value={1}>1 heure</option>
+                                            <option value={2}>2 heures</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                                            Point de rendez-vous (optionnel)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={meetingPoint}
+                                            onChange={(e) => setMeetingPoint(e.target.value)}
+                                            placeholder="Ex: Devant l'auto-école"
+                                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                                            Notes (optionnel)
+                                        </label>
+                                        <textarea
+                                            value={notes}
+                                            onChange={(e) => setNotes(e.target.value)}
+                                            placeholder="Informations complémentaires..."
+                                            rows={3}
+                                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500"
+                                        />
+                                    </div>
+                                    <div className="flex gap-3 pt-4">
+                                        <button
+                                            type="submit"
+                                            disabled={submitting}
+                                            className="flex-1 px-4 py-2 bg-gold-500 text-slate-900 rounded-lg font-semibold hover:bg-gold-600 transition disabled:opacity-50"
+                                        >
+                                            {submitting ? "Réservation..." : "Réserver"}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowBookingForm(false);
+                                                setSelectedSlot(null);
+                                                setError(null);
+                                            }}
+                                            className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition"
+                                        >
+                                            Annuler
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Cours à venir */}
+                    <div className="bg-white rounded-xl border border-slate-200 p-6 mb-8 shadow-sm">
+                        <h2 className="text-xl font-bold text-slate-900 mb-4">
+                            Cours à venir ({upcomingLessons.length})
+                        </h2>
+                        {upcomingLessons.length === 0 ? (
+                            <p className="text-slate-500 text-center py-8">Aucun cours réservé</p>
+                        ) : (
+                            <div className="space-y-4">
+                                {upcomingLessons.map((lesson) => (
+                                    <div
+                                        key={lesson.id}
+                                        className={`border rounded-lg p-4 ${lesson.status === "CONFIRMED"
+                                                ? "border-green-200 bg-green-50"
+                                                : "border-orange-200 bg-orange-50"
+                                            }`}
+                                    >
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <Calendar className="w-5 h-5 text-slate-400" />
+                                                    <span className="font-bold text-slate-900">
+                                                        {new Date(lesson.date).toLocaleDateString("fr-FR", {
+                                                            weekday: "long",
+                                                            day: "numeric",
+                                                            month: "long",
+                                                        })}
+                                                    </span>
+                                                    <span className="px-2 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded">
+                                                        {lesson.startTime} - {lesson.endTime}
+                                                    </span>
+                                                </div>
+                                                <div className="text-sm text-slate-600 mb-2">
+                                                    <MapPin className="w-4 h-4 inline mr-1" />
+                                                    {lesson.meetingPoint || lesson.city}
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    {lesson.status === "CONFIRMED" ? (
+                                                        <span className="flex items-center gap-1 text-green-700">
+                                                            <CheckCircle className="w-4 h-4" />
+                                                            Confirmé
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center gap-1 text-orange-700">
+                                                            <Clock className="w-4 h-4" />
+                                                            En attente de confirmation
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            {lesson.status !== "CONFIRMED" && (
+                                                <button
+                                                    onClick={() => handleCancel(lesson.id)}
+                                                    className="px-3 py-1 bg-red-500 text-white rounded font-semibold hover:bg-red-600 transition text-sm"
+                                                >
+                                                    Annuler
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Historique */}
+                    {pastLessons.length > 0 && (
+                        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                            <h2 className="text-xl font-bold text-slate-900 mb-4">Historique</h2>
+                            <div className="space-y-3">
+                                {pastLessons.slice(0, 5).map((lesson) => (
+                                    <div key={lesson.id} className="border border-slate-200 rounded-lg p-3">
+                                        <div className="flex items-center justify-between text-sm">
+                                            <span className="text-slate-900">
+                                                {new Date(lesson.date).toLocaleDateString()} - {lesson.startTime}
+                                            </span>
+                                            <span
+                                                className={`px-2 py-1 rounded text-xs font-bold ${lesson.status === "COMPLETED"
+                                                        ? "bg-blue-100 text-blue-700"
+                                                        : "bg-red-100 text-red-700"
+                                                    }`}
+                                            >
+                                                {lesson.status === "COMPLETED" ? "Terminé" : "Annulé"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </>
+            )}
+        </div>
+    );
+}
