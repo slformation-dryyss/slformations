@@ -84,6 +84,12 @@ model User {
   consentLogs      ConsentLog[]
   dataExportRequests DataExportRequest[]
   quizAttempts     QuizAttempt[]
+  
+  // Relations Système de Réservation Cours de Conduite
+  instructorProfile    InstructorProfile?
+  studentAssignments   InstructorAssignment[] @relation("StudentAssignments")
+  studentLessons       DrivingLesson[]        @relation("StudentLessons")
+  studentChangeRequests ChangeRequest[]       @relation("StudentChangeRequests")
 }
 
 model Course {
@@ -694,3 +700,186 @@ model Option {
 //   ATTENDED
 //   NO_SHOW
 // }
+
+// ============================================
+// SYSTÈME DE RÉSERVATION COURS DE CONDUITE
+// ============================================
+
+// Profil instructeur (extension du User avec role INSTRUCTOR)
+model InstructorProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Spécialité
+  specialty   String   @default("DRIVING") // DRIVING | PROFESSIONAL
+  
+  // Localisation (pour attribution géographique)
+  city        String   // Ex: "Pontault-Combault"
+  department  String   // Ex: "77" (Seine-et-Marne)
+  postalCode  String?
+  
+  // Types de permis enseignés (pour instructeurs conduite)
+  licenseTypes String[] @default([]) // ["B", "A2", "AAC", etc.]
+  
+  // Véhicule(s) utilisé(s)
+  vehicleType  String?  // "MANUAL" | "AUTOMATIC" | "BOTH"
+  
+  // Préférences / Disponibilité générale
+  maxStudentsPerWeek Int? @default(20)
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  availabilities    InstructorAvailability[]
+  assignments       InstructorAssignment[]
+  drivingLessons    DrivingLesson[]
+  currentInstructorRequests ChangeRequest[] @relation("CurrentInstructor")
+  requestedInstructorRequests ChangeRequest[] @relation("RequestedInstructor")
+}
+
+// Créneaux de disponibilité (avec support récurrence)
+model InstructorAvailability {
+  id            String   @id @default(cuid())
+  instructorId  String
+  instructor    InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  
+  // Créneau ponctuel
+  date          DateTime?
+  startTime     String   // Format "HH:mm" (ex: "14:00")
+  endTime       String   // Format "HH:mm" (ex: "18:00")
+  
+  // Récurrence (optionnel)
+  isRecurring   Boolean  @default(false)
+  recurrencePattern String? // "WEEKLY" | "DAILY" | "MONTHLY"
+  recurrenceDays    Int[]   @default([]) // [1,3,5] = Lundi, Mercredi, Vendredi (1=Lundi, 7=Dimanche)
+  recurrenceEndDate DateTime? // Date de fin de la récurrence
+  
+  // Statut
+  isBooked      Boolean  @default(false)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  lessons       DrivingLesson[]
+  
+  @@index([instructorId, date])
+  @@index([instructorId, isBooked])
+}
+
+// Attribution élève-instructeur
+model InstructorAssignment {
+  id            String   @id @default(cuid())
+  studentId     String
+  student       User     @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
+  
+  instructorId  String
+  instructor    InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  
+  // Contexte
+  courseType    String   // "PERMIS_B" | "PERMIS_A2" | "AAC" | etc.
+  assignedBy    String?  // userId de l'admin qui a fait l'attribution (si manuelle)
+  assignmentReason String? // "AUTO" | "MANUAL" | "PREFERENCE_CHANGE" | "GEOGRAPHIC"
+  
+  // Statut
+  isActive      Boolean  @default(true)
+  startDate     DateTime @default(now())
+  endDate       DateTime?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([studentId, instructorId, courseType, isActive])
+  @@index([studentId, isActive])
+  @@index([instructorId, isActive])
+}
+
+// Réservation de cours de conduite
+model DrivingLesson {
+  id              String   @id @default(cuid())
+  
+  // Participants
+  studentId       String
+  student         User     @relation("StudentLessons", fields: [studentId], references: [id], onDelete: Cascade)
+  
+  instructorId    String
+  instructor      InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  
+  availabilityId  String?
+  availability    InstructorAvailability? @relation(fields: [availabilityId], references: [id], onDelete: SetNull)
+  
+  // Détails du cours
+  date            DateTime
+  startTime       String   // Format "HH:mm"
+  endTime         String   // Format "HH:mm"
+  duration        Int      // En heures (1 ou 2)
+  
+  // Localisation
+  meetingPoint    String?  // Point de rendez-vous
+  city            String
+  
+  // Statut
+  status          String   @default("PENDING") // PENDING | CONFIRMED | CANCELLED | COMPLETED
+  
+  // Validation bilatérale
+  studentConfirmed    Boolean @default(false)
+  instructorConfirmed Boolean @default(false)
+  confirmedAt         DateTime?
+  
+  // Annulation
+  cancelledAt     DateTime?
+  cancelledBy     String?  // userId
+  cancellationReason String?
+  isUrgentCancellation Boolean @default(false)
+  urgencyValidatedBy   String? // userId de l'admin/secretary
+  
+  // Décompte des heures
+  isDeducted      Boolean  @default(false) // true si annulation tardive
+  
+  // Notes
+  instructorNotes String?
+  studentNotes    String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([studentId, date])
+  @@index([instructorId, date])
+  @@index([status])
+}
+
+// Demande de changement d'instructeur
+model ChangeRequest {
+  id              String   @id @default(cuid())
+  
+  studentId       String
+  student         User     @relation("StudentChangeRequests", fields: [studentId], references: [id], onDelete: Cascade)
+  
+  currentInstructorId String
+  currentInstructor   InstructorProfile @relation("CurrentInstructor", fields: [currentInstructorId], references: [id], onDelete: Cascade)
+  
+  requestedInstructorId String?
+  requestedInstructor   InstructorProfile? @relation("RequestedInstructor", fields: [requestedInstructorId], references: [id], onDelete: SetNull)
+  
+  // Justification
+  reason          String   // "PREFERENCE_GENDER" | "SCHEDULE_CONFLICT" | "PEDAGOGICAL" | "OTHER"
+  details         String?  // Détails de la demande
+  
+  // Préférences spécifiques
+  preferredGender String?  // "MALE" | "FEMALE" | "NO_PREFERENCE"
+  
+  // Statut
+  status          String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  reviewedBy      String?  // userId de l'admin
+  reviewedAt      DateTime?
+  reviewNotes     String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([studentId, status])
+  @@index([status])
+}
