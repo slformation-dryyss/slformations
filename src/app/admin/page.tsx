@@ -1,25 +1,26 @@
 
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { 
-  Users, 
-  Calendar, 
-  BookOpen, 
-  Euro, 
-  FileText, 
-  UserPlus, 
-  GraduationCap, 
-  Clock, 
-  AlertCircle, 
-  CheckCircle 
+import {
+  Users,
+  Calendar,
+  BookOpen,
+  Euro,
+  FileText,
+  UserPlus,
+  GraduationCap,
+  Clock,
+  AlertCircle,
+  CheckCircle
 } from "lucide-react";
 import Link from "next/link";
 import DashboardCharts from "@/components/admin/DashboardCharts";
+import { AdminWelcomeWrapper } from "@/components/admin/AdminWelcomeWrapper";
 
 async function getAdminStats() {
   const userCount = await prisma.user.count();
   const courseCount = await prisma.course.count();
-  
+
   const now = new Date();
 
   // Session stats
@@ -27,7 +28,7 @@ async function getAdminStats() {
     where: { endDate: { lt: now } }
   });
   const currentSessions = await prisma.courseSession.count({
-    where: { 
+    where: {
       startDate: { lte: now },
       endDate: { gte: now }
     }
@@ -139,9 +140,9 @@ async function getAdminStats() {
     where: { onboardingStatus: "PENDING_DOCS" }
   });
 
-  return { 
-    userCount, 
-    courseCount, 
+  return {
+    userCount,
+    courseCount,
     salesTotal,
     pastSessions,
     currentSessions,
@@ -163,14 +164,15 @@ export default async function AdminDashboardPage() {
   const isOwner = user.role === "OWNER";
 
   return (
-    <div className="pb-8">
+    <div className="pb-8 relative">
+      <AdminWelcomeWrapper role={user.role} />
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-slate-900">Vue d&apos;ensemble</h1>
         <div className="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full px-3 py-1 bg-slate-100 rounded-full">
           Rôle: <span className="font-semibold text-slate-700">{user.role}</span>
         </div>
       </div>
-      
+
       {/* Primary Stats Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {/* Card 1: Users */}
@@ -279,8 +281,8 @@ export default async function AdminDashboardPage() {
 
       {/* Visual Analytics for Owner */}
       {isOwner && (
-        <DashboardCharts 
-          monthlyData={stats.monthlyStats} 
+        <DashboardCharts
+          monthlyData={stats.monthlyStats}
           sessionStats={{
             past: stats.pastSessions,
             current: stats.currentSessions,
@@ -379,7 +381,7 @@ export default async function AdminDashboardPage() {
                           {approvedCount} / 4 documents validés
                         </p>
                       </div>
-                      <Link 
+                      <Link
                         href={`/admin/documents/${u.id}`}
                         className="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-tighter"
                       >
@@ -417,13 +419,13 @@ export default async function AdminDashboardPage() {
                     <div className="min-w-0 pr-4">
                       <p className="text-sm font-medium text-slate-900 truncate">{doc.user.name || doc.user.email}</p>
                       <p className="text-xs text-slate-500 uppercase">
-                        {doc.type === "ID_CARD" ? "Carte d'identité" : 
-                         doc.type === "DRIVING_LICENSE" ? "Permis" : 
-                         doc.type === "JUSTIF_DOMICILE" ? "Justificatif" : 
-                         doc.type === "PHOTO" ? "Photo" : doc.type}
+                        {doc.type === "ID_CARD" ? "Carte d'identité" :
+                          doc.type === "DRIVING_LICENSE" ? "Permis" :
+                            doc.type === "JUSTIF_DOMICILE" ? "Justificatif" :
+                              doc.type === "PHOTO" ? "Photo" : doc.type}
                       </p>
                     </div>
-                    <Link 
+                    <Link
                       href={`/admin/documents/${doc.userId}`}
                       className="text-[10px] font-bold text-gold-600 hover:text-gold-700 uppercase tracking-tighter"
                     >

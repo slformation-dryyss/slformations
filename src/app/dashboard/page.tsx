@@ -20,6 +20,7 @@ import Image from "next/image";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { WelcomeTour } from "@/components/dashboard/WelcomeTour";
 
 type ProfileResponse = {
   id: string;
@@ -150,6 +151,7 @@ export default function Dashboard() {
 
   return (
     <>
+      <WelcomeTour role={user.role} onClose={() => { }} />
       <div className="pt-6">
         <div className="max-w-7xl mx-auto">
           {/* En-tête de section */}

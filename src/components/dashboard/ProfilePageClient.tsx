@@ -10,6 +10,8 @@ import {
 import Image from 'next/image';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { ProfileForm } from '@/components/dashboard/ProfileForm';
+import { WelcomeTour } from '@/components/dashboard/WelcomeTour';
+import { Sparkles } from 'lucide-react';
 
 type ProfileResponse = {
   id: string;
@@ -49,6 +51,7 @@ export function ProfilePageClient({
   const { user: auth0User, isLoading } = useUser();
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [showTour, setShowTour] = useState(false);
 
   const isOnboarding = (searchParams?.onboarding ?? params?.get('onboarding')) === '1';
 
@@ -176,12 +179,20 @@ export function ProfilePageClient({
                   <span className="text-gray-400">Rôle</span>
                   <span className="font-semibold">{user.role}</span>
                 </div>
-                {/* <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Heures effectuées</span>
-                  <span className="font-semibold">0h / --</span>
-                </div> */}
+              </div>
+
+              <div className="pt-4 border-t border-navy-700">
+                <button
+                  onClick={() => setShowTour(true)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-navy-900 border border-gold-500/30 text-gold-500 rounded-xl text-xs font-bold hover:bg-gold-500/10 transition"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Revoir le tutoriel bienvenue
+                </button>
               </div>
             </div>
+
+            {showTour && <WelcomeTour role={user.role} forced onClose={() => setShowTour(false)} />}
 
             {user.role === "STUDENT" && (
               <div className="bg-navy-800 rounded-2xl p-6 border border-navy-700 text-xs md:text-sm">
