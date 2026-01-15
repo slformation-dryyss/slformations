@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { RefreshCw, Home, MessageSquare } from 'lucide-react';
 
 export default function Error({
@@ -24,6 +25,21 @@ export default function Error({
             </div>
 
             <div className="max-w-2xl w-full text-center relative z-10">
+                {/* Logo */}
+                <div className="flex justify-center mb-12">
+                    <Link href="/">
+                        <div className="relative h-12 w-48 md:h-16 md:w-64 transform hover:scale-105 transition-transform duration-300">
+                            <Image
+                                src="/logo.svg"
+                                alt="SL Formations"
+                                fill
+                                className="object-contain drop-shadow-2xl brightness-110"
+                                priority
+                            />
+                        </div>
+                    </Link>
+                </div>
+
                 {/* Error Code Headline */}
                 <div className="mb-4">
                     <h1 className="text-[12rem] md:text-[18rem] font-black leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-red-400 via-red-500 to-red-600 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
