@@ -14,7 +14,11 @@ export default async function GeneratorPage() {
     });
 
     if (pendingLinks.length > 0) {
-        await Promise.all(pendingLinks.map(link => syncStripePaymentStatus(link.id)));
+        try {
+            await Promise.all(pendingLinks.map(link => syncStripePaymentStatus(link.id)));
+        } catch (e) {
+            console.error("Background Sync Failed in GeneratorPage:", e);
+        }
     }
 
     const users = await prisma.user.findMany({

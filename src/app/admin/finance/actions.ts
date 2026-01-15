@@ -150,37 +150,42 @@ export async function syncStripePaymentStatus(linkId: string) {
     if (!link || !link.stripeSessionId) return { error: "Lien introuvable." };
     if (link.status === "PAID") return { success: true, alreadyPaid: true };
 
-    // Vérifier auprès de Stripe
-    const session = await stripe.checkout.sessions.retrieve(link.stripeSessionId);
+    try {
+        // Vérifier auprès de Stripe
+        const session = await stripe.checkout.sessions.retrieve(link.stripeSessionId);
 
-    if (session.payment_status === "paid") {
-        // Mettre à jour le lien
-        await prisma.paymentLink.update({
-            where: { id: linkId },
-            data: { status: "PAID" }
-        });
-
-        // Inscrire l'élève si besoin
-        if (link.userId && link.courseId) {
-            await prisma.enrollment.upsert({
-                where: {
-                    userId_courseId: {
-                        userId: link.userId,
-                        courseId: link.courseId
-                    }
-                },
-                update: { status: "ACTIVE" },
-                create: {
-                    userId: link.userId,
-                    courseId: link.courseId,
-                    status: "ACTIVE"
-                }
+        if (session.payment_status === "paid") {
+            // Mettre à jour le lien
+            await prisma.paymentLink.update({
+                where: { id: linkId },
+                data: { status: "PAID" }
             });
-        }
-        return { success: true, updated: true };
-    }
 
-    return { success: true, updated: false, currentStatus: session.payment_status };
+            // Inscrire l'élève si besoin
+            if (link.userId && link.courseId) {
+                await prisma.enrollment.upsert({
+                    where: {
+                        userId_courseId: {
+                            userId: link.userId,
+                            courseId: link.courseId
+                        }
+                    },
+                    update: { status: "ACTIVE" },
+                    create: {
+                        userId: link.userId,
+                        courseId: link.courseId,
+                        status: "ACTIVE"
+                    }
+                });
+            }
+            return { success: true, updated: true };
+        }
+
+        return { success: true, updated: false, currentStatus: session.payment_status };
+    } catch (error: any) {
+        console.error(`[Stripe Sync Error] LinkID: ${linkId}:`, error.message);
+        return { error: "Erreur lors de la récupération du statut Stripe." };
+    }
 }
 
 export async function syncPaymentLinkStatusAction(formData: FormData) {
