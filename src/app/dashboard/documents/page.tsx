@@ -154,7 +154,9 @@ export default async function DocumentsPage() {
                                             </div>
                                             <div className="min-w-0 flex-1">
                                                 <p className="text-sm font-medium truncate text-slate-800">
-                                                    {[...REQUIRED_DOCS, ...OPTIONAL_DOCS].find(d => d.type === doc.type)?.label || doc.type}
+                                                    <span className="font-bold text-slate-900">
+                                                        {[...REQUIRED_DOCS, ...OPTIONAL_DOCS].find(d => d.type === doc.type)?.label || doc.type}
+                                                    </span>
                                                 </p>
                                                 <p className="text-xs text-slate-500">
                                                     Le {doc.uploadedAt.toLocaleDateString()}

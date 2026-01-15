@@ -154,12 +154,12 @@ export default function PaiementContent({ paymentLinks }: Props) {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-sm">
-                  <div className="bg-navy-700 rounded-xl p-4">
+                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
                     <div className="flex items-center space-x-2 mb-2 text-slate-500">
-                      <Euro className="w-4 h-4 text-green-500" />
+                      <Euro className="w-4 h-4 text-green-600" />
                       <span>Total payé</span>
                     </div>
-                    <div className="text-2xl font-bold text-green-500">
+                    <div className="text-2xl font-bold text-green-600">
                       0€
                     </div>
                   </div>

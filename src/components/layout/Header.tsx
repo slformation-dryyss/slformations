@@ -88,26 +88,25 @@ export function Header() {
             >
               Plannings
             </Link>
-            
+
             {/* Dropdown Nos Permis */}
-            <div 
+            <div
               className="relative group"
               onMouseEnter={() => setActiveDropdown("permis")}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <button 
+              <button
                 className={`flex items-center space-x-1 transition focus:outline-none text-sm ${activeDropdown === "permis" ? "text-gold-500" : "text-slate-600 group-hover:text-gold-500"}`}
                 onClick={() => toggleDropdown("permis")}
               >
                 <span>Nos Permis</span>
                 <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${activeDropdown === "permis" ? "rotate-180" : "group-hover:rotate-180"}`} />
               </button>
-              
-              <div className={`absolute top-full left-0 w-64 pt-2 transition-all duration-200 transform ${
-                activeDropdown === "permis" 
-                  ? "opacity-100 visible translate-y-0" 
+
+              <div className={`absolute top-full left-0 w-64 pt-2 transition-all duration-200 transform ${activeDropdown === "permis"
+                  ? "opacity-100 visible translate-y-0"
                   : "opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0"
-              }`}>
+                }`}>
                 <div className="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden py-2">
                   <Link
                     href="/formations/permis-b"
@@ -144,7 +143,7 @@ export function Header() {
                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                     <span>Conduite Accompagnée (AAC)</span>
                   </Link>
-                   <div className="my-2 border-t border-slate-100"></div>
+                  <div className="my-2 border-t border-slate-100"></div>
                   <Link
                     href="/formations/recuperation-points"
                     className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-red-600 font-medium hover:text-red-700 transition"
@@ -157,26 +156,25 @@ export function Header() {
             </div>
 
             {/* Dropdown Formations (Pro) */}
-            <div 
+            <div
               className="relative group"
               onMouseEnter={() => setActiveDropdown("pro")}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <button 
+              <button
                 className={`flex items-center space-x-1 transition focus:outline-none text-sm ${activeDropdown === "pro" ? "text-gold-500" : "text-slate-600 group-hover:text-gold-500"}`}
                 onClick={() => toggleDropdown("pro")}
               >
                 <span>Formations Pro</span>
                 <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${activeDropdown === "pro" ? "rotate-180" : "group-hover:rotate-180"}`} />
               </button>
-              
-              <div className={`absolute top-full left-0 w-64 pt-2 transition-all duration-200 transform ${
-                activeDropdown === "pro" 
-                  ? "opacity-100 visible translate-y-0" 
+
+              <div className={`absolute top-full left-0 w-64 pt-2 transition-all duration-200 transform ${activeDropdown === "pro"
+                  ? "opacity-100 visible translate-y-0"
                   : "opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0"
-              }`}>
+                }`}>
                 <div className="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden py-2">
-                   <Link
+                  <Link
                     href="/formations/catalogue"
                     className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
                   >
@@ -184,7 +182,7 @@ export function Header() {
                     <span>Tout le catalogue</span>
                   </Link>
                   <div className="my-2 border-t border-slate-100"></div>
-                   <Link
+                  <Link
                     href="/formations/vtc"
                     className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
                   >
@@ -195,28 +193,28 @@ export function Header() {
                     href="/formations/caces"
                     className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
                   >
-                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                     <span>CACES®</span>
                   </Link>
-                   <Link
+                  <Link
                     href="/formations/secourisme"
                     className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
                   >
-                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                     <span>Secourisme (SST)</span>
                   </Link>
-                   <Link
+                  <Link
                     href="/formations/incendie"
                     className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
                   >
-                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                     <span>Sécurité Incendie</span>
                   </Link>
                   <Link
                     href="/formations/habilitation-electrique"
                     className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
                   >
-                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                     <span>Habilitation Élec.</span>
                   </Link>
                 </div>
@@ -235,13 +233,17 @@ export function Header() {
                 >
                   {user.picture ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={user.picture}
-                      alt={user.name || "User"}
-                      className="w-8 h-8 rounded-full border border-gold-500"
-                    />
+                    <div className="relative w-8 h-8">
+                      <img
+                        src={user.picture}
+                        alt={user.name || "User"}
+                        className="w-8 h-8 rounded-full border border-gold-500 object-cover"
+                      />
+                    </div>
                   ) : (
-                    <User className="w-6 h-6" />
+                    <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500">
+                      <span className="text-[10px] font-bold">{user?.name?.charAt(0) || <User className="w-4 h-4" />}</span>
+                    </div>
                   )}
                   <span className="hidden xl:block text-sm font-medium">
                     {user?.name}
@@ -267,16 +269,15 @@ export function Header() {
                 </button>
                 {/* Dropdown Menu Desktop */}
                 <div
-                  className={`absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden transition-all duration-200 transform origin-top-right ${
-                    isStudentMenuOpen
+                  className={`absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden transition-all duration-200 transform origin-top-right ${isStudentMenuOpen
                       ? "opacity-100 visible scale-100"
                       : "opacity-0 invisible scale-95"
-                  }`}
+                    }`}
                 >
                   <div className="py-2">
                     <div className="px-4 py-2 border-b border-slate-50 mb-1">
-                       <p className="text-sm font-bold text-slate-900 truncate">{user?.name}</p>
-                       <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                      <p className="text-sm font-bold text-slate-900 truncate">{user?.name}</p>
+                      <p className="text-xs text-slate-500 truncate">{user?.email}</p>
                     </div>
 
                     <Link
@@ -293,19 +294,19 @@ export function Header() {
                       className="flex items-center space-x-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-gold-600 transition"
                       onClick={() => setIsStudentMenuOpen(false)}
                     >
-                       <User className="w-4 h-4" />
-                       <span>Mon Profil</span>
+                      <User className="w-4 h-4" />
+                      <span>Mon Profil</span>
                     </Link>
 
                     {isAdmin && (
-                        <Link
+                      <Link
                         href="/admin/finance"
                         className="flex items-center space-x-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-gold-600 transition"
                         onClick={() => setIsStudentMenuOpen(false)}
-                        >
+                      >
                         <CreditCardIcon className="w-4 h-4" />
                         <span>Finances</span>
-                        </Link>
+                      </Link>
                     )}
 
                     <div className="border-t border-slate-50 my-1"></div>
@@ -380,27 +381,27 @@ export function Header() {
             >
               Plannings
             </Link>
-            
+
             {/* Mobile Dropdowns */}
             <div className="py-2 space-y-1">
               <span className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Nos Permis</span>
               <Link
                 href="/formations/permis-b"
-                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Permis B (Auto)
               </Link>
               <Link
                 href="/formations/permis-moto"
-                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Permis Moto A2
               </Link>
               <Link
                 href="/formations/recuperation-points"
-                 className="block py-2 px-3 rounded-lg text-red-600 font-medium hover:bg-red-50 hover:text-red-700 transition ml-2 border-l border-red-100"
+                className="block py-2 px-3 rounded-lg text-red-600 font-medium hover:bg-red-50 hover:text-red-700 transition ml-2 border-l border-red-100"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Récupération de Points
@@ -409,52 +410,52 @@ export function Header() {
 
             <div className="py-2 space-y-1">
               <span className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Formations Pro</span>
-               <Link
+              <Link
                 href="/formations/catalogue"
-                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Tout le catalogue
               </Link>
               <Link
                 href="/formations/vtc"
-                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 VTC / Taxi
               </Link>
-               <Link
+              <Link
                 href="/formations/caces"
-                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 CACES®
               </Link>
-               <Link
+              <Link
                 href="/formations/secourisme"
-                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Secourisme
               </Link>
-               <Link
+              <Link
                 href="/formations/incendie"
-                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Incendie
               </Link>
-               <Link
+              <Link
                 href="/formations/habilitation-electrique"
-                 className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Habilitation Élec.
               </Link>
             </div>
-            
+
             <div className="py-2 border-t border-slate-100 my-2"></div>
-            
+
             <Link
               href="/#testimonials"
               className="py-2 text-slate-600 hover:text-gold-500 transition"
@@ -474,11 +475,11 @@ export function Header() {
               <p className="text-xs uppercase tracking-wide text-slate-500 mb-1">
                 {isAdmin ? "Espace Admin" : isInstructor ? "Espace Formateur" : "Espace élève"}
               </p>
-              
-               {/* Mobile User Menu Items (Dashboard etc) */}
+
+              {/* Mobile User Menu Items (Dashboard etc) */}
               <div className="flex flex-col space-y-2">
-                 {/* ... existing mobile user items ... */}
-                  <Link
+                {/* ... existing mobile user items ... */}
+                <Link
                   href={isAdmin ? "/admin" : "/dashboard"}
                   className="flex items-center space-x-2 py-1 text-slate-600 hover:text-gold-500 transition"
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -500,10 +501,19 @@ export function Header() {
                 <div className="flex items-center justify-between py-2">
                   <Link
                     href="/profile"
-                    className="flex items-center space-x-2 text-slate-900 hover:text-gold-500 transition"
+                    className="flex items-center space-x-3 text-slate-900 hover:text-gold-500 transition"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                     {/* User Info */}
+                    {/* User Info with Picture Fallback */}
+                    <div className="relative w-8 h-8 flex-shrink-0">
+                      {user.picture ? (
+                        <img src={user.picture} alt="" className="w-8 h-8 rounded-full object-cover border border-slate-200" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200">
+                          <span className="text-[10px] font-bold">{user?.name?.charAt(0) || "U"}</span>
+                        </div>
+                      )}
+                    </div>
                     <span className="text-sm font-medium truncate max-w-[140px]">
                       {user?.name}
                     </span>
@@ -527,12 +537,12 @@ export function Header() {
                     Se connecter / Espace élève
                   </a>
                   <div className="grid grid-cols-1 gap-3">
-                     <Link
-                        href="/demande-acces"
-                        className="px-4 py-2 text-sm text-slate-900 border border-slate-200 rounded-lg hover:border-gold-500 hover:text-gold-500 transition text-center"
-                        onClick={() => setIsMobileMenuOpen(false)}
+                    <Link
+                      href="/demande-acces"
+                      className="px-4 py-2 text-sm text-slate-900 border border-slate-200 rounded-lg hover:border-gold-500 hover:text-gold-500 transition text-center"
+                      onClick={() => setIsMobileMenuOpen(false)}
                     >
-                        Demande d&apos;accès
+                      Demande d&apos;accès
                     </Link>
                   </div>
                 </div>
