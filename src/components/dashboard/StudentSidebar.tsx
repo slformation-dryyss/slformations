@@ -12,7 +12,8 @@ import {
   Settings,
   LogOut,
   HelpCircle,
-  FileText
+  FileText,
+  Car
 } from "lucide-react";
 
 interface SidebarProps {
@@ -26,12 +27,13 @@ export function StudentSidebar({ role = "STUDENT" }: SidebarProps) {
 
   const navigation = isTeacher ? [
     { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Mon Planning", href: "/dashboard/planning-prof", icon: CalendarDays },
-    { name: "Mes Élèves", href: "/dashboard/students", icon: User }, // Specific to teachers
+    { name: "Dispos Conduite", href: "/instructor/availability", icon: CalendarDays },
+    { name: "Cours Conduite", href: "/instructor/lessons", icon: GraduationCap },
     { name: "Mon Profil", href: "/dashboard/profile", icon: Settings },
   ] : [
     { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
     { name: "Mes formations", href: "/dashboard/mes-formations", icon: GraduationCap },
+    { name: "Conduite / Auto-école", href: "/dashboard/driving-lessons", icon: Car },
     { name: "Mon planning", href: "/dashboard/planning", icon: CalendarDays },
     { name: "Mes documents", href: "/dashboard/documents", icon: FileText },
     { name: "Mes paiements", href: "/dashboard/paiement", icon: CreditCard },
@@ -53,16 +55,14 @@ export function StudentSidebar({ role = "STUDENT" }: SidebarProps) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`group flex items-center px-2 py-3 text-sm font-medium rounded-md transition-colors ${
-                  isActive
+                className={`group flex items-center px-2 py-3 text-sm font-medium rounded-md transition-colors ${isActive
                     ? "bg-gold-500 text-slate-900"
                     : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                }`}
+                  }`}
               >
                 <item.icon
-                  className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                    isActive ? "text-slate-900" : "text-slate-400 group-hover:text-gold-400"
-                  }`}
+                  className={`mr-3 flex-shrink-0 h-5 w-5 ${isActive ? "text-slate-900" : "text-slate-400 group-hover:text-gold-400"
+                    }`}
                   aria-hidden="true"
                 />
                 {item.name}
@@ -77,7 +77,7 @@ export function StudentSidebar({ role = "STUDENT" }: SidebarProps) {
           className="flex-shrink-0 w-full group block"
         >
           <div className="flex items-center">
-             <div className="flex items-center text-red-400 group-hover:text-red-300">
+            <div className="flex items-center text-red-400 group-hover:text-red-300">
               <LogOut className="inline-block w-5 h-5 mr-3" />
               <span className="text-sm font-medium">Déconnexion</span>
             </div>

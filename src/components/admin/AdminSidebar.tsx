@@ -11,7 +11,8 @@ import {
   Euro,
   LogOut,
   Calendar,
-  FileText
+  FileText,
+  Car
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -28,6 +29,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
     { href: "/admin/courses", label: "Formations (CMS)", icon: BookOpen },
     { href: "/admin/documents", label: "Dossiers Élèves", icon: FileText }, // New
     { href: "/admin/sessions", label: "Sessions", icon: Calendar },
+    { href: "/admin/driving-lessons", label: "Gestion Conduite", icon: Car },
     { href: "/admin/settings", label: "Paramètres", icon: Settings },
   ];
 
@@ -50,16 +52,14 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
               <Link
                 key={item.label}
                 href={item.href}
-                className={`group flex items-center px-2 py-3 text-sm font-medium rounded-md transition-colors ${
-                  isActive
-                    ? "bg-gold-500 text-slate-900"
-                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                }`}
+                className={`group flex items-center px-2 py-3 text-sm font-medium rounded-md transition-colors ${isActive
+                  ? "bg-gold-500 text-slate-900"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                  }`}
               >
                 <item.icon
-                  className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                    isActive ? "text-slate-900" : "text-slate-400 group-hover:text-gold-400"
-                  }`}
+                  className={`mr-3 flex-shrink-0 h-5 w-5 ${isActive ? "text-slate-900" : "text-slate-400 group-hover:text-gold-400"
+                    }`}
                   aria-hidden="true"
                 />
                 {item.label}
