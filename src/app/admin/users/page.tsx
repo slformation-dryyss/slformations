@@ -202,7 +202,11 @@ export default async function AdminUsersPage({
                           currentRoles={user.roles || []}
                           currentRole={user.role}
                         />
-                        <DeleteUserButton userId={user.id} />
+                        <DeleteUserButton
+                          userId={user.id}
+                          userName={user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email}
+                        />
+
                       </div>
                     </td>
                   </tr>
