@@ -44,7 +44,7 @@ export default async function VehiclesPage({
     return (
         <VehiclesClient
             vehicles={vehicles as any}
-            stats={stats}
+            stats={stats ?? null}
             instructors={instructors as any}
             currentFilters={filters}
         />
