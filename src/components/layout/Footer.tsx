@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Instagram, Linkedin, MapPin, Phone, Mail } from "lucide-react";
+import { Facebook, Instagram, Linkedin, MapPin, Phone, Mail, Ghost, Video } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 import { SystemSetting } from "@prisma/client";
@@ -17,7 +17,9 @@ export async function Footer() {
             "CONTACT_EMAIL",
             "SOCIAL_FACEBOOK",
             "SOCIAL_INSTAGRAM",
-            "SOCIAL_LINKEDIN"
+            "SOCIAL_LINKEDIN",
+            "SOCIAL_SNAPCHAT",
+            "SOCIAL_TIKTOK"
           ]
         }
       }
@@ -56,19 +58,29 @@ export async function Footer() {
             </p>
             <div className="flex space-x-4">
               {settings["SOCIAL_FACEBOOK"] && (
-                  <a href={settings["SOCIAL_FACEBOOK"]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
-                    <Facebook className="w-5 h-5" />
-                  </a>
+                <a href={settings["SOCIAL_FACEBOOK"]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
+                  <Facebook className="w-5 h-5" />
+                </a>
               )}
               {settings["SOCIAL_INSTAGRAM"] && (
-                  <a href={settings["SOCIAL_INSTAGRAM"]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
-                    <Instagram className="w-5 h-5" />
-                  </a>
+                <a href={settings["SOCIAL_INSTAGRAM"]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
+                  <Instagram className="w-5 h-5" />
+                </a>
               )}
               {settings["SOCIAL_LINKEDIN"] && (
-                  <a href={settings["SOCIAL_LINKEDIN"]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
-                    <Linkedin className="w-5 h-5" />
-                  </a>
+                <a href={settings["SOCIAL_LINKEDIN"]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
+                  <Linkedin className="w-5 h-5" />
+                </a>
+              )}
+              {settings["SOCIAL_SNAPCHAT"] && (
+                <a href={settings["SOCIAL_SNAPCHAT"]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition">
+                  <Ghost className="w-5 h-5" />
+                </a>
+              )}
+              {settings["SOCIAL_TIKTOK"] && (
+                <a href={settings["SOCIAL_TIKTOK"]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center hover:bg-gold-500 hover:text-white text-slate-600 transition" title="TikTok">
+                  <Video className="w-5 h-5" />
+                </a>
               )}
             </div>
           </div>
@@ -124,7 +136,7 @@ export async function Footer() {
             </ul>
           </div>
         </div>
-        
+
         <div className="border-t border-slate-200 pt-8 text-center text-slate-500 text-sm">
           <p>© {new Date().getFullYear()} SL Formations. Tous droits réservés.</p>
         </div>

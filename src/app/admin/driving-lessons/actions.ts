@@ -308,3 +308,144 @@ export async function getDrivingLessonsStats() {
         },
     };
 }
+/**
+ * Récupérer tous les instructeurs avec leurs profils
+ */
+export async function getInstructors() {
+    await requireAdmin();
+
+    try {
+        const instructors = await prisma.instructorProfile.findMany({
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        phone: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        assignments: { where: { isActive: true } },
+                    },
+                },
+            },
+            orderBy: { createdAt: "desc" },
+        });
+
+        return { success: true, data: instructors };
+    } catch (error: any) {
+        console.error("Error fetching instructors:", error);
+        return { success: false, error: "Erreur lors de la récupération des instructeurs" };
+    }
+}
+
+/**
+ * Récupérer toutes les attributions actives
+ */
+export async function getAllAssignments() {
+    await requireAdmin();
+
+    try {
+        const assignments = await prisma.instructorAssignment.findMany({
+            where: { isActive: true },
+            include: {
+                student: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                    },
+                },
+                instructor: {
+                    include: {
+                        user: {
+                            select: {
+                                firstName: true,
+                                lastName: true,
+                            },
+                        },
+                    },
+                },
+            },
+            orderBy: { createdAt: "desc" },
+        });
+
+        return { success: true, data: assignments };
+    } catch (error: any) {
+        console.error("Error fetching assignments:", error);
+        return { success: false, error: "Erreur lors de la récupération des attributions" };
+    }
+}
+
+/**
+ * Récupérer tous les cours de conduite
+ */
+export async function getAllLessons(limit: number = 50) {
+    await requireAdmin();
+
+    try {
+        const lessons = await prisma.drivingLesson.findMany({
+            include: {
+                student: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    },
+                },
+                instructor: {
+                    include: {
+                        user: {
+                            select: {
+                                firstName: true,
+                                lastName: true,
+                            },
+                        },
+                    },
+                },
+            },
+            orderBy: { date: "desc" },
+            take: limit,
+        });
+
+        return { success: true, data: lessons };
+    } catch (error: any) {
+        console.error("Error fetching lessons:", error);
+        return { success: false, error: "Erreur lors de la récupération des cours" };
+    }
+}
+
+/**
+ * Rechercher des élèves pour l'attribution
+ */
+export async function searchStudents(query: string) {
+    await requireAdmin();
+
+    try {
+        const students = await prisma.user.findMany({
+            where: {
+                OR: [
+                    { firstName: { contains: query, mode: "insensitive" } },
+                    { lastName: { contains: query, mode: "insensitive" } },
+                    { email: { contains: query, mode: "insensitive" } },
+                ],
+                // On peut filtrer par rôle si besoin, mais souvent on veut n'importe qui
+            },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+            },
+            take: 10,
+        });
+
+        return { success: true, data: students };
+    } catch (error: any) {
+        console.error("Error searching students:", error);
+        return { success: false, error: "Erreur lors de la recherche" };
+    }
+}

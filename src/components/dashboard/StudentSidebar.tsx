@@ -13,15 +13,22 @@ import {
   LogOut,
   HelpCircle,
   FileText,
-  Car
+  Car,
+  Globe,
+  Facebook,
+  Instagram,
+  Linkedin,
+  Ghost,
+  Video
 } from "lucide-react";
 
 interface SidebarProps {
   role?: string;
   roles?: string[];
+  socialLinks?: Record<string, string>;
 }
 
-export function StudentSidebar({ role = "STUDENT", roles }: SidebarProps) {
+export function StudentSidebar({ role = "STUDENT", roles, socialLinks = {} }: SidebarProps) {
   const pathname = usePathname();
 
   // Consolidation des rôles
@@ -112,6 +119,28 @@ export function StudentSidebar({ role = "STUDENT", roles }: SidebarProps) {
           })}
         </nav>
       </div>
+
+      {/* Social Links Mini-Section */}
+      <div className="px-4 py-3 border-t border-slate-800">
+        <div className="flex items-center justify-around gap-2">
+          {Object.entries(socialLinks).map(([key, url]) => {
+            if (!url) return null;
+            let Icon = Globe;
+            if (key.includes("FACEBOOK")) Icon = Facebook;
+            if (key.includes("INSTAGRAM")) Icon = Instagram;
+            if (key.includes("LINKEDIN")) Icon = Linkedin;
+            if (key.includes("SNAPCHAT")) Icon = Ghost;
+            if (key.includes("TIKTOK")) Icon = Video;
+
+            return (
+              <a key={key} href={url} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-gold-500 transition-colors" title={key.replace("SOCIAL_", "")}>
+                <Icon className="w-4 h-4" />
+              </a>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="flex-shrink-0 flex border-t border-slate-800 p-4">
         <Link
           href="/api/auth/logout"
