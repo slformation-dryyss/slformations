@@ -27,6 +27,8 @@ type ProfileResponse = {
   email: string;
   name: string | null;
   role: string;
+  roles?: string[]; // New field
+  primaryRole?: string; // New field
   isProfileComplete: boolean;
   createdAt: string;
   firstName: string | null;
@@ -88,8 +90,10 @@ export default function Dashboard() {
         }
         const profileData: ProfileResponse = await profileRes.json();
 
+        const roles = profileData.roles || [profileData.role];
+
         // Admin/Owner → redirection tableau de bord admin (IMMÉDIATE)
-        if (profileData.role === "ADMIN" || profileData.role === "OWNER") {
+        if (profileData.role === "ADMIN" || profileData.role === "OWNER" || roles.includes("ADMIN") || roles.includes("OWNER")) {
           router.replace("/admin");
           return;
         }
@@ -147,7 +151,8 @@ export default function Dashboard() {
   const futureSessions = stats?.stats.futureSessionsCount || 0;
   const nextSession = stats?.nextSession;
 
-  const isInstructor = user.role === "INSTRUCTOR" || user.role === "ADMIN" || user.role === "OWNER";
+  const roles = user.roles || [user.role];
+  const isInstructor = roles.includes("INSTRUCTOR") || roles.includes("ADMIN") || roles.includes("OWNER");
 
   return (
     <>

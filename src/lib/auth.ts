@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 import Stripe from "stripe";
 
 // Rôles supportés dans l'application (alignés avec le champ `role` de Prisma)
-// Hierarchy: OWNER > ADMIN > SECRETARY > INSTRUCTOR > STUDENT
-export type Role = "OWNER" | "ADMIN" | "SECRETARY" | "INSTRUCTOR" | "STUDENT";
+// Hierarchy: OWNER > ADMIN > SECRETARY > [TEACHER, INSTRUCTOR] > STUDENT
+export type Role = "OWNER" | "ADMIN" | "SECRETARY" | "TEACHER" | "INSTRUCTOR" | "STUDENT";
 
 const AUTH0_ROLE_CLAIM = "https://sl-formations.fr/roles";
 
@@ -36,44 +36,69 @@ function parseJwt(token: string) {
   }
 }
 
-function mapAuth0RolesToPrisma(auth0Roles: string[] | undefined | null): Role {
+function mapAuth0RolesToPrisma(auth0Roles: string[] | undefined | null): { roles: Role[]; primaryRole: Role } {
   // Valeur par défaut : élève
   if (!auth0Roles || auth0Roles.length === 0) {
-    return "STUDENT";
+    return { roles: ["STUDENT"], primaryRole: "STUDENT" };
   }
 
-  // On cherche le rôle le plus élevé dans la liste des rôles Auth0
-  const roles = auth0Roles.map(r => r.toLowerCase());
+  const roleSet = new Set<Role>(["STUDENT"]); // Tout le monde est au moins étudiant potentiellement
+  const normalizedRoles = auth0Roles.map((r) => r.toLowerCase());
 
+  if (normalizedRoles.includes("owner")) roleSet.add("OWNER");
+  if (normalizedRoles.includes("admin")) roleSet.add("ADMIN");
+  if (normalizedRoles.includes("secretary") || normalizedRoles.includes("secretaire")) roleSet.add("SECRETARY");
 
-  if (roles.includes("owner")) return "OWNER";
-  if (roles.includes("admin")) return "ADMIN";
-  if (roles.includes("secretary") || roles.includes("secretaire")) return "SECRETARY";
-  if (roles.includes("teacher") || roles.includes("enseignant") || roles.includes("instructor"))
-    return "INSTRUCTOR";
+  // Distinction TEACHER vs INSTRUCTOR
+  if (normalizedRoles.includes("teacher") || normalizedRoles.includes("enseignant")) roleSet.add("TEACHER");
+  if (normalizedRoles.includes("instructor") || normalizedRoles.includes("moniteur")) roleSet.add("INSTRUCTOR");
 
-  return "STUDENT";
+  // Déterminer le rôle principal (le plus élevé)
+  const roles = Array.from(roleSet);
+  let primaryRole: Role = "STUDENT";
+
+  if (roleSet.has("OWNER")) primaryRole = "OWNER";
+  else if (roleSet.has("ADMIN")) primaryRole = "ADMIN";
+  else if (roleSet.has("SECRETARY")) primaryRole = "SECRETARY";
+  else if (roleSet.has("TEACHER")) primaryRole = "TEACHER"; // Priorité arbitraire entre Teacher et Instructor
+  else if (roleSet.has("INSTRUCTOR")) primaryRole = "INSTRUCTOR";
+
+  return { roles, primaryRole };
 }
 
 /**
  * Vérifie si `userRole` a les privilèges suffisants pour `requiredRole`
- * Hierarchy: OWNER > ADMIN > SECRETARY > INSTRUCTOR > STUDENT
+ * Hierarchy: OWNER > ADMIN > SECRETARY > [TEACHER, INSTRUCTOR] > STUDENT
  */
-export function hasRole(userRole: Role | string, requiredRole: Role): boolean {
+export function hasRole(userRoleOrUser: Role | string | any, requiredRole: Role): boolean {
+  let userRoles: string[] = [];
+
+  if (typeof userRoleOrUser === 'string') {
+    userRoles = [userRoleOrUser];
+  } else if (userRoleOrUser && Array.isArray(userRoleOrUser.roles)) {
+    userRoles = userRoleOrUser.roles;
+  } else if (userRoleOrUser && userRoleOrUser.role) {
+    userRoles = [userRoleOrUser.role]; // Legacy fallback
+  } else {
+    return false;
+  }
+
   const levels: Record<Role, number> = {
     OWNER: 50,
     ADMIN: 40,
     SECRETARY: 30,
+    TEACHER: 20,
     INSTRUCTOR: 20,
     STUDENT: 10,
   };
 
-  // Normalisation au cas où on reçoit une string arbitraire
-  const userLevel = levels[userRole as Role] || 0;
   const requiredLevel = levels[requiredRole] || 0;
 
-  const isAllowed = userLevel >= requiredLevel;
-  return isAllowed;
+  // Check if ANY of the user's roles meets the level requirement
+  return userRoles.some(role => {
+    const level = levels[role as Role] || 0;
+    return level >= requiredLevel;
+  });
 }
 
 import { NextResponse } from "next/server";
@@ -125,13 +150,8 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
   let auth0Roles = (auth0User as any)[AUTH0_ROLE_CLAIM] as string[] | undefined;
 
   // FALLBACK ULTIME : Si session.user est vide, on va chercher directement dans le tokenSet de la session
-  // Note: auth0.getSession() retourne { user, tokenSet, ... }
-  // On doit caster 'session' en any pour accéder à tokenSet ou idToken s'ils ne sont pas typés correctement
   const sessionAny = session as any;
   const idToken = sessionAny.tokenSet?.idToken || sessionAny.idToken;
-
-  // DEBUG: Inspect Auth0 Payload
-  // console.log("DEBUG AUTH: User Email:", auth0User.email);
 
   if (!auth0Roles && idToken) {
     try {
@@ -144,10 +164,8 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
     }
   }
 
-
-
-  const mappedRole = mapAuth0RolesToPrisma(auth0Roles);
-
+  const { roles: mappedRoles, primaryRole: mappedPrimaryRole } = mapAuth0RolesToPrisma(auth0Roles);
+  const mappedRoleLegacy = mappedPrimaryRole; // Pour le champ 'role' déprécié
 
   // On essaie d'abord de retrouver l'utilisateur via auth0Id,
   // puis on retombe sur l'email si besoin (pour les anciens comptes).
@@ -164,21 +182,21 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
       }));
   } catch (error) {
     console.error("[AUTH] Error trying to find user in DB:", error);
-    // On throw pas forcément tout de suite pour laisser une chance de debug
   }
 
-  // Si trouvé, on synchronise le rôle + infos de base (sans écraser ton profil manuel)
+  // Si trouvé, on synchronise le rôle + infos de base
   if (dbUser) {
-
-    // On met à jour les métadonnées principales
-    // Note: on upgrant/downgrade le rôle selon Auth0 à chaque login
     // Optimization: Check if an update is actually needed to reduce DB writes
     const timeSinceLastLogin = Date.now() - (dbUser.lastLoginAt?.getTime() || 0);
     const ONE_HOUR = 60 * 60 * 1000;
 
-    // Always use Auth0 role as source of truth
-    const expectedRole = mappedRole;
+    const expectedRole = mappedRoleLegacy;
 
+    // Check if roles need update (simple equality check on sorted arrays)
+    const currentRolesAuth0 = JSON.stringify(mappedRoles.sort());
+    const dbRoles = JSON.stringify((dbUser.roles || []).sort());
+
+    const needsRolesUpdate = currentRolesAuth0 !== dbRoles;
     const needsRoleUpdate = dbUser.role !== expectedRole;
     const needsNameUpdate = (auth0User.name || auth0User.nickname) && dbUser.name !== (auth0User.name || auth0User.nickname);
     const needsEmailUpdate = (auth0User.email && dbUser.email !== auth0User.email);
@@ -186,18 +204,18 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
     const needsLoginTimeUpdate = timeSinceLastLogin > ONE_HOUR;
 
     // Only hit the DB if something changed or it's been a while
-    if (needsRoleUpdate || needsNameUpdate || needsEmailUpdate || needsAuth0IdUpdate || needsLoginTimeUpdate) {
+    if (needsRoleUpdate || needsRolesUpdate || needsNameUpdate || needsEmailUpdate || needsAuth0IdUpdate || needsLoginTimeUpdate) {
       // On met à jour les métadonnées principales
       dbUser = await prisma.user.update({
         where: { id: dbUser.id },
         data: {
-          role: expectedRole,
+          role: expectedRole, // Legacy
+          roles: mappedRoles, // New
+          primaryRole: mappedPrimaryRole, // New
 
-          // On garde le nom/email à jour depuis Auth0 si disponibles
           name: auth0User.name || auth0User.nickname || dbUser.name,
           email: auth0User.email ?? dbUser.email,
           auth0Id: auth0Id, // On s'assure que l'ID Auth0 est bien lié
-          // On ne remplit firstName/lastName/phone que s'ils sont encore vides
           firstName: dbUser.firstName ?? inferredFirstName ?? dbUser.firstName,
           lastName: dbUser.lastName ?? inferredLastName ?? dbUser.lastName,
           phone: dbUser.phone ?? inferredPhone ?? dbUser.phone,
@@ -206,10 +224,8 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
       });
     }
 
-
     // Si on a Stripe configuré et pas encore de customer, on le crée maintenant
     if (stripe && !dbUser.stripeCustomerId) {
-
       try {
         const customer = await stripe.customers.create({
           email: dbUser.email,
@@ -224,17 +240,13 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
           where: { id: dbUser.id },
           data: { stripeCustomerId: customer.id },
         });
-
-      } catch (err) {
-
-      }
+      } catch (err) { }
     }
 
     return dbUser;
   }
 
-
-  // Si non trouvé, on le crée avec le rôle déterminé depuis Auth0 (sinon STUDENT)
+  // Si non trouvé, on le crée
   let created = await prisma.user.create({
     data: {
       auth0Id: auth0Id || auth0User.email, // fallback raisonnable si sub absent
@@ -243,14 +255,17 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
       firstName: inferredFirstName,
       lastName: inferredLastName,
       phone: inferredPhone,
-      role: mappedRole,
+
+      role: mappedRoleLegacy,
+      roles: mappedRoles,
+      primaryRole: mappedPrimaryRole,
+
       lastLoginAt: new Date(),
     },
   });
 
   // À la création, on génère aussi un customer Stripe si possible
   if (stripe) {
-
     try {
       const customer = await stripe.customers.create({
         email: created.email,
@@ -265,12 +280,8 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
         where: { id: created.id },
         data: { stripeCustomerId: customer.id },
       });
-
-    } catch (err) {
-
-    }
+    } catch (err) { }
   }
-
 
   return created;
 }
@@ -289,7 +300,6 @@ export async function requireVerifiedAuth0User(req?: NextRequest) {
   }
 
   if (!session?.user) {
-
     redirect("/api/auth/login");
   }
 
@@ -297,10 +307,8 @@ export async function requireVerifiedAuth0User(req?: NextRequest) {
   const emailVerified = Boolean(auth0User.email_verified);
 
   if (!emailVerified) {
-
     redirect("/dashboard/verify-email");
   }
-
 
   return auth0User;
 }
@@ -316,10 +324,8 @@ export async function requireVerifiedUser(req?: NextRequest) {
   const user = await getOrCreateUser(req);
 
   if (!user) {
-
     redirect("/api/auth/login");
   }
-
 
   return { user, auth0User };
 }
@@ -333,10 +339,8 @@ export async function requireOnboardedUser(req?: NextRequest) {
   const { user, auth0User } = await requireVerifiedUser(req);
 
   if (!user.isProfileComplete) {
-
     redirect("/dashboard/profile?onboarding=1");
   }
-
 
   return { user, auth0User };
 }
@@ -348,10 +352,8 @@ export async function requireUser(req?: NextRequest) {
   const user = await getOrCreateUser(req);
 
   if (!user) {
-
     redirect("/api/auth/login");
   }
-
 
   return user;
 }
@@ -362,10 +364,8 @@ export async function requireUser(req?: NextRequest) {
 export async function requireRole(requiredRole: Role, req?: NextRequest) {
   const user = await requireUser(req);
 
-  // On utilise hasRole pour vérifier la hiérarchie
-  // Ex: si requireRole('ADMIN'), un OWNER passera aussi.
-  if (!hasRole(user.role as Role, requiredRole)) {
-
+  // Utilisation de la nouvelle logique hasRole qui gère l'objet user
+  if (!hasRole(user, requiredRole)) {
     redirect("/dashboard");
   }
 
@@ -384,8 +384,27 @@ export async function requireSecretary(req?: NextRequest) {
   return requireRole("SECRETARY", req);
 }
 
+// Modifié : Vérifie explicitement le rôle INSTRUCTOR (conduite)
+export async function requireInstructor(req?: NextRequest) {
+  const user = await requireUser(req);
+
+  // Specific check: user must be INSTRUCTOR or ADMIN/OWNER logic
+  // hasRole handles hierarchy: INSTRUCTOR=20, ADMIN=40, OWNER=50
+  if (!hasRole(user, "INSTRUCTOR")) {
+    redirect("/dashboard");
+  }
+  return user;
+}
+
+// Modifié : Vérifie explicitement le rôle TEACHER (formation pro)
 export async function requireTeacher(req?: NextRequest) {
-  return requireRole("INSTRUCTOR", req);
+  const user = await requireUser(req);
+
+  // Hierarchy check: TEACHER=20. So ADMIN/OWNER also pass.
+  if (!hasRole(user, "TEACHER")) {
+    redirect("/dashboard");
+  }
+  return user;
 }
 
 export async function requireStudent(req?: NextRequest) {

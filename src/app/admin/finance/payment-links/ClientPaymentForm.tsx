@@ -218,7 +218,7 @@ export default function ClientPaymentForm({ users, courses }: { users: User[], c
 
                 <button
                     type="submit"
-                    disabled={loading || !selectedUserId || !amount}
+                    disabled={loading || !selectedUserId || !selectedCourseId || !amount}
                     className="w-full bg-slate-900 text-white py-2 px-4 rounded-md hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center font-bold transition-colors"
                 >
                     {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : "Générer le lien de paiement"}

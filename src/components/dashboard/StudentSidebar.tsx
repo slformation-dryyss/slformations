@@ -18,27 +18,68 @@ import {
 
 interface SidebarProps {
   role?: string;
+  roles?: string[];
 }
 
-export function StudentSidebar({ role = "STUDENT" }: SidebarProps) {
+export function StudentSidebar({ role = "STUDENT", roles }: SidebarProps) {
   const pathname = usePathname();
 
-  const isTeacher = role === "INSTRUCTOR" || role === "ADMIN" || role === "OWNER";
+  // Consolidation des rôles
+  const userRoles = roles || [role];
 
-  const navigation = isTeacher ? [
+  const isOwner = userRoles.includes("OWNER");
+  const isAdmin = userRoles.includes("ADMIN") || isOwner;
+
+  // INSTRUCTOR = Moniteur de conduite (gère uniquement la conduite)
+  const isInstructor = userRoles.includes("INSTRUCTOR") || isAdmin;
+
+  // TEACHER = Formateur professionnel (VTC, CACES...)
+  const isTeacher = userRoles.includes("TEACHER") || isAdmin;
+
+  const isStudent = userRoles.includes("STUDENT");
+
+  // SECTION ÉLÈVE (Toujours visible si on est élève ou si on n'a pas d'autre rôle)
+  // Si on est Admin/Instructor/Teacher, on voit quand même l'accès élève ? Souvent oui pour tester.
+  // Mais pour alléger, on peut masquer si on est admin.
+  // Ici on laisse visible pour tous sauf si on veut explicitement séparer.
+  const showStudentSection = true;
+
+  const navigation = [
     { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Dispos Conduite", href: "/instructor/availability", icon: CalendarDays },
-    { name: "Cours Conduite", href: "/instructor/lessons", icon: GraduationCap },
-    { name: "Mon Profil", href: "/dashboard/profile", icon: Settings },
-  ] : [
-    { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Mes formations", href: "/dashboard/mes-formations", icon: GraduationCap },
-    { name: "Conduite / Auto-école", href: "/dashboard/driving-lessons", icon: Car },
-    { name: "Mon planning", href: "/dashboard/planning", icon: CalendarDays },
-    { name: "Mes documents", href: "/dashboard/documents", icon: FileText },
-    { name: "Mes paiements", href: "/dashboard/paiement", icon: CreditCard },
-    { name: "Mon profil", href: "/dashboard/profile", icon: User },
   ];
+
+  if (isStudent && showStudentSection) {
+    navigation.push(
+      { name: "Mes formations", href: "/dashboard/mes-formations", icon: GraduationCap },
+      { name: "Conduite / Auto-école", href: "/dashboard/driving-lessons", icon: Car },
+      { name: "Mon planning", href: "/dashboard/planning", icon: CalendarDays },
+      { name: "Mes documents", href: "/dashboard/documents", icon: FileText },
+      { name: "Mes paiements", href: "/dashboard/paiement", icon: CreditCard },
+    );
+  }
+
+  // SECTION INSTRUCTEUR (Conduite)
+  if (isInstructor) {
+    // On pourrait ajouter un séparateur ou un header de section ici visuellement
+    // Mais pour l'instant on ajoute à la liste
+    navigation.push(
+      { name: "Dispos Conduite", href: "/instructor/availability", icon: CalendarDays },
+      { name: "Cours Conduite", href: "/instructor/lessons", icon: Car },
+      { name: "Mes Élèves (Conduite)", href: "/instructor/students", icon: User },
+    );
+  }
+
+  // SECTION TEACHER (Formation Pro)
+  if (isTeacher) {
+    navigation.push(
+      { name: "Mes Cours (Pro)", href: "/teacher/courses", icon: GraduationCap },
+      { name: "Sessions (Pro)", href: "/teacher/sessions", icon: CalendarDays },
+      { name: "Stagiaires (Pro)", href: "/teacher/students", icon: User },
+    );
+  }
+
+  // Toujours ajouter le profil à la fin
+  navigation.push({ name: "Mon Profil", href: "/dashboard/profile", icon: Settings });
 
   return (
     <div className="flex flex-col w-64 bg-slate-900 border-r border-slate-800 min-h-screen fixed top-0 left-0 h-full z-40">
@@ -56,8 +97,8 @@ export function StudentSidebar({ role = "STUDENT" }: SidebarProps) {
                 key={item.name}
                 href={item.href}
                 className={`group flex items-center px-2 py-3 text-sm font-medium rounded-md transition-colors ${isActive
-                    ? "bg-gold-500 text-slate-900"
-                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                  ? "bg-gold-500 text-slate-900"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
                   }`}
               >
                 <item.icon
@@ -87,4 +128,3 @@ export function StudentSidebar({ role = "STUDENT" }: SidebarProps) {
     </div>
   );
 }
-

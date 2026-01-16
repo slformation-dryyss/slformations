@@ -8,6 +8,7 @@ import {
     AlertTriangle,
     RefreshCw,
     GraduationCap,
+    Car,
 } from "lucide-react";
 import Link from "next/link";
 import { getDrivingLessonsStats, getPendingChangeRequests } from "./actions";
@@ -190,7 +191,7 @@ export default async function AdminDrivingLessonsPage() {
             </div>
 
             {/* Actions rapides */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Link
                     href="/admin/driving-lessons/assignments"
                     className="bg-white p-6 rounded-lg border border-slate-200 hover:border-gold-500 transition shadow-sm"
@@ -221,6 +222,17 @@ export default async function AdminDrivingLessonsPage() {
                     <h3 className="font-bold text-slate-900 mb-2">Instructeurs</h3>
                     <p className="text-sm text-slate-600">
                         Gérer les profils instructeurs
+                    </p>
+                </Link>
+
+                <Link
+                    href="/admin/driving-lessons/vehicles"
+                    className="bg-white p-6 rounded-lg border border-slate-200 hover:border-gold-500 transition shadow-sm"
+                >
+                    <Car className="w-8 h-8 text-gold-500 mb-3" />
+                    <h3 className="font-bold text-slate-900 mb-2">Véhicules</h3>
+                    <p className="text-sm text-slate-600">
+                        Gérer la flotte et la maintenance
                     </p>
                 </Link>
             </div>

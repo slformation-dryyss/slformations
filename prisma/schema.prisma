@@ -55,7 +55,10 @@ model User {
   isProfileComplete Boolean         @default(false)
   onboardingStatus String           @default("NEW") // NEW, PENDING_DOCS, DOCS_VERIFIED, READY_TO_PAY, ACTIVE
 
-  role             String           @default("STUDENT")
+  roles            String[]         @default(["STUDENT"]) // ["STUDENT", "TEACHER", "INSTRUCTOR", "ADMIN", "OWNER"]
+  primaryRole      String           @default("STUDENT")   // Rôle principal pour l'affichage
+  role             String           @default("STUDENT")   // @deprecated: Keeping for backward compatibility during migration
+  
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   
@@ -86,10 +89,39 @@ model User {
   quizAttempts     QuizAttempt[]
   
   // Relations Système de Réservation Cours de Conduite
+  teacherProfile       TeacherProfile?
   instructorProfile    InstructorProfile?
   studentAssignments   InstructorAssignment[] @relation("StudentAssignments")
   studentLessons       DrivingLesson[]        @relation("StudentLessons")
   studentChangeRequests ChangeRequest[]       @relation("StudentChangeRequests")
+}
+
+// Profil Formateur (formations professionnelles)
+model TeacherProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Spécialités professionnelles
+  specialties String[] @default([]) // ["VTC", "TAXI", "CACES", "SST", "INCENDIE", etc.]
+  
+  // Certifications
+  certifications String[] @default([])
+  
+  // Localisation
+  city        String
+  department  String
+  
+  // Disponibilité
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations: using the exact relation name matching the User model
+  // Note: sessionsTeaching in User has @relation("TeacherSessions")
+  // But User already has sessionsTeaching field, so we don't strictly *need* to link TeacherProfile to Session unless we change the Session model to point to TeacherProfile instead of User.
+  // For now, let's keep the User relation for sessions but we can add specific TeacherProfile relations later if needed.
 }
 
 model Course {
@@ -377,7 +409,7 @@ model OrderItem {
 
 // --- Modèles Legacy / Présentiel (Location & Planning) ---
 
-model Vehicle {
+model LegacyVehicle {
   id          String         @id @default(cuid())
   model       String
   brand       String
@@ -407,7 +439,7 @@ model Booking {
 
   user    User     @relation(fields: [userId], references: [id])
   course  Course?  @relation(fields: [courseId], references: [id])
-  vehicle Vehicle? @relation(fields: [vehicleId], references: [id])
+  vehicle LegacyVehicle? @relation(fields: [vehicleId], references: [id])
 
   @@index([userId])
   @@index([courseId])
@@ -738,6 +770,7 @@ model InstructorProfile {
   drivingLessons    DrivingLesson[]
   currentInstructorRequests ChangeRequest[] @relation("CurrentInstructor")
   requestedInstructorRequests ChangeRequest[] @relation("RequestedInstructor")
+  vehicles          Vehicle[]
 }
 
 // Créneaux de disponibilité (avec support récurrence)
@@ -810,6 +843,9 @@ model DrivingLesson {
   
   availabilityId  String?
   availability    InstructorAvailability? @relation(fields: [availabilityId], references: [id], onDelete: SetNull)
+  
+  vehicleId       String?
+  vehicle         Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
   
   // Détails du cours
   date            DateTime
@@ -885,4 +921,72 @@ model ChangeRequest {
   
   @@index([studentId, status])
   @@index([status])
+}
+
+// ============================================
+// GESTION DES VÉHICULES
+// ============================================
+
+model Vehicle {
+  id                String   @id @default(cuid())
+  
+  // Informations véhicule
+  brand             String   // Renault, Peugeot, etc.
+  model             String   // Clio, 208, etc.
+  licensePlate      String   @unique
+  year              Int
+  transmission      String   // MANUAL | AUTOMATIC
+  fuelType          String   // DIESEL | GASOLINE | ELECTRIC | HYBRID
+  
+  // Statut
+  status            String   @default("ACTIVE") // ACTIVE | MAINTENANCE | RETIRED
+  isAvailable       Boolean  @default(true)
+  
+  // Maintenance
+  lastMaintenanceDate    DateTime?
+  nextMaintenanceDate    DateTime?
+  maintenanceDueKm       Int?
+  currentKm              Int      @default(0)
+  
+  // Assurance & Contrôle technique
+  insuranceExpiryDate    DateTime?
+  technicalControlDate   DateTime?
+  insuranceCompany       String?
+  insurancePolicyNumber  String?
+  
+  // Attribution
+  assignedInstructorId   String?
+  assignedInstructor     InstructorProfile? @relation(fields: [assignedInstructorId], references: [id], onDelete: SetNull)
+  
+  // Relations
+  maintenanceRecords     VehicleMaintenance[]
+  lessons                DrivingLesson[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([status, isAvailable])
+  @@index([assignedInstructorId])
+}
+
+model VehicleMaintenance {
+  id            String   @id @default(cuid())
+  vehicleId     String
+  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  
+  type          String   // ROUTINE | REPAIR | INSPECTION | ACCIDENT
+  description   String
+  cost          Float?
+  performedBy   String?  // Garage name
+  performedAt   DateTime
+  nextDueDate   DateTime?
+  
+  // Détails supplémentaires
+  kilometers    Int?     // Kilométrage au moment de la maintenance
+  invoiceNumber String?
+  notes         String?
+  
+  createdAt     DateTime @default(now())
+  
+  @@index([vehicleId, performedAt])
 }

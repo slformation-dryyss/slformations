@@ -36,6 +36,8 @@ export async function GET(request: NextRequest) {
       email: user.email,
       name: user.name,
       role: user.role,
+      roles: user.roles, // New field
+      primaryRole: user.primaryRole, // New field
       isProfileComplete: user.isProfileComplete,
       createdAt: user.createdAt,
       firstName: user.firstName,
@@ -173,7 +175,10 @@ export async function POST(request: NextRequest) {
     });
 
     // 4. Si c'est un instructeur, on s'assure qu'il a son InstructorProfile
-    if (updated.role === "INSTRUCTOR") {
+    const role = updated.role;
+    const roles = updated.roles || [role];
+
+    if (roles.includes("INSTRUCTOR")) {
       await prisma.instructorProfile.upsert({
         where: { userId: updated.id },
         update: {
@@ -187,6 +192,22 @@ export async function POST(request: NextRequest) {
           department: body.postalCode ? body.postalCode.substring(0, 2) : "À définir",
           postalCode: body.postalCode || null,
           specialty: "DRIVING",
+        },
+      });
+    }
+
+    // 5. Si c'est un formateur (TEACHER), on s'assure qu'il a son TeacherProfile
+    if (roles.includes("TEACHER")) {
+      await prisma.teacherProfile.upsert({
+        where: { userId: updated.id },
+        create: {
+          userId: updated.id,
+          city: body.city || "À définir",
+          department: body.postalCode ? body.postalCode.substring(0, 2) : "À définir",
+        },
+        update: {
+          city: body.city || "À définir",
+          department: body.postalCode ? body.postalCode.substring(0, 2) : "À définir",
         },
       });
     }
