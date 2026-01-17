@@ -5,7 +5,7 @@ import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle } from "lucide
 export default async function AdminAllLessonsPage() {
     await requireAdmin();
     const result = await getAllLessons();
-    const lessons = result.success ? result.data : [];
+    const lessons = result.success && result.data ? result.data : [];
 
     return (
         <div className="pb-8">
@@ -49,9 +49,9 @@ export default async function AdminAllLessonsPage() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${lesson.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                                                lesson.status === 'CONFIRMED' ? 'bg-blue-100 text-blue-700' :
-                                                    lesson.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
-                                                        'bg-yellow-100 text-yellow-700'
+                                            lesson.status === 'CONFIRMED' ? 'bg-blue-100 text-blue-700' :
+                                                lesson.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
+                                                    'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {lesson.status === 'COMPLETED' ? <CheckCircle className="w-3.5 h-3.5" /> :
                                                 lesson.status === 'CANCELLED' ? <XCircle className="w-3.5 h-3.5" /> :

@@ -19,8 +19,8 @@ export default async function AdminDrivingLessonsPage() {
     const statsResult = await getDrivingLessonsStats();
     const requestsResult = await getPendingChangeRequests();
 
-    const stats = statsResult.success ? statsResult.data : null;
-    const changeRequests = requestsResult.success ? requestsResult.data : [];
+    const stats = statsResult.success && statsResult.data ? statsResult.data : null;
+    const changeRequests = requestsResult.success && requestsResult.data ? requestsResult.data : [];
 
     return (
         <div className="pb-8">

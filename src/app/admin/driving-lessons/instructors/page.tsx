@@ -6,7 +6,7 @@ import Link from "next/link";
 export default async function AdminInstructorsPage() {
     await requireAdmin();
     const result = await getInstructors();
-    const instructors = result.success ? result.data : [];
+    const instructors = result.success && result.data ? result.data : [];
 
     return (
         <div className="pb-8">
