@@ -113,7 +113,9 @@ export async function Footer() {
             <ul className="space-y-3 text-slate-600">
               <li className="flex items-start space-x-2">
                 <MapPin className="text-gold-500 w-5 h-5 mt-1 flex-shrink-0" />
-                <span>{address}</span>
+                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`} target="_blank" rel="noopener noreferrer" className="hover:text-gold-500 transition">
+                  {address}
+                </a>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone className="text-gold-500 w-5 h-5 flex-shrink-0" />
