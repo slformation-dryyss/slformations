@@ -1,26 +1,26 @@
 -- AlterTable
-ALTER TABLE "Course" ADD COLUMN     "maxStudents" INTEGER DEFAULT 0;
+ALTER TABLE "Course" ADD COLUMN IF NOT EXISTS "maxStudents" INTEGER DEFAULT 0;
 
 -- AlterTable
-ALTER TABLE "CourseSessionBooking" ADD COLUMN     "justification" TEXT;
+ALTER TABLE "CourseSessionBooking" ADD COLUMN IF NOT EXISTS "justification" TEXT;
 
 -- AlterTable
-ALTER TABLE "LessonProgress" ADD COLUMN     "lastAccessedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-ADD COLUMN     "timeSpent" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "LessonProgress" ADD COLUMN IF NOT EXISTS "lastAccessedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN IF NOT EXISTS "timeSpent" INTEGER NOT NULL DEFAULT 0;
 
 -- AlterTable
-ALTER TABLE "Module" ADD COLUMN     "dayNumber" INTEGER,
-ADD COLUMN     "duration" INTEGER;
+ALTER TABLE "Module" ADD COLUMN IF NOT EXISTS "dayNumber" INTEGER,
+ADD COLUMN IF NOT EXISTS "duration" INTEGER;
 
 -- AlterTable
-ALTER TABLE "PaymentLink" ADD COLUMN     "justification" TEXT,
+ALTER TABLE "PaymentLink" ADD COLUMN IF NOT EXISTS "justification" TEXT,
 ALTER COLUMN "courseId" DROP NOT NULL;
 
 -- AlterTable
-ALTER TABLE "User" ADD COLUMN     "gdprConsent" BOOLEAN,
-ADD COLUMN     "gdprConsentDate" TIMESTAMP(3),
-ADD COLUMN     "hasCompletedTour" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "marketingConsent" BOOLEAN;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "gdprConsent" BOOLEAN,
+ADD COLUMN IF NOT EXISTS "gdprConsentDate" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS "hasCompletedTour" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN IF NOT EXISTS "marketingConsent" BOOLEAN;
 
 -- CreateTable
 CREATE TABLE "ConsentLog" (
