@@ -17,8 +17,8 @@ export default async function middleware(request: NextRequest) {
     return auth0.middleware(request);
   }
 
-  // Protection Auth0 pour les zones privées : tout l'espace élève vit sous /dashboard
-  if (pathname.startsWith("/dashboard")) {
+  // Protection Auth0 pour les zones privées : tout l'espace élève vit sous /dashboard, ainsi que les espaces formateurs
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/instructor") || pathname.startsWith("/teacher")) {
 
 
     // Auth0 v4: Récupération de la session via le client Edge-compatible
@@ -77,6 +77,8 @@ export const config = {
   matcher: [
     "/formations",
     "/dashboard/:path*",
+    "/instructor/:path*",
+    "/teacher/:path*",
   ],
 };
 

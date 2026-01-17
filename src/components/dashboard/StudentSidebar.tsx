@@ -70,18 +70,18 @@ export function StudentSidebar({ role = "STUDENT", roles, socialLinks = {} }: Si
     // On pourrait ajouter un séparateur ou un header de section ici visuellement
     // Mais pour l'instant on ajoute à la liste
     navigation.push(
-      { name: "Dispos Conduite", href: "/instructor/availability", icon: CalendarDays },
-      { name: "Cours Conduite", href: "/instructor/lessons", icon: Car },
-      { name: "Mes Élèves (Conduite)", href: "/instructor/students", icon: User },
+      { name: "Dispos Conduite", href: "/dashboard/instructor/availability", icon: CalendarDays },
+      { name: "Cours Conduite", href: "/dashboard/instructor/lessons", icon: Car },
+      { name: "Mes Élèves (Conduite)", href: "/dashboard/instructor/students", icon: User },
     );
   }
 
   // SECTION TEACHER (Formation Pro)
   if (isTeacher) {
     navigation.push(
-      { name: "Mes Cours (Pro)", href: "/teacher/courses", icon: GraduationCap },
-      { name: "Sessions (Pro)", href: "/teacher/sessions", icon: CalendarDays },
-      { name: "Stagiaires (Pro)", href: "/teacher/students", icon: User },
+      { name: "Mes Cours (Pro)", href: "/dashboard/teacher/courses", icon: GraduationCap },
+      { name: "Sessions (Pro)", href: "/dashboard/teacher/sessions", icon: CalendarDays },
+      { name: "Stagiaires (Pro)", href: "/dashboard/teacher/students", icon: User },
     );
   }
 

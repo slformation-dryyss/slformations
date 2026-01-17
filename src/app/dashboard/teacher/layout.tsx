@@ -11,15 +11,8 @@ export default async function TeacherLayout({
     const user = await requireTeacher();
 
     return (
-        <div className="flex bg-slate-50 min-h-screen font-sans text-slate-900">
-            {/* Sidebar Fixe */}
-            <StudentSidebar role={user.role} roles={user.roles} />
-
-            <div className="flex-1 flex flex-col ml-64 min-h-screen">
-                <main className="flex-1 p-8">
-                    {children}
-                </main>
-            </div>
-        </div>
+        <>
+            {children}
+        </>
     );
 }

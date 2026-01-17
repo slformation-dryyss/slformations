@@ -12,17 +12,19 @@ export default async function DashboardLayout({
 
   // Default role
   let userRole = "STUDENT";
+  let userRoles: string[] = ["STUDENT"];
 
   if (session?.user) {
     // Try to get role from DB for more accuracy/updates
     // Using sub (Auth0 ID) to find user
     const dbUser = await prisma.user.findUnique({
       where: { auth0Id: session.user.sub },
-      select: { role: true }
+      select: { role: true, roles: true }
     });
 
     if (dbUser) {
       userRole = dbUser.role;
+      userRoles = dbUser.roles || [dbUser.role];
     }
   }
 
@@ -44,7 +46,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex bg-slate-50 min-h-screen font-sans text-slate-900">
       {/* Sidebar Fixe */}
-      <StudentSidebar role={userRole} socialLinks={socialLinks} />
+      <StudentSidebar role={userRole} roles={userRoles} socialLinks={socialLinks} />
 
       <div className="flex-1 flex flex-col ml-64 min-h-screen">
         <main className="flex-1 p-8">
