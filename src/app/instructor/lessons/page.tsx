@@ -28,6 +28,7 @@ type Lesson = {
 export default function InstructorLessonsPage() {
     const [lessons, setLessons] = useState<Lesson[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [filter, setFilter] = useState<string>("ALL");
 
     useEffect(() => {
@@ -36,9 +37,16 @@ export default function InstructorLessonsPage() {
 
     async function loadLessons() {
         setLoading(true);
-        const result = await getMyLessons(filter === "ALL" ? undefined : filter);
-        if (result.success && result.data) {
-            setLessons(result.data as any);
+        setError(null);
+        try {
+            const result = await getMyLessons(filter === "ALL" ? undefined : filter);
+            if (result.success && result.data) {
+                setLessons(result.data as any);
+            } else {
+                setError(result.error || "Erreur lors de la récupération des cours");
+            }
+        } catch (e) {
+            setError("Erreur de connexion au serveur");
         }
         setLoading(false);
     }
@@ -80,8 +88,8 @@ export default function InstructorLessonsPage() {
                         key={status}
                         onClick={() => setFilter(status)}
                         className={`px-4 py-2 rounded-lg font-medium transition ${filter === status
-                                ? "bg-gold-500 text-slate-900"
-                                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            ? "bg-gold-500 text-slate-900"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                             }`}
                     >
                         {status === "ALL" && "Tous"}
@@ -91,6 +99,12 @@ export default function InstructorLessonsPage() {
                     </button>
                 ))}
             </div>
+
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-center font-medium">
+                    {error}
+                </div>
+            )}
 
             {/* Liste des cours */}
             {loading ? (
@@ -122,10 +136,10 @@ export default function InstructorLessonsPage() {
                             <div
                                 key={lesson.id}
                                 className={`bg-white rounded-xl border p-6 ${lesson.status === "PENDING"
-                                        ? "border-orange-200 bg-orange-50"
-                                        : lesson.status === "CONFIRMED"
-                                            ? "border-green-200 bg-green-50"
-                                            : "border-slate-200"
+                                    ? "border-orange-200 bg-orange-50"
+                                    : lesson.status === "CONFIRMED"
+                                        ? "border-green-200 bg-green-50"
+                                        : "border-slate-200"
                                     }`}
                             >
                                 <div className="flex items-start justify-between mb-4">
@@ -175,12 +189,12 @@ export default function InstructorLessonsPage() {
                                     <div className="flex flex-col items-end gap-2">
                                         <span
                                             className={`px-3 py-1 rounded-full text-xs font-bold ${lesson.status === "PENDING"
-                                                    ? "bg-orange-100 text-orange-700"
-                                                    : lesson.status === "CONFIRMED"
-                                                        ? "bg-green-100 text-green-700"
-                                                        : lesson.status === "COMPLETED"
-                                                            ? "bg-blue-100 text-blue-700"
-                                                            : "bg-red-100 text-red-700"
+                                                ? "bg-orange-100 text-orange-700"
+                                                : lesson.status === "CONFIRMED"
+                                                    ? "bg-green-100 text-green-700"
+                                                    : lesson.status === "COMPLETED"
+                                                        ? "bg-blue-100 text-blue-700"
+                                                        : "bg-red-100 text-red-700"
                                                 }`}
                                         >
                                             {lesson.status === "PENDING" && "En attente"}

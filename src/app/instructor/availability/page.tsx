@@ -59,9 +59,16 @@ export default function AvailabilityPage() {
 
     async function loadAvailabilities() {
         setLoading(true);
-        const result = await getMyAvailabilities();
-        if (result.success && result.data) {
-            setAvailabilities(result.data as any);
+        setError(null);
+        try {
+            const result = await getMyAvailabilities();
+            if (result.success && result.data) {
+                setAvailabilities(result.data as any);
+            } else {
+                setError(result.error || "Une erreur est survenue lors du chargement");
+            }
+        } catch (e) {
+            setError("Erreur de connexion au serveur");
         }
         setLoading(false);
     }
@@ -132,6 +139,12 @@ export default function AvailabilityPage() {
                     Ajouter un créneau
                 </button>
             </div>
+
+            {error && !showForm && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-center font-medium">
+                    {error}
+                </div>
+            )}
 
             {/* Form */}
             {showForm && (
@@ -239,8 +252,8 @@ export default function AvailabilityPage() {
                                                     type="button"
                                                     onClick={() => toggleDay(day.value)}
                                                     className={`px-3 py-2 rounded-lg font-medium transition ${recurrenceDays.includes(day.value)
-                                                            ? "bg-gold-500 text-slate-900"
-                                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                                        ? "bg-gold-500 text-slate-900"
+                                                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                                                         }`}
                                                 >
                                                     {day.label}

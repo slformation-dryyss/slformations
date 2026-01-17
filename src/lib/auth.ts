@@ -42,7 +42,7 @@ function mapAuth0RolesToPrisma(auth0Roles: string[] | undefined | null): { roles
     return { roles: ["STUDENT"], primaryRole: "STUDENT" };
   }
 
-  const roleSet = new Set<Role>(["STUDENT"]); // Tout le monde est au moins étudiant potentiellement
+  const roleSet = new Set<Role>();
   const normalizedRoles = auth0Roles.map((r) => r.toLowerCase());
 
   if (normalizedRoles.includes("owner")) roleSet.add("OWNER");
@@ -53,6 +53,11 @@ function mapAuth0RolesToPrisma(auth0Roles: string[] | undefined | null): { roles
   if (normalizedRoles.includes("teacher") || normalizedRoles.includes("enseignant")) roleSet.add("TEACHER");
   if (normalizedRoles.includes("instructor") || normalizedRoles.includes("moniteur")) roleSet.add("INSTRUCTOR");
 
+  // Si aucun rôle spécial n'a été trouvé, on met STUDENT
+  if (roleSet.size === 0) {
+    roleSet.add("STUDENT");
+  }
+
   // Déterminer le rôle principal (le plus élevé)
   const roles = Array.from(roleSet);
   let primaryRole: Role = "STUDENT";
@@ -60,7 +65,7 @@ function mapAuth0RolesToPrisma(auth0Roles: string[] | undefined | null): { roles
   if (roleSet.has("OWNER")) primaryRole = "OWNER";
   else if (roleSet.has("ADMIN")) primaryRole = "ADMIN";
   else if (roleSet.has("SECRETARY")) primaryRole = "SECRETARY";
-  else if (roleSet.has("TEACHER")) primaryRole = "TEACHER"; // Priorité arbitraire entre Teacher et Instructor
+  else if (roleSet.has("TEACHER")) primaryRole = "TEACHER";
   else if (roleSet.has("INSTRUCTOR")) primaryRole = "INSTRUCTOR";
 
   return { roles, primaryRole };
