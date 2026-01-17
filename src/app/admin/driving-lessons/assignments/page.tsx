@@ -11,8 +11,8 @@ export default async function AdminAssignmentsPage() {
         getInstructors()
     ]);
 
-    const assignments = assignmentsRes.success ? assignmentsRes.data : [];
-    const instructors = instructorsRes.success ? instructorsRes.data : [];
+    const assignments = assignmentsRes.success && assignmentsRes.data ? assignmentsRes.data : [];
+    const instructors = instructorsRes.success && instructorsRes.data ? instructorsRes.data : [];
 
     return (
         <div className="pb-8">
