@@ -370,3 +370,58 @@ export async function rejectLesson(lessonId: string, reason?: string) {
         return { success: false, error: error.message || "Erreur lors du refus" };
     }
 }
+
+/**
+ * Récupérer les élèves attribués à l'instructeur
+ */
+export async function getMyStudents() {
+    const user = await requireUser();
+
+    if (user.role !== "INSTRUCTOR") {
+        return { success: false, error: "Accès réservé aux instructeurs" };
+    }
+
+    const instructorProfile = await prisma.instructorProfile.findUnique({
+        where: { userId: user.id },
+    });
+
+    if (!instructorProfile) {
+        return { success: false, error: "Profil instructeur introuvable" };
+    }
+
+    try {
+        const assignments = await prisma.instructorAssignment.findMany({
+            where: {
+                instructorId: instructorProfile.id,
+                isActive: true,
+            },
+            include: {
+                student: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        phone: true,
+                        city: true,
+                        addressLine1: true,
+                        postalCode: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: "desc" },
+        });
+
+        // Transformer pour n'avoir que l'objet student avec les infos d'attribution
+        const students = assignments.map(a => ({
+            ...a.student,
+            courseType: a.courseType,
+            assignedAt: a.createdAt,
+        }));
+
+        return { success: true, data: students };
+    } catch (error: any) {
+        console.error("Error fetching instructor students:", error);
+        return { success: false, error: error.message || "Erreur lors de la récupération des élèves" };
+    }
+}
