@@ -76,6 +76,57 @@ export async function addQuestionAction(formData: FormData) {
   revalidatePath(`/admin/courses/quizzes/${quizId}`);
 }
 
+// Supprimer une question
+export async function deleteQuestionAction(formData: FormData) {
+  await requireAdmin();
+  const id = formData.get("id") as string;
+  const quizId = formData.get("quizId") as string;
+  
+  await prisma.question.delete({ where: { id } });
+  revalidatePath(`/admin/courses/quizzes/${quizId}`);
+}
+
+// Modifier une question
+export async function updateQuestionAction(formData: FormData) {
+  await requireAdmin();
+  
+  const id = formData.get("id") as string;
+  const quizId = formData.get("quizId") as string;
+  const text = formData.get("text") as string;
+  const type = formData.get("type") as string; // SINGLE, MULTIPLE
+  const optionsJson = formData.get("options") as string;
+
+  if (!id || !text) throw new Error("Données manquantes");
+
+  const options = JSON.parse(optionsJson);
+
+  // Transaction pour update la question et remplacer les options
+  await prisma.$transaction(async (tx) => {
+    // 1. Update question info
+    await tx.question.update({
+      where: { id },
+      data: { text, type }
+    });
+
+    // 2. Gestion des options : On supprime les anciennes et on recrée (approche simple)
+    // Attention : cela change les IDs des options. Si des QuizAttempt référencent les IDs, cela peut poser souci.
+    // Pour l'instant on suppose qu'on est en phase de création/édition.
+    await tx.option.deleteMany({
+      where: { questionId: id }
+    });
+
+    await tx.option.createMany({
+      data: options.map((opt: any) => ({
+        questionId: id,
+        text: opt.text,
+        isCorrect: opt.isCorrect
+      }))
+    });
+  });
+
+  revalidatePath(`/admin/courses/quizzes/${quizId}`);
+}
+
 export async function deleteQuizAction(formData: FormData) {
   await requireAdmin();
   const id = formData.get("id") as string;

@@ -2,8 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Plus, Trash, CheckCircle, Save } from "lucide-react";
-import { addQuestionAction, deleteQuizAction } from "../actions";
+import { ArrowLeft, Plus } from "lucide-react";
+import { addQuestionAction } from "../actions";
+import { QuestionItem } from "@/components/admin/QuestionItem";
 
 async function getQuiz(id: string) {
   return await prisma.quiz.findUnique({
@@ -54,31 +55,12 @@ export default async function QuizAdminPage({
           <h2 className="text-xl font-bold text-slate-900">Questions ({quiz.questions.length})</h2>
           
           {quiz.questions.map((question: any, idx: number) => (
-            <div key={question.id} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="font-bold text-slate-800">
-                  {idx + 1}. {question.text}
-                </h3>
-                <span className="text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded text-slate-500">
-                  {question.type}
-                </span>
-              </div>
-              
-              <ul className="space-y-2">
-                {question.options.map((opt: any) => (
-                  <li key={opt.id} className="flex items-center gap-2 text-sm">
-                    {opt.isCorrect ? (
-                      <CheckCircle className="w-4 h-4 text-emerald-500" />
-                    ) : (
-                      <div className="w-4 h-4 rounded-full border border-slate-300" />
-                    )}
-                    <span className={opt.isCorrect ? "text-emerald-700 font-medium" : "text-slate-600"}>
-                      {opt.text}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <QuestionItem 
+              key={question.id} 
+              question={question} 
+              quizId={quiz.id} 
+              index={idx} 
+            />
           ))}
 
           {/* New Question Form */}
@@ -110,4 +92,3 @@ export default async function QuizAdminPage({
     </div>
   );
 }
-
