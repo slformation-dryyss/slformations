@@ -126,7 +126,7 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                
+
                 {/* Séparateur vertical pour desktop */}
                 <div className="hidden md:block w-px bg-slate-100 self-stretch" />
 
@@ -150,25 +150,25 @@ export default function Home() {
         {/* Pôles d'Expertise (moved up) */}
         <section id="formations-pro" className="py-20 bg-slate-50">
           <div className="max-w-7xl mx-auto px-6">
-              <div className="text-center mb-10">
-                <p className="text-sm font-bold text-slate-800 mb-1">
-                  Votre avenir commence ici. <span className="text-gold-500 italic">Certifié Qualiopi.</span>
-                </p>
-                <p className="text-sm text-slate-600 mb-4 max-w-2xl mx-auto">
-                  Formez-vous aux métiers qui recrutent : agent de sécurité, CACES, numérique... <br />
-                  Financement CPF, France Travail et OPCO.
-                </p>
-                <div className="mt-6">
-                  <Link
-                    href="/formations"
-                    className="inline-flex items-center px-8 py-3 rounded-lg bg-gold-500 text-white font-bold text-sm uppercase tracking-wide hover:bg-gold-600 transition shadow-lg hover:shadow-gold-500/20"
-                  >
-                    formation professionnelle
-                  </Link>
-                </div>
+            <div className="text-center mb-10">
+              <p className="text-sm font-bold text-slate-800 mb-1">
+                Votre avenir commence ici. <span className="text-gold-500 italic">Certifié Qualiopi.</span>
+              </p>
+              <p className="text-sm text-slate-600 mb-4 max-w-2xl mx-auto">
+                Formez-vous aux métiers qui recrutent : agent de sécurité, CACES, numérique... <br />
+                Financement CPF, France Travail et OPCO.
+              </p>
+              <div className="mt-6">
+                <Link
+                  href="/formations"
+                  className="inline-flex items-center px-8 py-3 rounded-lg bg-gold-500 text-white font-bold text-sm uppercase tracking-wide hover:bg-gold-600 transition shadow-lg hover:shadow-gold-500/20"
+                >
+                  formation professionnelle
+                </Link>
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Formation Transport */}
               {/* Formation IT */}
               <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
@@ -209,7 +209,7 @@ export default function Home() {
                     Formation Travaux publics
                   </h3>
                   <p className="text-slate-600 text-sm leading-relaxed mb-4">
-                    CACES R482 (engins de chantier) et R483 (grues mobiles). 
+                    CACES R482 (engins de chantier) et R483 (grues mobiles).
                     Formations réglementaires pour travailler en toute sécurité.
                   </p>
                   <Link
@@ -234,7 +234,7 @@ export default function Home() {
                 <div className="p-6 flex flex-col flex-1">
                   <h3 className="text-2xl font-bold mb-2 text-slate-900">Formation CACES</h3>
                   <p className="text-slate-600 text-sm leading-relaxed mb-4">
-                    Obtenez votre CACES pour nacelles, grues et engins de chantier. 
+                    Obtenez votre CACES pour nacelles, grues et engins de chantier.
                     Nous vous guidons vers la certification adaptée à vos besoins.
                   </p>
                   <Link
@@ -261,7 +261,7 @@ export default function Home() {
                     Sécurité & Prévention
                   </h3>
                   <p className="text-slate-600 text-sm leading-relaxed mb-4">
-                    Agent de sécurité (Titre RNCP), SSIAP 1-2-3, SST et Habilitations Électriques. 
+                    Agent de sécurité (Titre RNCP), SSIAP 1-2-3, SST et Habilitations Électriques.
                     Des diplômes reconnus pour des métiers en tension.
                   </p>
                   <Link
@@ -417,36 +417,7 @@ export default function Home() {
                 </div>
               </article>
 
-              {/* Conduite Supervisée */}
-              <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
-                <div className="h-48 overflow-hidden">
-                  <img
-                    className="w-full h-full object-cover"
-                    src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=800"
-                    alt="Conduite Supervisée"
-                  />
-                </div>
-                <div className="p-6 flex flex-col flex-1">
-                  <span className="inline-block px-3 py-1 mb-3 rounded-full bg-gold-500/15 text-gold-500 text-xs font-semibold">
-                    Conduite Supervisée
-                  </span>
-                  <h3 className="text-2xl font-bold mb-3 text-slate-900">
-                    Conduite Supervisée
-                  </h3>
-                  <p className="text-slate-600 mb-4 text-sm leading-relaxed">
-                    Gagnez en expérience à moindre coût avant l'examen avec la conduite supervisée. Dès 18 ans.
-                  </p>
-                  <div className="mt-auto flex items-center justify-between text-sm text-gray-400">
-                    <span className="flex items-center space-x-1">
-                      <Clock className="w-4 h-4" />
-                      <span>Dès 18 ans</span>
-                    </span>
-                    <Link href="/formations/conduite-supervisee" className="text-gold-500 font-semibold hover:underline">
-                      Sur devis
-                    </Link>
-                  </div>
-                </div>
-              </article>
+
 
               {/* Permis AAC */}
               <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm card-hover flex flex-col">
@@ -740,7 +711,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
               {/* Desktop connecting lines */}
               <div className="hidden md:block absolute top-1/4 left-[20%] right-[20%] h-0.5 bg-gradient-to-r from-gold-500/0 via-gold-500/20 to-gold-500/0" />
-              
+
               {[
                 {
                   step: "01",
@@ -785,7 +756,7 @@ export default function Home() {
           {/* Decorative elements */}
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-gold-500/5 rounded-full blur-3xl" />
-          
+
           <div className="max-w-7xl mx-auto px-6 relative">
             <div className="text-center mb-20">
               <span className="inline-block px-4 py-1.5 rounded-full bg-gold-500/10 text-gold-600 text-xs font-bold uppercase tracking-widest mb-4">Avis clients</span>
@@ -822,7 +793,7 @@ export default function Home() {
                   <div className="absolute top-8 right-10 text-gold-500/10 group-hover:text-gold-500/20 transition-colors">
                     <Zap className="w-16 h-16 fill-current" />
                   </div>
-                  
+
                   <div className="flex items-center gap-5 mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-gold-500/20 transition-transform">
                       {testimonial.name[0]}
@@ -847,8 +818,8 @@ export default function Home() {
 
                   <div className="mt-8 pt-8 border-t border-slate-50 flex items-center justify-between">
                     <div className="flex -space-x-2">
-                       <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100" />
-                       <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-200" />
+                      <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100" />
+                      <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-200" />
                     </div>
                     <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Verified</span>
                   </div>
@@ -862,7 +833,7 @@ export default function Home() {
         <section id="pricing-permis" className="py-32 bg-slate-50 relative overflow-hidden">
           {/* Abstract background shapes */}
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gold-500/5 -skew-x-12 translate-x-1/2" />
-          
+
           <div className="max-w-7xl mx-auto px-6 relative">
             <div className="text-center mb-24">
               <span className="inline-block px-4 py-1.5 rounded-full bg-gold-500/10 text-gold-600 text-xs font-bold uppercase tracking-widest mb-4">Investissez dans votre avenir</span>
@@ -881,7 +852,7 @@ export default function Home() {
                   <span className="text-gold-600 font-black text-xs uppercase tracking-[0.25em]"> Liberté totale</span>
                   <h3 className="text-3xl font-black text-slate-900 mt-2 tracking-tight group-hover:text-gold-600 transition-colors">Permis A – Moto</h3>
                 </div>
-                
+
                 <div className="mb-10 flex flex-col">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">à partir de</span>
                   <div className="flex items-baseline gap-2">
@@ -910,11 +881,11 @@ export default function Home() {
               {/* Permis B – Voiture - ELITE */}
               <article className="relative rounded-[3rem] p-12 bg-slate-900 text-white flex flex-col shadow-2xl transition-all duration-500 scale-110 z-20 border-[6px] border-gold-500/20 group overflow-hidden">
                 <div className="absolute top-10 right-10 opacity-10 rotate-12">
-                   <Star className="w-32 h-32 fill-current" />
+                  <Star className="w-32 h-32 fill-current" />
                 </div>
-                
+
                 <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-gold-400 via-gold-600 to-gold-400" />
-                
+
                 <div className="mb-10">
                   <span className="bg-gold-500 text-slate-900 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Le plus populaire</span>
                   <h3 className="text-4xl font-black text-white mt-4 tracking-tight">Permis B</h3>
@@ -951,7 +922,7 @@ export default function Home() {
                   <span className="text-gold-600 font-black text-xs uppercase tracking-[0.25em]"> Carrière Pro</span>
                   <h3 className="text-3xl font-black text-slate-900 mt-2 tracking-tight group-hover:text-gold-600 transition-colors">VTC & Taxi</h3>
                 </div>
-                
+
                 <div className="mb-10 flex flex-col">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">à partir de</span>
                   <div className="flex items-baseline gap-2">

@@ -104,8 +104,8 @@ export function Header() {
               </button>
 
               <div className={`absolute top-full left-0 w-64 pt-2 transition-all duration-200 transform ${activeDropdown === "permis"
-                  ? "opacity-100 visible translate-y-0"
-                  : "opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0"
+                ? "opacity-100 visible translate-y-0"
+                : "opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0"
                 }`}>
                 <div className="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden py-2">
                   <Link
@@ -129,13 +129,7 @@ export function Header() {
                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                     <span>Permis en Accéléré</span>
                   </Link>
-                  <Link
-                    href="/formations/conduite-supervisee"
-                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                    <span>Conduite Supervisée</span>
-                  </Link>
+
                   <Link
                     href="/formations/permis-aac"
                     className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
@@ -170,8 +164,8 @@ export function Header() {
               </button>
 
               <div className={`absolute top-full left-0 w-64 pt-2 transition-all duration-200 transform ${activeDropdown === "pro"
-                  ? "opacity-100 visible translate-y-0"
-                  : "opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0"
+                ? "opacity-100 visible translate-y-0"
+                : "opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0"
                 }`}>
                 <div className="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden py-2">
                   <Link
@@ -270,8 +264,8 @@ export function Header() {
                 {/* Dropdown Menu Desktop */}
                 <div
                   className={`absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden transition-all duration-200 transform origin-top-right ${isStudentMenuOpen
-                      ? "opacity-100 visible scale-100"
-                      : "opacity-0 invisible scale-95"
+                    ? "opacity-100 visible scale-100"
+                    : "opacity-0 invisible scale-95"
                     }`}
                 >
                   <div className="py-2">
@@ -374,6 +368,7 @@ export function Header() {
             >
               Accueil
             </Link>
+
             <Link
               href="/nos-plannings"
               className="py-2 text-slate-600 hover:text-gold-500 transition"
