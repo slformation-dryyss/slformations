@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate && npx prisma migrate resolve --applied 20260116005325_add_tour_and_course_limit || true && npx prisma migrate deploy && next build",
+    "build": "npx prisma generate && (npx prisma migrate resolve --applied 20260116005325_add_tour_and_course_limit || true) && (npx prisma migrate resolve --rolled-back 20260117212528_sync_pull || true) && npx prisma migrate deploy && next build",
     "build:local": "npx prisma generate && next build",
     "start": "node scripts/start.js",
     "lint": "eslint"
