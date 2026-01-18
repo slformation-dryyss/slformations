@@ -24,14 +24,14 @@ DROP INDEX "Vehicle_status_idx";
 ALTER TABLE "DrivingLesson" ADD COLUMN     "vehicleId" TEXT;
 
 -- AlterTable
-ALTER TABLE "User" DROP COLUMN "hasCompletedTour",
+ALTER TABLE "User" DROP COLUMN IF EXISTS "hasCompletedTour",
 ALTER COLUMN "primaryRole" SET NOT NULL;
 
 -- AlterTable
-ALTER TABLE "Vehicle" DROP COLUMN "features",
-DROP COLUMN "image",
-DROP COLUMN "pricePerDay",
-DROP COLUMN "type",
+ALTER TABLE "Vehicle" DROP COLUMN IF EXISTS "features",
+DROP COLUMN IF EXISTS "image",
+DROP COLUMN IF EXISTS "pricePerDay",
+DROP COLUMN IF EXISTS "type",
 ADD COLUMN     "assignedInstructorId" TEXT,
 ADD COLUMN     "currentKm" INTEGER NOT NULL DEFAULT 0,
 ADD COLUMN     "fuelType" TEXT NOT NULL,
