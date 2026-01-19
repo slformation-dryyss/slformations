@@ -176,7 +176,7 @@ export default function PermisBPage() {
                   </div>
                   <h3 className="font-bold mb-2 text-sm">Paiement Sécurisé</h3>
                   <p className="text-slate-500 text-xs">Paiement en 3x ou 4x sans frais.</p>
-                  <div className="flex flex-wrap justify-center items-center gap-3 mt-4 opacity-40 grayscale hover:grayscale-0 transition-all duration-300">
+                  <div className="flex flex-wrap justify-center items-center gap-3 mt-4 opacity-70 hover:opacity-100 transition-all duration-300">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-4 w-auto" />
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-2.5 w-auto" />
                     <img src="https://www.klarna.com/assets/img/logos/klarna-logo.svg" alt="Klarna" className="h-3.5 w-auto" />
