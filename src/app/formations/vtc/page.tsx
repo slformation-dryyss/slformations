@@ -405,7 +405,7 @@ export default async function FormationVTCPage() {
                         <div className="absolute top-0 inset-x-0 bg-gold-500 text-slate-900 text-xs font-bold text-center py-1 uppercase tracking-wider">Recommandé</div>
                         <h3 className="text-lg font-black text-white uppercase mb-2 mt-4">Pack Gold</h3>
                         <p className="text-xs text-gray-400 mb-4 italic">"Vous n'avez aucune base et voulez tout apprendre !"</p>
-                        <div className="text-3xl font-black text-gold-400 mb-6">1599€</div>
+                        <div className="text-3xl font-black text-gold-400 mb-6">1499€</div>
                         <ul className="space-y-3 text-sm flex-1 mb-6 text-gray-300">
                             <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-gold-500 mt-0.5" /> Tout inclus Pack Essentiel</li>
                             <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-gold-500 mt-0.5" /> <strong>Frais d'examen (206€) offerts</strong></li>
