@@ -25,8 +25,8 @@ export async function createAvailabilitySlot(formData: {
     const user = await requireUser();
 
     // Vérifier que l'utilisateur est instructeur
-    if (user.role !== "INSTRUCTOR") {
-        return { success: false, error: "Accès réservé aux instructeurs" };
+    if (!hasRole(user, "INSTRUCTOR")) {
+        return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
     }
 
     // Récupérer le profil instructeur
@@ -148,8 +148,8 @@ export async function getMyAvailabilities() {
 export async function deleteAvailabilitySlot(slotId: string) {
     const user = await requireUser();
 
-    if (user.role !== "INSTRUCTOR") {
-        return { success: false, error: "Accès réservé aux instructeurs" };
+    if (!hasRole(user, "INSTRUCTOR")) {
+        return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
     }
 
     try {
@@ -245,8 +245,8 @@ export async function getMyLessons(status?: string) {
 export async function confirmLesson(lessonId: string) {
     const user = await requireUser();
 
-    if (user.role !== "INSTRUCTOR") {
-        return { success: false, error: "Accès réservé aux instructeurs" };
+    if (!hasRole(user, "INSTRUCTOR")) {
+        return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
     }
 
     try {
@@ -310,8 +310,8 @@ export async function confirmLesson(lessonId: string) {
 export async function rejectLesson(lessonId: string, reason?: string) {
     const user = await requireUser();
 
-    if (user.role !== "INSTRUCTOR") {
-        return { success: false, error: "Accès réservé aux instructeurs" };
+    if (!hasRole(user, "INSTRUCTOR")) {
+        return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
     }
 
     try {
