@@ -248,6 +248,22 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
       } catch (err) { }
     }
 
+    // 3. Ensure extension profiles (Instructor/Teacher) exist if roles are present
+    if (mappedRoles.includes("INSTRUCTOR")) {
+      await prisma.instructorProfile.upsert({
+        where: { userId: dbUser.id },
+        create: { userId: dbUser.id, city: "À définir", department: "À définir" },
+        update: {},
+      });
+    }
+    if (mappedRoles.includes("TEACHER")) {
+      await prisma.teacherProfile.upsert({
+        where: { userId: dbUser.id },
+        create: { userId: dbUser.id, city: "À définir", department: "À définir" },
+        update: {},
+      });
+    }
+
     return dbUser;
   }
 
@@ -268,6 +284,18 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
       lastLoginAt: new Date(),
     },
   });
+
+  // Ensure extension profiles for new users too
+  if (mappedRoles.includes("INSTRUCTOR")) {
+    await prisma.instructorProfile.create({
+      data: { userId: created.id, city: "À définir", department: "À définir" }
+    });
+  }
+  if (mappedRoles.includes("TEACHER")) {
+    await prisma.teacherProfile.create({
+      data: { userId: created.id, city: "À définir", department: "À définir" }
+    });
+  }
 
   // À la création, on génère aussi un customer Stripe si possible
   if (stripe) {

@@ -5,11 +5,18 @@ const fs = require('fs');
 const nextDir = '.next';
 
 if (!fs.existsSync(nextDir)) {
-    console.log('🏗️ .next directory not found, running build...');
+    console.log('🏗️  .next directory not found.');
+
+    if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_RUNTIME_BUILD) {
+        console.warn('⚠️  Warning: .next directory is missing in production environment.');
+        console.warn('   This might indicate an incomplete build or deployment configuration.');
+    }
+
+    console.log('🛠️  Running build (npm run build)...');
     try {
         execSync('npm run build', { stdio: 'inherit' });
     } catch (error) {
-        console.error('❌ Build failed:', error);
+        console.error('❌ Build failed during startup:', error);
         process.exit(1);
     }
 }
