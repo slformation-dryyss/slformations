@@ -115,7 +115,11 @@ export async function getMyAvailabilities() {
             where: { userId: user.id },
             include: {
                 availabilities: {
-                    orderBy: [{ date: "asc" }, { startTime: "asc" }],
+                    orderBy: [
+                        { isRecurring: "desc" }, // Recurring first
+                        { date: "asc" },         // Then by date for one-time slots
+                        { startTime: "asc" }     // Then by start time
+                    ],
                     include: {
                         lessons: {
                             select: {
