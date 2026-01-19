@@ -162,35 +162,107 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
 
           {/* Programme Section */}
           {course.modules && course.modules.length > 0 && (
-            <section id="programme">
-              <div className="flex items-center gap-3 mb-6">
-                <BookOpen className="w-8 h-8 text-gold-500" />
-                <h2 className="text-3xl font-bold text-slate-900">
-                  Programme de formation
-                </h2>
+            <section id="programme" className="scroll-mt-32">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                <div>
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 bg-gold-500/10 rounded-2xl flex items-center justify-center">
+                            <BookOpen className="w-6 h-6 text-gold-500" />
+                        </div>
+                        <h2 className="text-3xl md:text-4xl font-black text-slate-900 uppercase tracking-tight">
+                        Programme détaillé
+                        </h2>
+                    </div>
+                    <p className="text-slate-500 text-lg max-w-2xl font-medium">
+                        Une approche pédagogique structurée pour garantir votre réussite et une assimilation optimale des compétences.
+                    </p>
+                </div>
+                <div className="flex items-center gap-4 bg-slate-50 px-6 py-3 rounded-2xl border border-slate-100">
+                    <div className="text-right">
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Total</p>
+                        <p className="text-slate-900 font-black">{course.modules.length} Modules</p>
+                    </div>
+                    <div className="w-px h-8 bg-slate-200" />
+                    <div className="text-right">
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Format</p>
+                        <p className="text-slate-900 font-black">Présentiel</p>
+                    </div>
+                </div>
               </div>
-              <p className="text-slate-600 mb-8 text-lg">
-                Notre formation couvre l'ensemble des compétences nécessaires pour obtenir votre certification.
-              </p>
-              <Accordion className="space-y-3">
+
+              <div className="space-y-4">
                 {course.modules.map((module, index) => (
-                  <AccordionItem key={module.id} value={`module-${index}`}>
-                    <AccordionTrigger className="text-left hover:no-underline text-slate-900 font-semibold">
-                      {module.title}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-slate-600">
-                      <ul className="space-y-2 text-sm">
-                        {module.lessons.map((lesson) => (
-                          <li key={lesson.id} className="flex items-start gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-gold-500 mt-0.5 flex-shrink-0" />
-                            <span>{lesson.title}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </AccordionContent>
-                  </AccordionItem>
+                  <div key={module.id} className="group bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-gold-200 transition-all duration-500 overflow-hidden">
+                    <Accordion>
+                      <AccordionItem value={`module-${index}`} className="border-none">
+                        <AccordionTrigger className="w-full px-8 py-6 hover:no-underline group/trigger">
+                          <div className="flex items-center gap-6 text-left w-full">
+                            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex flex-col items-center justify-center border border-slate-100 group-hover/trigger:bg-gold-500 group-hover/trigger:border-gold-400 transition-all duration-500">
+                              <span className="text-[10px] font-black text-slate-400 group-hover/trigger:text-slate-900 uppercase leading-none">Jour</span>
+                              <span className="text-xl font-black text-slate-900 group-hover/trigger:text-slate-900">{module.dayNumber || index + 1}</span>
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-xl font-black text-slate-900 group-hover/trigger:text-gold-600 transition-colors">
+                                {module.title}
+                              </h3>
+                              <div className="flex items-center gap-4 mt-1">
+                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                  <Clock className="w-3 h-3" />
+                                  {module.duration || 7} Heures
+                                </span>
+                                <span className="w-1 h-1 rounded-full bg-slate-200" />
+                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                  {module.lessons.length} Séquences
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-8 pb-8 pt-2">
+                          {module.description && (
+                            <div className="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                              <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line italic font-medium">
+                                "{module.description}"
+                              </p>
+                            </div>
+                          )}
+                          <div className="grid gap-4">
+                            {module.lessons.map((lesson, lIndex) => (
+                              <div key={lesson.id} className="flex gap-4 p-4 rounded-2xl border border-slate-50 hover:border-gold-100 hover:bg-gold-50/30 transition-all group/lesson">
+                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-xs font-black text-slate-400 border border-slate-100 shadow-sm flex-shrink-0 group-hover/lesson:bg-gold-500 group-hover/lesson:text-slate-900 group-hover/lesson:border-gold-500 transition-all">
+                                  {lIndex + 1}
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-bold text-slate-900 mb-1">{lesson.title}</h4>
+                                  {lesson.content && (
+                                    <p className="text-sm text-slate-500 leading-relaxed whitespace-pre-line font-medium">
+                                      {lesson.content}
+                                    </p>
+                                  )}
+                                </div>
+                                {lesson.isFree && (
+                                  <span className="h-fit px-2 py-0.5 bg-green-100 text-[10px] font-black text-green-700 rounded uppercase tracking-tighter">Gratuit</span>
+                                )}
+                              </div>
+                            ))}
+                            {module.quiz && (
+                                <div className="flex items-center gap-4 p-4 rounded-2xl border-2 border-dashed border-gold-200 bg-gold-50/20">
+                                    <div className="w-10 h-10 rounded-xl bg-gold-500 flex items-center justify-center text-slate-900 shadow-lg shadow-gold-500/20">
+                                        <Award className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="font-black text-slate-900 uppercase text-xs tracking-widest">Évaluation des connaissances</h4>
+                                        <p className="text-sm text-slate-600 font-medium">Quiz de validation du module</p>
+                                    </div>
+                                </div>
+                            )}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
                 ))}
-              </Accordion>
+              </div>
             </section>
           )}
 

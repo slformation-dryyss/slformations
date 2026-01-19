@@ -9,6 +9,7 @@ import {
   LogOut,
   Loader2,
   ChevronDown,
+  ArrowRight,
   CalendarDays,
   GraduationCap,
   CreditCard as CreditCardIcon,
@@ -149,68 +150,88 @@ export function Header() {
               </div>
             </div>
 
-            {/* Dropdown Formations (Pro) */}
+            {/* Dropdown Formations Professionnelles */}
             <div
               className="relative group"
               onMouseEnter={() => setActiveDropdown("pro")}
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <button
-                className={`flex items-center space-x-1 transition focus:outline-none text-sm ${activeDropdown === "pro" ? "text-gold-500" : "text-slate-600 group-hover:text-gold-500"}`}
+                className={`flex items-center space-x-1 transition focus:outline-none text-sm group ${activeDropdown === "pro" ? "text-gold-500" : "text-slate-600 group-hover:text-gold-500"}`}
                 onClick={() => toggleDropdown("pro")}
               >
-                <span>Formations Pro</span>
+                <span className="font-medium">Nos Formations Professionnelles</span>
                 <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${activeDropdown === "pro" ? "rotate-180" : "group-hover:rotate-180"}`} />
               </button>
 
-              <div className={`absolute top-full left-0 w-64 pt-2 transition-all duration-200 transform ${activeDropdown === "pro"
-                ? "opacity-100 visible translate-y-0"
-                : "opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0"
+              <div className={`absolute top-full left-0 w-80 pt-2 transition-all duration-200 transform ${activeDropdown === "pro"
+                  ? "opacity-100 visible translate-y-0"
+                  : "opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0"
                 }`}>
-                <div className="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden py-2">
+                <div className="bg-white rounded-xl shadow-2xl border border-slate-100 overflow-visible py-3">
                   <Link
                     href="/formations/catalogue"
-                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                    className="flex items-center justify-between px-5 py-2.5 hover:bg-gold-50 text-slate-900 font-bold border-b border-slate-50 transition group/item"
                   >
-                    <span className="w-1 h-1 rounded-full bg-gold-500"></span>
                     <span>Tout le catalogue</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-gold-500 opacity-0 group-hover/item:opacity-100 transition-all -translate-x-2 group-hover/item:translate-x-0" />
                   </Link>
-                  <div className="my-2 border-t border-slate-100"></div>
-                  <Link
-                    href="/formations/vtc"
-                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                    <span>VTC / Taxi</span>
-                  </Link>
-                  <Link
-                    href="/formations/caces"
-                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                    <span>CACES®</span>
-                  </Link>
-                  <Link
-                    href="/formations/secourisme"
-                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                    <span>Secourisme (SST)</span>
-                  </Link>
-                  <Link
-                    href="/formations/incendie"
-                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                    <span>Sécurité Incendie</span>
-                  </Link>
-                  <Link
-                    href="/formations/habilitation-electrique"
-                    className="flex items-center space-x-3 px-4 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                    <span>Habilitation Élec.</span>
-                  </Link>
+
+                  <div className="space-y-1 mt-2">
+                    {/* VTC / TAXI */}
+                    <div className="relative group/sub">
+                      <div className="flex items-center justify-between px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 cursor-pointer transition">
+                        <span className="text-sm font-semibold">Formation VTC / Taxi</span>
+                        <ChevronDown className="w-3.5 h-3.5 -rotate-90" />
+                      </div>
+                      <div className="absolute left-full top-0 w-64 ml-0 opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible group-hover/sub:translate-x-0 translate-x-2 transition-all duration-200">
+                        <div className="bg-white rounded-xl shadow-xl border border-slate-100 py-2 ml-1">
+                          <Link href="/formations/vtc" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Formation VTC</Link>
+                          <Link href="/formations/vtc" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Formation Continue VTC</Link>
+                          <Link href="/formations/vtc" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Formation Taxi</Link>
+                          <Link href="/formations/vtc" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Passerelle Taxi vers VTC</Link>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CACES */}
+                    <Link
+                      href="/formations/caces"
+                      className="flex items-center space-x-3 px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                    >
+                      <span className="text-sm font-semibold">CACES®</span>
+                    </Link>
+
+                    {/* Secourisme */}
+                    <Link
+                      href="/formations/secourisme"
+                      className="flex items-center space-x-3 px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                    >
+                      <span className="text-sm font-semibold">Secourisme (SST)</span>
+                    </Link>
+
+                    {/* Incendie */}
+                    <div className="relative group/sub text-slate-700">
+                        <div className="flex items-center justify-between px-5 py-2 hover:bg-slate-50 hover:text-gold-600 cursor-pointer transition">
+                            <span className="text-sm font-semibold">Sécurité Incendie</span>
+                            <ChevronDown className="w-3.5 h-3.5 -rotate-90" />
+                        </div>
+                        <div className="absolute left-full top-0 w-64 ml-0 opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible group-hover/sub:translate-x-0 translate-x-2 transition-all duration-200">
+                            <div className="bg-white rounded-xl shadow-xl border border-slate-100 py-2 ml-1">
+                                <Link href="/formations/incendie" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Manipulation Extincteurs</Link>
+                                <Link href="/formations/incendie" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Équipier de Première Intervention</Link>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Habilitation */}
+                    <Link
+                      href="/formations/habilitation-electrique"
+                      className="flex items-center space-x-3 px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                    >
+                      <span className="text-sm font-semibold">Habilitation Élec.</span>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -404,49 +425,34 @@ export function Header() {
             </div>
 
             <div className="py-2 space-y-1">
-              <span className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Formations Pro</span>
+              <span className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Nos Formations Professionnelles</span>
               <Link
                 href="/formations/catalogue"
-                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
+                className="block py-2 px-3 rounded-lg text-slate-900 font-bold bg-slate-50 transition ml-2 border-l-2 border-gold-500"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Tout le catalogue
               </Link>
-              <Link
-                href="/formations/vtc"
-                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                VTC / Taxi
-              </Link>
-              <Link
-                href="/formations/caces"
-                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                CACES®
-              </Link>
-              <Link
-                href="/formations/secourisme"
-                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Secourisme
-              </Link>
-              <Link
-                href="/formations/incendie"
-                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Incendie
-              </Link>
-              <Link
-                href="/formations/habilitation-electrique"
-                className="block py-2 px-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-gold-500 transition ml-2 border-l border-slate-100"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Habilitation Élec.
-              </Link>
+              
+              <div className="ml-4 border-l border-slate-100 mt-2 space-y-2">
+                <div className="py-1">
+                    <p className="px-3 text-[10px] font-black uppercase text-slate-400">VTC / Taxi</p>
+                    <Link href="/formations/vtc" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>Formation VTC</Link>
+                    <Link href="/formations/vtc" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>Formation Continue VTC</Link>
+                </div>
+                
+                <div className="py-1">
+                    <p className="px-3 text-[10px] font-black uppercase text-slate-400">CACES</p>
+                    <Link href="/formations/caces" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>CACES®</Link>
+                </div>
+
+                <div className="py-1">
+                    <p className="px-3 text-[10px] font-black uppercase text-slate-400">Sécurité</p>
+                    <Link href="/formations/secourisme" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>Secourisme (SST)</Link>
+                    <Link href="/formations/incendie" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>Sécurité Incendie</Link>
+                    <Link href="/formations/habilitation-electrique" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>Habilitation Élec.</Link>
+                </div>
+              </div>
             </div>
 
             <div className="py-2 border-t border-slate-100 my-2"></div>

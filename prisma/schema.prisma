@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,152 +8,104 @@ datasource db {
 }
 
 model User {
-  id               String           @id @default(cuid())
-  auth0Id          String           @unique
-  email            String           @unique
-  name             String?
-
-  // Profil détaillé (complété après inscription)
-  firstName        String?
-  lastName         String?
-  phone            String?
-  birthDate        DateTime?
-
-  addressLine1     String?
-  addressLine2     String?
-  postalCode       String?
-  city             String?
-  country          String?
-  
-  // Profil Formateur / Enrichi
-  bio              String?
-  diplomas         String[]         @default([])
-  badges           String[]         @default([])
-
-  // Informations métier / formation
-  profession       String?          // Métier actuel
-  employerName     String?          // Nom de l'entreprise
-  wantsVtcTraining Boolean?         // Candidat formation VTC
-  wantsTaxiTraining Boolean?        // Candidat formation Taxi
-
-  // Pièces administratives (références, pas les fichiers eux‑mêmes)
-  nationalIdNumber String?          // N° de CNI / passeport
-  drivingLicenseNumber String?      // N° de permis
-  drivingLicenseType  String?       // A, B, C, etc.
-  drivingLicenseIssuedAt DateTime?  // Date de délivrance du permis
-
-  // Tracking Auth0
-  lastLoginAt      DateTime?        // Dernière connexion via Auth0
-
-  // Paiement / facturation
-  stripeCustomerId String?          @unique
-
-  // Onboarding / profil
-  isProfileComplete Boolean         @default(false)
-  onboardingStatus String           @default("NEW") // NEW, PENDING_DOCS, DOCS_VERIFIED, READY_TO_PAY, ACTIVE
-
-  roles            String[]         @default(["STUDENT"]) // ["STUDENT", "TEACHER", "INSTRUCTOR", "ADMIN", "OWNER"]
-  primaryRole      String           @default("STUDENT")   // Rôle principal pour l'affichage
-  role             String           @default("STUDENT")   // @deprecated: Keeping for backward compatibility during migration
-  
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  
-  // Relations LMS & E-commerce
-  enrollments      Enrollment[]
-  progress         LessonProgress[]
-  orders           Order[]
-  
-  // Relations anciennes (legacy / présentiel)
-  bookings         Booking[]
-  sessionBookings  SessionBooking[]
-  courseSessionBookings CourseSessionBooking[]
-  teachingSlots    SessionSlot[]
-  sessionsTeaching Session[]        @relation("TeacherSessions")
-  mainSessions     CourseSession[]  @relation("MainTeacher")
-
-  // Relations annexes
-  documents        UserDocument[]
-  addresses        Address[]
-  paymentLinks     PaymentLink[]
-  
-  // Confidentialité / RGPD
-  gdprConsent      Boolean?
-  gdprConsentDate  DateTime?
-  marketingConsent Boolean?
-  consentLogs      ConsentLog[]
-  dataExportRequests DataExportRequest[]
-  quizAttempts     QuizAttempt[]
-  
-  // Relations Système de Réservation Cours de Conduite
-  teacherProfile       TeacherProfile?
-  instructorProfile    InstructorProfile?
-  studentAssignments   InstructorAssignment[] @relation("StudentAssignments")
-  studentLessons       DrivingLesson[]        @relation("StudentLessons")
-  studentChangeRequests ChangeRequest[]       @relation("StudentChangeRequests")
+  id                     String                 @id @default(cuid())
+  auth0Id                String                 @unique
+  email                  String                 @unique
+  name                   String?
+  firstName              String?
+  lastName               String?
+  phone                  String?
+  birthDate              DateTime?
+  addressLine1           String?
+  addressLine2           String?
+  postalCode             String?
+  city                   String?
+  country                String?
+  profession             String?
+  employerName           String?
+  wantsVtcTraining       Boolean?
+  wantsTaxiTraining      Boolean?
+  nationalIdNumber       String?
+  drivingLicenseNumber   String?
+  drivingLicenseType     String?
+  drivingLicenseIssuedAt DateTime?
+  lastLoginAt            DateTime?
+  stripeCustomerId       String?                @unique
+  isProfileComplete      Boolean                @default(false)
+  role                   String                 @default("STUDENT")
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  badges                 String[]               @default([])
+  bio                    String?
+  diplomas               String[]               @default([])
+  onboardingStatus       String                 @default("NEW")
+  gdprConsent            Boolean?
+  gdprConsentDate        DateTime?
+  marketingConsent       Boolean?
+  roles                  String[]               @default(["STUDENT"])
+  primaryRole            String                 @default("STUDENT")
+  addresses              Address[]
+  bookings               Booking[]
+  studentChangeRequests  ChangeRequest[]        @relation("StudentChangeRequests")
+  consentLogs            ConsentLog[]
+  mainSessions           CourseSession[]        @relation("MainTeacher")
+  courseSessionBookings  CourseSessionBooking[]
+  dataExportRequests     DataExportRequest[]
+  studentLessons         DrivingLesson[]        @relation("StudentLessons")
+  enrollments            Enrollment[]
+  studentAssignments     InstructorAssignment[] @relation("StudentAssignments")
+  instructorProfile      InstructorProfile?
+  progress               LessonProgress[]
+  orders                 Order[]
+  paymentLinks           PaymentLink[]
+  quizAttempts           QuizAttempt[]
+  sessionsTeaching       Session[]              @relation("TeacherSessions")
+  sessionBookings        SessionBooking[]
+  teachingSlots          SessionSlot[]
+  teacherProfile         TeacherProfile?
+  documents              UserDocument[]
 }
 
-// Profil Formateur (formations professionnelles)
 model TeacherProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Spécialités professionnelles
-  specialties String[] @default([]) // ["VTC", "TAXI", "CACES", "SST", "INCENDIE", etc.]
-  
-  // Certifications
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  specialties    String[] @default([])
   certifications String[] @default([])
-  
-  // Localisation
-  city        String
-  department  String
-  
-  // Disponibilité
-  isActive    Boolean  @default(true)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relations: using the exact relation name matching the User model
-  // Note: sessionsTeaching in User has @relation("TeacherSessions")
-  // But User already has sessionsTeaching field, so we don't strictly *need* to link TeacherProfile to Session unless we change the Session model to point to TeacherProfile instead of User.
-  // For now, let's keep the User relation for sessions but we can add specific TeacherProfile relations later if needed.
+  city           String
+  department     String
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Course {
-  id          String       @id @default(cuid())
-  title       String
-  slug        String?      @unique
-  description String
-  price       Float        @default(0)
-  imageUrl    String?
-  isPublished Boolean      @default(false)
-  type        String       @default("VTC")
-  maxStudents Int?         @default(0) // 0 or null = unlimited
-  
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  // Relations LMS
-  modules     Module[]
-  enrollments Enrollment[]
-  orders      Order[] // Un order peut être lié à un course spécifique (ou plusieurs via relation n-n si panier)
-  categories  CourseOnCategory[]
-  orderItems  OrderItem[]
-  paymentLinks PaymentLink[]
-  quizzes      Quiz[]
-  
-  // Relations anciennes
-  bookings    Booking[]
-  sessions    Session[]
+  id             String             @id @default(cuid())
+  title          String
+  slug           String?            @unique
+  description    String
+  price          Float              @default(0)
+  imageUrl       String?
+  isPublished    Boolean            @default(false)
+  type           String             @default("VTC")
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  maxStudents    Int?               @default(0)
+  bookings       Booking[]
+  categories     CourseOnCategory[]
   courseSessions CourseSession[]
+  enrollments    Enrollment[]
+  modules        Module[]
+  orders         Order[]
+  orderItems     OrderItem[]
+  paymentLinks   PaymentLink[]
+  quizzes        Quiz[]
+  sessions       Session[]
 
   @@index([type])
   @@index([isPublished, type])
 }
 
-// Catégories de cours (pour organiser le catalogue)
 model CourseCategory {
   id          String             @id @default(cuid())
   slug        String             @unique
@@ -164,91 +113,75 @@ model CourseCategory {
   description String?
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
-
   courses     CourseOnCategory[]
 }
 
-// Table de liaison N-N entre Course et CourseCategory
 model CourseOnCategory {
   courseId   String
   categoryId String
-
-  course   Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  category CourseCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  assignedAt DateTime @default(now())
+  assignedAt DateTime       @default(now())
+  category   CourseCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  course     Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@id([courseId, categoryId])
   @@index([categoryId])
 }
 
 model Module {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  position    Int      @default(0)
-  isPublished Boolean  @default(false)
-  dayNumber   Int?
-  duration    Int?
-  
-  courseId    String
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  
-  lessons     Lesson[]
+  id           String        @id @default(cuid())
+  title        String
+  description  String?
+  position     Int           @default(0)
+  isPublished  Boolean       @default(false)
+  courseId     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  dayNumber    Int?
+  duration     Int?
+  lessons      Lesson[]
+  course       Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  quiz         Quiz?
   sessionSlots SessionSlot[]
-  quiz        Quiz?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
   @@index([courseId, position])
 }
 
 model Lesson {
-  id          String   @id @default(cuid())
+  id          String           @id @default(cuid())
   title       String
   description String?
-  videoUrl    String?  // URL Vimeo ou S3
-  content     String?  // Contenu texte / Markdown
-  position    Int      @default(0)
-  isPublished Boolean  @default(false)
-  isFree      Boolean  @default(false) // Pour preview avant achat
-  duration    Int      @default(0) // En secondes
-  
+  videoUrl    String?
+  content     String?
+  position    Int              @default(0)
+  isPublished Boolean          @default(false)
+  isFree      Boolean          @default(false)
+  duration    Int              @default(0)
   moduleId    String
-  module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   progress    LessonProgress[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
   @@index([moduleId, position])
 }
 
 model CourseSession {
-  id          String   @id @default(cuid())
-  courseId    String
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  
-  startDate   DateTime
-  endDate     DateTime
-  location    String?  // e.g. "Centre Épinay", "Paris 10"
-  maxSpots    Int      @default(10)
-  bookedSpots Int      @default(0)
-  
-  isPublished Boolean  @default(true)
-  
-  bookings    CourseSessionBooking[]
-  slots       SessionSlot[]
-
+  id            String                 @id @default(cuid())
+  courseId      String
+  startDate     DateTime
+  endDate       DateTime
+  location      String?
+  maxSpots      Int                    @default(10)
+  bookedSpots   Int                    @default(0)
+  isPublished   Boolean                @default(true)
   mainTeacherId String?
-  mainTeacher   User?    @relation("MainTeacher", fields: [mainTeacherId], references: [id])
-
-  meetingUrl  String?  // Global/Default meeting link (Teams/Skype)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  meetingUrl    String?
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  course        Course                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  mainTeacher   User?                  @relation("MainTeacher", fields: [mainTeacherId], references: [id])
+  bookings      CourseSessionBooking[]
+  slots         SessionSlot[]
 
   @@index([courseId])
   @@index([startDate])
@@ -256,22 +189,19 @@ model CourseSession {
 }
 
 model SessionSlot {
-  id        String   @id @default(cuid())
-  sessionId String
-  moduleId  String?  // Optional: Link to a specific module
-  teacherId String?  // Specific teacher for this slot
-  
-  start     DateTime
-  end       DateTime
-  location  String?  // Specific location (override session default)
-  meetingUrl String? // Specific link (override session default)
-  
-  session   CourseSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  module    Module?       @relation(fields: [moduleId], references: [id])
-  teacher   User?         @relation(fields: [teacherId], references: [id])
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String        @id @default(cuid())
+  sessionId  String
+  moduleId   String?
+  teacherId  String?
+  start      DateTime
+  end        DateTime
+  location   String?
+  meetingUrl String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  module     Module?       @relation(fields: [moduleId], references: [id])
+  session    CourseSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  teacher    User?         @relation(fields: [teacherId], references: [id])
 
   @@index([sessionId])
   @@index([teacherId])
@@ -279,9 +209,8 @@ model SessionSlot {
 }
 
 model SystemSetting {
-  key   String @id
-  value String
-  
+  key       String   @id
+  value     String
   updatedAt DateTime @updatedAt
 }
 
@@ -289,36 +218,32 @@ model CourseSessionBooking {
   id              String        @id @default(cuid())
   courseSessionId String
   userId          String
-  status          String        @default("BOOKED") // BOOKED, CANCELLED, ATTENDED, ON_HOLD
-  justification   String?       // Reason for ON_HOLD status (e.g., missing docs, payment pending)
-  
-  courseSession   CourseSession @relation(fields: [courseSessionId], references: [id], onDelete: Cascade)
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  status          String        @default("BOOKED")
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+  justification   String?
+  courseSession   CourseSession @relation(fields: [courseSessionId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([courseSessionId, userId]) // Prevent double booking
+  @@unique([courseSessionId, userId])
   @@index([courseSessionId])
   @@index([userId])
 }
 
 model PaymentLink {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   userId          String
   courseId        String?
-  stripeSessionId String   @unique // Stripe Checkout Session ID
-  stripeUrl       String   // The payment URL
-  amount          Float    // Amount in EUR
-  status          String   @default("PENDING") // PENDING, PAID, EXPIRED, CANCELLED
-  expiresAt       DateTime? // Optional expiration
-  justification   String?   // Reason for price override
-  
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course          Course?  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  stripeSessionId String    @unique
+  stripeUrl       String
+  amount          Float
+  status          String    @default("PENDING")
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  justification   String?
+  course          Course?   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
@@ -327,60 +252,50 @@ model PaymentLink {
 model LessonProgress {
   id             String   @id @default(cuid())
   isCompleted    Boolean  @default(false)
-  timeSpent      Int      @default(0) // In seconds
+  userId         String
+  lessonId       String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
   lastAccessedAt DateTime @default(now())
-  
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  lessonId    String
-  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  timeSpent      Int      @default(0)
+  lesson         Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
 }
 
 model Enrollment {
-  id        String            @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
   courseId  String
-  status    String            @default("ACTIVE")
-  progress  Int               @default(0) // pourcentage 0–100 calculé
-  
-  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course    Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+  status    String   @default("ACTIVE")
+  progress  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
   @@index([courseId])
 }
 
 model Order {
-  id              String        @id @default(cuid())
+  id              String      @id @default(cuid())
   userId          String
-  user            User          @relation(fields: [userId], references: [id])
-  
-  courseId        String?       // Achat direct d'un cours (simplifié)
-  course          Course?       @relation(fields: [courseId], references: [id])
-  
+  courseId        String?
   amount          Float
-  currency        String        @default("EUR")
-  status          String        @default("PENDING")
-  stripeSessionId String?       @unique
+  currency        String      @default("EUR")
+  status          String      @default("PENDING")
+  stripeSessionId String?     @unique
   stripePaymentId String?
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  items           OrderItem[]
-
-  payments        Payment[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   couponId        String?
-  coupon          Coupon?       @relation(fields: [couponId], references: [id])
+  coupon          Coupon?     @relation(fields: [couponId], references: [id])
+  course          Course?     @relation(fields: [courseId], references: [id])
+  user            User        @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  payments        Payment[]
 
   @@index([userId])
   @@index([courseId])
@@ -389,57 +304,51 @@ model Order {
   @@index([couponId])
 }
 
-// Détail des lignes de commande (panier multi‑cours)
 model OrderItem {
   id        String   @id @default(cuid())
   orderId   String
   courseId  String
   quantity  Int      @default(1)
   unitPrice Float
-
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  course  Course @relation(fields: [courseId], references: [id])
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  course    Course   @relation(fields: [courseId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
   @@index([courseId])
 }
 
-// --- Modèles Legacy / Présentiel (Location & Planning) ---
-
 model LegacyVehicle {
-  id          String         @id @default(cuid())
+  id          String    @id @default(cuid())
   model       String
   brand       String
   type        String
   pricePerDay Float
-  status      String        @default("AVAILABLE")
+  status      String    @default("AVAILABLE")
   image       String?
-  features    String?        // JSON string or comma separated
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  features    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   bookings    Booking[]
 
   @@index([status])
 }
 
 model Booking {
-  id          String        @id @default(cuid())
+  id          String         @id @default(cuid())
   userId      String
   courseId    String?
   vehicleId   String?
   startDate   DateTime
   endDate     DateTime?
-  status      String        @default("PENDING")
+  status      String         @default("PENDING")
   totalAmount Float
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  user    User     @relation(fields: [userId], references: [id])
-  course  Course?  @relation(fields: [courseId], references: [id])
-  vehicle LegacyVehicle? @relation(fields: [vehicleId], references: [id])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  course      Course?        @relation(fields: [courseId], references: [id])
+  user        User           @relation(fields: [userId], references: [id])
+  vehicle     LegacyVehicle? @relation(fields: [vehicleId], references: [id])
 
   @@index([userId])
   @@index([courseId])
@@ -449,20 +358,19 @@ model Booking {
 }
 
 model Session {
-  id        String       @id @default(cuid())
+  id        String           @id @default(cuid())
   courseId  String
   teacherId String?
   startsAt  DateTime
   endsAt    DateTime
-  mode      String       @default("IN_PERSON")
+  mode      String           @default("IN_PERSON")
   location  String?
   maxSeats  Int?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-
-  course   Course          @relation(fields: [courseId], references: [id])
-  teacher  User?           @relation("TeacherSessions", fields: [teacherId], references: [id])
-  bookings SessionBooking[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  course    Course           @relation(fields: [courseId], references: [id])
+  teacher   User?            @relation("TeacherSessions", fields: [teacherId], references: [id])
+  bookings  SessionBooking[]
 
   @@index([courseId])
   @@index([teacherId])
@@ -470,21 +378,18 @@ model Session {
 }
 
 model SessionBooking {
-  id        String                @id @default(cuid())
+  id        String   @id @default(cuid())
   sessionId String
   userId    String
-  status    String                @default("BOOKED")
-  createdAt DateTime              @default(now())
-  updatedAt DateTime              @updatedAt
-
-  session Session @relation(fields: [sessionId], references: [id])
-  user    User    @relation(fields: [userId], references: [id])
+  status    String   @default("BOOKED")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  session   Session  @relation(fields: [sessionId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([sessionId])
   @@index([userId])
 }
-
-// --- Contact & Support ---
 
 model ContactMessage {
   id        String   @id @default(cuid())
@@ -499,76 +404,64 @@ model ContactMessage {
   @@index([createdAt])
 }
 
-// --- Documents utilisateurs ---
-
 model UserDocument {
-  id          String   @id @default(cuid())
-  userId      String
-  type        String   // ID_CARD, DRIVING_LICENSE, JUSTIF_DOMICILE, etc.
-  fileUrl     String   // URL vers le stockage (S3, etc.)
-  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
-  rejectionReason String? // Motif du refus si REJECTED
-  uploadedAt  DateTime @default(now())
-  reviewedAt  DateTime?
-
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String    @id @default(cuid())
+  userId          String
+  type            String
+  fileUrl         String
+  status          String    @default("PENDING")
+  uploadedAt      DateTime  @default(now())
+  reviewedAt      DateTime?
+  rejectionReason String?
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([type])
   @@index([status])
 }
 
-// --- Adresses utilisateurs ---
-
 model Address {
-  id          String   @id @default(cuid())
-  userId      String?
-  label       String?  // Maison, Travail, etc.
-  line1       String
-  line2       String?
-  postalCode  String
-  city        String
-  country     String
-  isDefault   Boolean  @default(false)
-
-  user        User?    @relation(fields: [userId], references: [id])
+  id         String  @id @default(cuid())
+  userId     String?
+  label      String?
+  line1      String
+  line2      String?
+  postalCode String
+  city       String
+  country    String
+  isDefault  Boolean @default(false)
+  user       User?   @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
 
-// --- Paiements ---
-
 model Payment {
   id                String   @id @default(cuid())
   orderId           String
-  provider          String   // stripe, paypal, etc.
+  provider          String
   providerPaymentId String
-  status            String   @default("PENDING") // PENDING, SUCCEEDED, FAILED, REFUNDED
+  status            String   @default("PENDING")
   amount            Float
   currency          String   @default("EUR")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-
   order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
   @@index([status])
 }
 
-// --- Coupons / Codes promo ---
-
 model Coupon {
-  id          String   @id @default(cuid())
-  code        String   @unique
+  id          String    @id @default(cuid())
+  code        String    @unique
   description String?
-  discountPct Int?     // 20 => -20%
-  discountAmt Float?   // montant fixe
+  discountPct Int?
+  discountAmt Float?
   validFrom   DateTime?
   validUntil  DateTime?
   maxUses     Int?
-  usedCount   Int      @default(0)
-  isActive    Boolean  @default(true)
-
+  usedCount   Int       @default(0)
+  isActive    Boolean   @default(true)
   orders      Order[]
 
   @@index([code])
@@ -578,12 +471,12 @@ model Coupon {
 model ConsentLog {
   id          String   @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   consentType String
   isGranted   Boolean
   ipAddress   String?
   userAgent   String?
   createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -591,33 +484,29 @@ model ConsentLog {
 model DataExportRequest {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status    String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  status    String   @default("PENDING")
   exportUrl String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 model Quiz {
-  id           String     @id @default(cuid())
+  id           String        @id @default(cuid())
   title        String
   description  String?
-  passingScore Int        @default(80)
-  isPublished  Boolean    @default(true)
-  
+  passingScore Int           @default(80)
+  isPublished  Boolean       @default(true)
   courseId     String?
-  course       Course?    @relation(fields: [courseId], references: [id])
-  
-  moduleId     String?    @unique
-  module       Module?    @relation(fields: [moduleId], references: [id])
-  
+  moduleId     String?       @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   questions    Question[]
+  course       Course?       @relation(fields: [courseId], references: [id])
+  module       Module?       @relation(fields: [moduleId], references: [id])
   quizAttempts QuizAttempt[]
-  
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
 
   @@index([courseId])
 }
@@ -625,14 +514,14 @@ model Quiz {
 model QuizAttempt {
   id          String   @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   quizId      String
-  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   score       Int      @default(0)
   isPassed    Boolean  @default(false)
   answers     Json     @default("{}")
   startedAt   DateTime @default(now())
   completedAt DateTime @default(now())
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([quizId])
@@ -641,16 +530,13 @@ model QuizAttempt {
 model Question {
   id        String   @id @default(cuid())
   text      String
-  type      String   @default("SINGLE") // SINGLE, MULTIPLE
+  type      String   @default("SINGLE")
   position  Int      @default(0)
-  
   quizId    String
-  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  
-  options   Option[]
-  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  options   Option[]
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   @@index([quizId])
 }
@@ -659,334 +545,176 @@ model Option {
   id         String   @id @default(cuid())
   text       String
   isCorrect  Boolean  @default(false)
-  
   questionId String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@index([questionId])
 }
 
-// --- Enums ---
-
-// enum Role {
-//   STUDENT
-//   INSTRUCTOR
-//   ADMIN
-// }
-
-// enum CourseType {
-//   PERMIS_MOTO
-//   PERMIS_AUTO
-//   PERMIS_POIDS_LOURD
-//   VTC
-//   TAXI
-//   SSIAP
-//   INFORMATIQUE // Réintégré si besoin pour dev web
-//   AUTRE
-// }
-
-// enum EnrollmentStatus {
-//   PENDING
-//   ACTIVE
-//   COMPLETED
-//   CANCELLED
-// }
-
-// enum OrderStatus {
-//   PENDING
-//   PAID
-//   FAILED
-//   REFUNDED
-// }
-
-// enum VehicleType {
-//   SEDAN
-//   SUV
-//   ELECTRIC
-//   HYBRID
-//   DIESEL
-// }
-
-// enum VehicleStatus {
-//   AVAILABLE
-//   RENTED
-//   MAINTENANCE
-// }
-
-// enum BookingStatus {
-//   PENDING
-//   CONFIRMED
-//   CANCELLED
-//   COMPLETED
-// }
-
-// enum SessionMode {
-//   IN_PERSON
-//   ONLINE
-//   HYBRID
-// }
-
-// enum SessionBookingStatus {
-//   BOOKED
-//   CANCELLED
-//   ATTENDED
-//   NO_SHOW
-// }
-
-// ============================================
-// SYSTÈME DE RÉSERVATION COURS DE CONDUITE
-// ============================================
-
-// Profil instructeur (extension du User avec role INSTRUCTOR)
 model InstructorProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Spécialité
-  specialty   String   @default("DRIVING") // DRIVING | PROFESSIONAL
-  
-  // Localisation (pour attribution géographique)
-  city        String   // Ex: "Pontault-Combault"
-  department  String   // Ex: "77" (Seine-et-Marne)
-  postalCode  String?
-  
-  // Types de permis enseignés (pour instructeurs conduite)
-  licenseTypes String[] @default([]) // ["B", "A2", "AAC", etc.]
-  
-  // Véhicule(s) utilisé(s)
-  vehicleType  String?  // "MANUAL" | "AUTOMATIC" | "BOTH"
-  
-  // Préférences / Disponibilité générale
-  maxStudentsPerWeek Int? @default(20)
-  isActive    Boolean  @default(true)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relations
-  availabilities    InstructorAvailability[]
-  assignments       InstructorAssignment[]
-  drivingLessons    DrivingLesson[]
-  currentInstructorRequests ChangeRequest[] @relation("CurrentInstructor")
-  requestedInstructorRequests ChangeRequest[] @relation("RequestedInstructor")
-  vehicles          Vehicle[]
+  id                          String                   @id @default(cuid())
+  userId                      String                   @unique
+  specialty                   String                   @default("DRIVING")
+  city                        String
+  department                  String
+  postalCode                  String?
+  licenseTypes                String[]                 @default([])
+  vehicleType                 String?
+  maxStudentsPerWeek          Int?                     @default(20)
+  isActive                    Boolean                  @default(true)
+  createdAt                   DateTime                 @default(now())
+  updatedAt                   DateTime                 @updatedAt
+  currentInstructorRequests   ChangeRequest[]          @relation("CurrentInstructor")
+  requestedInstructorRequests ChangeRequest[]          @relation("RequestedInstructor")
+  drivingLessons              DrivingLesson[]
+  assignments                 InstructorAssignment[]
+  availabilities              InstructorAvailability[]
+  user                        User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicles                    Vehicle[]
 }
 
-// Créneaux de disponibilité (avec support récurrence)
 model InstructorAvailability {
-  id            String   @id @default(cuid())
-  instructorId  String
-  instructor    InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade)
-  
-  // Créneau ponctuel
-  date          DateTime?
-  startTime     String   // Format "HH:mm" (ex: "14:00")
-  endTime       String   // Format "HH:mm" (ex: "18:00")
-  
-  // Récurrence (optionnel)
-  isRecurring   Boolean  @default(false)
-  recurrencePattern String? // "WEEKLY" | "DAILY" | "MONTHLY"
-  recurrenceDays    Int[]   @default([]) // [1,3,5] = Lundi, Mercredi, Vendredi (1=Lundi, 7=Dimanche)
-  recurrenceEndDate DateTime? // Date de fin de la récurrence
-  
-  // Statut
-  isBooked      Boolean  @default(false)
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  // Relations
-  lessons       DrivingLesson[]
-  
+  id                String            @id @default(cuid())
+  instructorId      String
+  date              DateTime?
+  startTime         String
+  endTime           String
+  isRecurring       Boolean           @default(false)
+  recurrencePattern String?
+  recurrenceDays    Int[]             @default([])
+  recurrenceEndDate DateTime?
+  isBooked          Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  lessons           DrivingLesson[]
+  instructor        InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+
   @@index([instructorId, date])
   @@index([instructorId, isBooked])
 }
 
-// Attribution élève-instructeur
 model InstructorAssignment {
-  id            String   @id @default(cuid())
-  studentId     String
-  student       User     @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
-  
-  instructorId  String
-  instructor    InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade)
-  
-  // Contexte
-  courseType    String   // "PERMIS_B" | "PERMIS_A2" | "AAC" | etc.
-  assignedBy    String?  // userId de l'admin qui a fait l'attribution (si manuelle)
-  assignmentReason String? // "AUTO" | "MANUAL" | "PREFERENCE_CHANGE" | "GEOGRAPHIC"
-  
-  // Statut
-  isActive      Boolean  @default(true)
-  startDate     DateTime @default(now())
-  endDate       DateTime?
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
+  id               String            @id @default(cuid())
+  studentId        String
+  instructorId     String
+  courseType       String
+  assignedBy       String?
+  assignmentReason String?
+  isActive         Boolean           @default(true)
+  startDate        DateTime          @default(now())
+  endDate          DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  instructor       InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  student          User              @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
+
   @@unique([studentId, instructorId, courseType, isActive])
   @@index([studentId, isActive])
   @@index([instructorId, isActive])
 }
 
-// Réservation de cours de conduite
 model DrivingLesson {
-  id              String   @id @default(cuid())
-  
-  // Participants
-  studentId       String
-  student         User     @relation("StudentLessons", fields: [studentId], references: [id], onDelete: Cascade)
-  
-  instructorId    String
-  instructor      InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade)
-  
-  availabilityId  String?
-  availability    InstructorAvailability? @relation(fields: [availabilityId], references: [id], onDelete: SetNull)
-  
-  vehicleId       String?
-  vehicle         Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
-  
-  // Détails du cours
-  date            DateTime
-  startTime       String   // Format "HH:mm"
-  endTime         String   // Format "HH:mm"
-  duration        Int      // En heures (1 ou 2)
-  
-  // Localisation
-  meetingPoint    String?  // Point de rendez-vous
-  city            String
-  
-  // Statut
-  status          String   @default("PENDING") // PENDING | CONFIRMED | CANCELLED | COMPLETED
-  
-  // Validation bilatérale
-  studentConfirmed    Boolean @default(false)
-  instructorConfirmed Boolean @default(false)
-  confirmedAt         DateTime?
-  
-  // Annulation
-  cancelledAt     DateTime?
-  cancelledBy     String?  // userId
-  cancellationReason String?
-  isUrgentCancellation Boolean @default(false)
-  urgencyValidatedBy   String? // userId de l'admin/secretary
-  
-  // Décompte des heures
-  isDeducted      Boolean  @default(false) // true si annulation tardive
-  
-  // Rappels
-  reminderSent    Boolean  @default(false)
+  id                   String                  @id @default(cuid())
+  studentId            String
+  instructorId         String
+  availabilityId       String?
+  date                 DateTime
+  startTime            String
+  endTime              String
+  duration             Int
+  meetingPoint         String?
+  city                 String
+  status               String                  @default("PENDING")
+  studentConfirmed     Boolean                 @default(false)
+  instructorConfirmed  Boolean                 @default(false)
+  confirmedAt          DateTime?
+  cancelledAt          DateTime?
+  cancelledBy          String?
+  cancellationReason   String?
+  isUrgentCancellation Boolean                 @default(false)
+  urgencyValidatedBy   String?
+  isDeducted           Boolean                 @default(false)
+  reminderSent         Boolean                 @default(false)
+  instructorNotes      String?
+  studentNotes         String?
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  vehicleId            String?
+  availability         InstructorAvailability? @relation(fields: [availabilityId], references: [id])
+  instructor           InstructorProfile       @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  student              User                    @relation("StudentLessons", fields: [studentId], references: [id], onDelete: Cascade)
+  vehicle              Vehicle?                @relation(fields: [vehicleId], references: [id])
 
-  // Notes
-  instructorNotes String?
-  studentNotes    String?
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
   @@index([studentId, date])
   @@index([instructorId, date])
   @@index([status])
 }
 
-// Demande de changement d'instructeur
 model ChangeRequest {
-  id              String   @id @default(cuid())
-  
-  studentId       String
-  student         User     @relation("StudentChangeRequests", fields: [studentId], references: [id], onDelete: Cascade)
-  
-  currentInstructorId String
-  currentInstructor   InstructorProfile @relation("CurrentInstructor", fields: [currentInstructorId], references: [id], onDelete: Cascade)
-  
+  id                    String             @id @default(cuid())
+  studentId             String
+  currentInstructorId   String
   requestedInstructorId String?
-  requestedInstructor   InstructorProfile? @relation("RequestedInstructor", fields: [requestedInstructorId], references: [id], onDelete: SetNull)
-  
-  // Justification
-  reason          String   // "PREFERENCE_GENDER" | "SCHEDULE_CONFLICT" | "PEDAGOGICAL" | "OTHER"
-  details         String?  // Détails de la demande
-  
-  // Préférences spécifiques
-  preferredGender String?  // "MALE" | "FEMALE" | "NO_PREFERENCE"
-  
-  // Statut
-  status          String   @default("PENDING") // PENDING | APPROVED | REJECTED
-  reviewedBy      String?  // userId de l'admin
-  reviewedAt      DateTime?
-  reviewNotes     String?
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
+  reason                String
+  details               String?
+  preferredGender       String?
+  status                String             @default("PENDING")
+  reviewedBy            String?
+  reviewedAt            DateTime?
+  reviewNotes           String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  currentInstructor     InstructorProfile  @relation("CurrentInstructor", fields: [currentInstructorId], references: [id], onDelete: Cascade)
+  requestedInstructor   InstructorProfile? @relation("RequestedInstructor", fields: [requestedInstructorId], references: [id])
+  student               User               @relation("StudentChangeRequests", fields: [studentId], references: [id], onDelete: Cascade)
+
   @@index([studentId, status])
   @@index([status])
 }
 
-// ============================================
-// GESTION DES VÉHICULES
-// ============================================
-
 model Vehicle {
-  id                String   @id @default(cuid())
-  
-  // Informations véhicule
-  brand             String   // Renault, Peugeot, etc.
-  model             String   // Clio, 208, etc.
-  licensePlate      String   @unique
-  year              Int
-  transmission      String   // MANUAL | AUTOMATIC
-  fuelType          String   // DIESEL | GASOLINE | ELECTRIC | HYBRID
-  
-  // Statut
-  status            String   @default("ACTIVE") // ACTIVE | MAINTENANCE | RETIRED
-  isAvailable       Boolean  @default(true)
-  
-  // Maintenance
-  lastMaintenanceDate    DateTime?
-  nextMaintenanceDate    DateTime?
-  maintenanceDueKm       Int?
-  currentKm              Int      @default(0)
-  
-  // Assurance & Contrôle technique
-  insuranceExpiryDate    DateTime?
-  technicalControlDate   DateTime?
-  insuranceCompany       String?
-  insurancePolicyNumber  String?
-  
-  // Attribution
-  assignedInstructorId   String?
-  assignedInstructor     InstructorProfile? @relation(fields: [assignedInstructorId], references: [id], onDelete: SetNull)
-  
-  // Relations
-  maintenanceRecords     VehicleMaintenance[]
-  lessons                DrivingLesson[]
-  
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  
+  id                    String               @id @default(cuid())
+  model                 String
+  brand                 String
+  status                String               @default("ACTIVE")
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  assignedInstructorId  String?
+  currentKm             Int                  @default(0)
+  fuelType              String
+  insuranceCompany      String?
+  insuranceExpiryDate   DateTime?
+  insurancePolicyNumber String?
+  isAvailable           Boolean              @default(true)
+  lastMaintenanceDate   DateTime?
+  licensePlate          String               @unique
+  maintenanceDueKm      Int?
+  nextMaintenanceDate   DateTime?
+  technicalControlDate  DateTime?
+  transmission          String
+  year                  Int
+  lessons               DrivingLesson[]
+  assignedInstructor    InstructorProfile?   @relation(fields: [assignedInstructorId], references: [id])
+  maintenanceRecords    VehicleMaintenance[]
+
   @@index([status, isAvailable])
   @@index([assignedInstructorId])
 }
 
 model VehicleMaintenance {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   vehicleId     String
-  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  
-  type          String   // ROUTINE | REPAIR | INSPECTION | ACCIDENT
+  type          String
   description   String
   cost          Float?
-  performedBy   String?  // Garage name
+  performedBy   String?
   performedAt   DateTime
   nextDueDate   DateTime?
-  
-  // Détails supplémentaires
-  kilometers    Int?     // Kilométrage au moment de la maintenance
+  kilometers    Int?
   invoiceNumber String?
   notes         String?
-  
-  createdAt     DateTime @default(now())
-  
+  createdAt     DateTime  @default(now())
+  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
   @@index([vehicleId, performedAt])
 }

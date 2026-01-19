@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { requireUser, hasRole } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import {
     generateRecurringDates,
@@ -106,35 +106,40 @@ export async function createAvailabilitySlot(formData: {
 export async function getMyAvailabilities() {
     const user = await requireUser();
 
-    if (user.role !== "INSTRUCTOR") {
-        return { success: false, error: "Accès réservé aux instructeurs" };
+    if (!hasRole(user, "INSTRUCTOR")) {
+        return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
     }
 
-    const instructorProfile = await prisma.instructorProfile.findUnique({
-        where: { userId: user.id },
-        include: {
-            availabilities: {
-                orderBy: [{ date: "asc" }, { startTime: "asc" }],
-                include: {
-                    lessons: {
-                        select: {
-                            id: true,
-                            status: true,
-                            student: {
-                                select: { firstName: true, lastName: true },
+    try {
+        const instructorProfile = await prisma.instructorProfile.findUnique({
+            where: { userId: user.id },
+            include: {
+                availabilities: {
+                    orderBy: [{ date: "asc" }, { startTime: "asc" }],
+                    include: {
+                        lessons: {
+                            select: {
+                                id: true,
+                                status: true,
+                                student: {
+                                    select: { firstName: true, lastName: true },
+                                },
                             },
                         },
                     },
                 },
             },
-        },
-    });
+        });
 
-    if (!instructorProfile) {
-        return { success: false, error: "Profil instructeur introuvable" };
+        if (!instructorProfile) {
+            return { success: false, error: "Profil instructeur introuvable" };
+        }
+
+        return { success: true, data: instructorProfile.availabilities || [] };
+    } catch (error: any) {
+        console.error("Error fetching instructor availabilities:", error);
+        return { success: false, error: error.message || "Erreur lors de la récupération des disponibilités" };
     }
-
-    return { success: true, data: instructorProfile.availabilities };
 }
 
 /**
@@ -195,38 +200,43 @@ export async function deleteAvailabilitySlot(slotId: string) {
 export async function getMyLessons(status?: string) {
     const user = await requireUser();
 
-    if (user.role !== "INSTRUCTOR") {
-        return { success: false, error: "Accès réservé aux instructeurs" };
+    if (!hasRole(user, "INSTRUCTOR")) {
+        return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
     }
 
-    const instructorProfile = await prisma.instructorProfile.findUnique({
-        where: { userId: user.id },
-    });
+    try {
+        const instructorProfile = await prisma.instructorProfile.findUnique({
+            where: { userId: user.id },
+        });
 
-    if (!instructorProfile) {
-        return { success: false, error: "Profil instructeur introuvable" };
-    }
+        if (!instructorProfile) {
+            return { success: false, error: "Profil instructeur introuvable" };
+        }
 
-    const lessons = await prisma.drivingLesson.findMany({
-        where: {
-            instructorId: instructorProfile.id,
-            ...(status && { status }),
-        },
-        include: {
-            student: {
-                select: {
-                    id: true,
-                    firstName: true,
-                    lastName: true,
-                    email: true,
-                    phone: true,
+        const lessons = await prisma.drivingLesson.findMany({
+            where: {
+                instructorId: instructorProfile.id,
+                ...(status && { status }),
+            },
+            include: {
+                student: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        phone: true,
+                    },
                 },
             },
-        },
-        orderBy: [{ date: "asc" }, { startTime: "asc" }],
-    });
+            orderBy: [{ date: "asc" }, { startTime: "asc" }],
+        });
 
-    return { success: true, data: lessons };
+        return { success: true, data: lessons || [] };
+    } catch (error: any) {
+        console.error("Error fetching instructor lessons:", error);
+        return { success: false, error: error.message || "Erreur lors de la récupération des cours" };
+    }
 }
 
 /**
@@ -377,19 +387,19 @@ export async function rejectLesson(lessonId: string, reason?: string) {
 export async function getMyStudents() {
     const user = await requireUser();
 
-    if (user.role !== "INSTRUCTOR") {
-        return { success: false, error: "Accès réservé aux instructeurs" };
-    }
-
-    const instructorProfile = await prisma.instructorProfile.findUnique({
-        where: { userId: user.id },
-    });
-
-    if (!instructorProfile) {
-        return { success: false, error: "Profil instructeur introuvable" };
+    if (!hasRole(user, "INSTRUCTOR")) {
+        return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
     }
 
     try {
+        const instructorProfile = await prisma.instructorProfile.findUnique({
+            where: { userId: user.id },
+        });
+
+        if (!instructorProfile) {
+            return { success: false, error: "Profil instructeur introuvable" };
+        }
+
         const assignments = await prisma.instructorAssignment.findMany({
             where: {
                 instructorId: instructorProfile.id,
@@ -419,7 +429,7 @@ export async function getMyStudents() {
             assignedAt: a.createdAt,
         }));
 
-        return { success: true, data: students };
+        return { success: true, data: students || [] };
     } catch (error: any) {
         console.error("Error fetching instructor students:", error);
         return { success: false, error: error.message || "Erreur lors de la récupération des élèves" };

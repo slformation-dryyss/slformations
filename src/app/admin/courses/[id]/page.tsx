@@ -85,41 +85,54 @@ export default async function CMSCoursePage({
                         <div key={module.id} className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
                             <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
                                 <div className="flex-1">
-                                    <form action={updateModuleAction} className="flex flex-wrap items-center gap-4">
-                                        <input type="hidden" name="moduleId" value={module.id} />
-                                        <input type="hidden" name="courseId" value={course.id} />
-                                        
-                                        <input 
-                                            type="text" 
-                                            name="title" 
-                                            defaultValue={module.title} 
-                                            className="font-bold text-slate-800 bg-transparent border-b border-transparent focus:border-gold-500 focus:outline-none px-1"
-                                        />
-                                        
-                                        <div className="flex items-center gap-2 text-xs text-slate-500 bg-white px-2 py-1 rounded border border-slate-200">
-                                            <span>Jour</span>
-                                            <input 
-                                                type="number" 
-                                                name="dayNumber" 
-                                                defaultValue={module.dayNumber || 1} 
-                                                className="w-10 font-bold text-slate-900 focus:outline-none"
-                                            />
-                                        </div>
-                                        
-                                        <div className="flex items-center gap-2 text-xs text-slate-500 bg-white px-2 py-1 rounded border border-slate-200">
-                                            <span>Durée (h)</span>
-                                            <input 
-                                                type="number" 
-                                                name="duration" 
-                                                defaultValue={module.duration || 7} 
-                                                className="w-10 font-bold text-slate-900 focus:outline-none"
-                                            />
-                                        </div>
+                                        <div className="flex flex-col flex-1 gap-2">
+                                            <form id={`update-module-${module.id}`} action={updateModuleAction} className="flex flex-wrap items-center gap-4">
+                                                <input type="hidden" name="moduleId" value={module.id} />
+                                                <input type="hidden" name="courseId" value={course.id} />
+                                                
+                                                <input 
+                                                    type="text" 
+                                                    name="title" 
+                                                    defaultValue={module.title} 
+                                                    className="font-bold text-slate-800 bg-transparent border-b border-transparent focus:border-gold-500 focus:outline-none px-1 flex-1"
+                                                />
+                                                
+                                                <div className="flex items-center gap-2 text-xs text-slate-500 bg-white px-2 py-1 rounded border border-slate-200">
+                                                    <span>Jour</span>
+                                                    <input 
+                                                        type="number" 
+                                                        name="dayNumber" 
+                                                        defaultValue={module.dayNumber || 1} 
+                                                        className="w-10 font-bold text-slate-900 focus:outline-none"
+                                                    />
+                                                </div>
+                                                
+                                                <div className="flex items-center gap-2 text-xs text-slate-500 bg-white px-2 py-1 rounded border border-slate-200">
+                                                    <span>Durée (h)</span>
+                                                    <input 
+                                                        type="number" 
+                                                        name="duration" 
+                                                        defaultValue={module.duration || 7} 
+                                                        className="w-10 font-bold text-slate-900 focus:outline-none"
+                                                    />
+                                                </div>
 
-                                        <button type="submit" className="text-gold-600 hover:text-gold-700">
-                                            <CheckCircle className="w-4 h-4" />
-                                        </button>
-                                    </form>
+                                                <button type="submit" className="text-gold-600 hover:text-gold-700 bg-white p-1 rounded-full shadow-sm border border-slate-100">
+                                                    <CheckCircle className="w-4 h-4" />
+                                                </button>
+                                            </form>
+                                            <textarea
+                                                name="description"
+                                                form={`update-module-${module.id}`}
+                                                defaultValue={module.description || ""}
+                                                placeholder="Description du module / Objectifs (optionnel)"
+                                                className="w-full text-xs text-slate-500 bg-transparent border-none focus:ring-0 focus:outline-none resize-none h-8 hover:h-20 transition-all p-1"
+                                                onChange={(e) => {
+                                                    // Simple auto-hide hack if not used with a real form element properly
+                                                }}
+                                            ></textarea>
+                                            {/* We need to move the form around if we want a single submit button for both fields */}
+                                        </div>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     {module.quiz ? (
@@ -232,34 +245,41 @@ export default async function CMSCoursePage({
                 {/* Create Module UI */}
                  <div className="bg-white border-2 border-dashed border-slate-200 rounded-lg p-6 hover:border-gold-300 transition-colors">
                     <h3 className="text-sm font-bold text-slate-900 mb-3">Nouveau Module</h3>
-                    <form action={createModuleAction} className="flex flex-wrap gap-3">
+                    <form action={createModuleAction} className="space-y-4">
                          <input type="hidden" name="courseId" value={course.id} />
-                         <input
-                            type="text"
-                            name="title"
-                            placeholder="Titre du module (ex: Introduction)"
-                            required
-                            className="flex-1 min-w-[200px] rounded-md border-slate-300 shadow-sm focus:border-gold-500 focus:ring-gold-500 sm:text-sm p-2 border"
-                        />
-                        <div className="flex items-center gap-2">
-                            <label className="text-xs font-bold text-slate-500">Jour</label>
-                            <input 
-                                type="number" 
-                                name="dayNumber" 
-                                placeholder="1" 
-                                className="w-16 rounded-md border-slate-300 shadow-sm sm:text-sm p-2 border" 
+                         <div className="flex flex-wrap gap-3">
+                            <input
+                                type="text"
+                                name="title"
+                                placeholder="Titre du module (ex: Introduction)"
+                                required
+                                className="flex-1 min-w-[200px] rounded-md border-slate-300 shadow-sm focus:border-gold-500 focus:ring-gold-500 sm:text-sm p-2 border"
                             />
+                            <div className="flex items-center gap-2">
+                                <label className="text-xs font-bold text-slate-500">Jour</label>
+                                <input 
+                                    type="number" 
+                                    name="dayNumber" 
+                                    placeholder="1" 
+                                    className="w-16 rounded-md border-slate-300 shadow-sm sm:text-sm p-2 border" 
+                                />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <label className="text-xs font-bold text-slate-500">Heures</label>
+                                <input 
+                                    type="number" 
+                                    name="duration" 
+                                    placeholder="7" 
+                                    className="w-16 rounded-md border-slate-300 shadow-sm sm:text-sm p-2 border" 
+                                />
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <label className="text-xs font-bold text-slate-500">Heures</label>
-                            <input 
-                                type="number" 
-                                name="duration" 
-                                placeholder="7" 
-                                className="w-16 rounded-md border-slate-300 shadow-sm sm:text-sm p-2 border" 
-                            />
-                        </div>
-                        <button type="submit" className="bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-800">
+                        <textarea
+                            name="description"
+                            placeholder="Description optionnelle du module..."
+                            className="w-full rounded-md border-slate-300 shadow-sm focus:border-gold-500 focus:ring-gold-500 sm:text-sm p-2 border h-20"
+                        ></textarea>
+                        <button type="submit" className="w-full bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-800">
                             Ajouter Module
                         </button>
                     </form>

@@ -83,6 +83,7 @@ export async function createModuleAction(formData: FormData) {
 
   const courseId = formData.get("courseId") as string;
   const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
   const dayNumber = parseInt(formData.get("dayNumber") as string) || 1;
   const duration = parseInt(formData.get("duration") as string) || 7;
 
@@ -98,6 +99,7 @@ export async function createModuleAction(formData: FormData) {
     data: {
       courseId,
       title,
+      description,
       position: (lastModule?.position ?? -1) + 1,
       isPublished: true, 
       dayNumber,
@@ -114,6 +116,7 @@ export async function updateModuleAction(formData: FormData) {
   const moduleId = formData.get("moduleId") as string;
   const courseId = formData.get("courseId") as string;
   const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
   const dayNumber = parseInt(formData.get("dayNumber") as string) || 1;
   const duration = parseInt(formData.get("duration") as string) || 7;
 
@@ -123,6 +126,7 @@ export async function updateModuleAction(formData: FormData) {
     where: { id: moduleId },
     data: {
       title,
+      description,
       dayNumber,
       duration,
     },

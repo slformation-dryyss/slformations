@@ -15,6 +15,7 @@ export async function getCourseBySlug(slug: string) {
       modules: {
         include: {
           lessons: true,
+          quiz: true,
         },
         orderBy: { position: 'asc' },
       },
