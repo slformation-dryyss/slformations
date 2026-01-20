@@ -10,6 +10,7 @@ import {
   BookOpen, Target, Award, GraduationCap, Wallet, 
   ArrowRight, Calendar, MapPin
 } from "lucide-react";
+import { CoursePricing } from "@/components/formations/CoursePricing";
 
 export const dynamic = 'force-dynamic';
 
@@ -125,6 +126,9 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
             </div>
           </div>
         </section>
+
+        {/* Pricing Section */}
+        {course.price && <CoursePricing price={course.price} title={course.title} />}
 
         <div className="max-w-7xl mx-auto px-6 py-24 space-y-24">
           {/* Intro Cards */}
