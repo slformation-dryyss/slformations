@@ -8,9 +8,9 @@ async function clearCourses() {
   try {
     // Delete in order to respect foreign key constraints
     await prisma.quizAttempt.deleteMany({});
-    await prisma.quizQuestion.deleteMany({});
+    await prisma.question.deleteMany({});
     await prisma.quiz.deleteMany({});
-    await prisma.userProgress.deleteMany({});
+    await prisma.lessonProgress.deleteMany({});
     await prisma.lesson.deleteMany({});
     await prisma.module.deleteMany({});
     await prisma.courseSession.deleteMany({});
