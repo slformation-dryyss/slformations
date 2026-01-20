@@ -24,10 +24,30 @@ try {
             ? `${dbUrl}&connection_limit=1`
             : `${dbUrl}?connection_limit=1`;
 
-        execSync('npx prisma migrate deploy', {
-            stdio: 'inherit',
-            env: { ...process.env, DATABASE_URL: limitedDbUrl }
-        });
+        const maxRetries = 3;
+        let attempt = 0;
+        let success = false;
+
+        while (attempt < maxRetries && !success) {
+            try {
+                attempt++;
+                console.log(`🔄 Deploying database migrations (Attempt ${attempt}/${maxRetries})...`);
+                execSync('npx prisma migrate deploy', {
+                    stdio: 'inherit',
+                    env: { ...process.env, DATABASE_URL: limitedDbUrl }
+                });
+                success = true;
+            } catch (err) {
+                console.error(`⚠️ Migration failed on attempt ${attempt}:`, err.message);
+                if (attempt < maxRetries) {
+                    console.log('⏳ Waiting 5 seconds before retrying...');
+                    const waitTill = new Date(new Date().getTime() + 5000);
+                    while (waitTill > new Date()) { } // Synchronous wait
+                } else {
+                    throw err; // Fail build if final attempt fails
+                }
+            }
+        }
     } else {
         console.warn('⚠️  DATABASE_URL not found, skipping migrations');
     }
