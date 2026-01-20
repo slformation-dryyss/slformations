@@ -137,6 +137,7 @@ Certification : Nouveau certificat SST (valable 24 mois).`,
         type: courseData.type,
         imageUrl: courseData.imageUrl,
         isPublished: true,
+        price: courseData.slug === 'sst-initial' ? 250 : 150,
       },
       create: {
         title: courseData.title,
@@ -145,7 +146,7 @@ Certification : Nouveau certificat SST (valable 24 mois).`,
         type: courseData.type,
         imageUrl: courseData.imageUrl,
         isPublished: true,
-        price: 0,
+        price: courseData.slug === 'sst-initial' ? 250 : 150, // SST Initial: 250€, MAC SST: 150€
       },
     });
 
