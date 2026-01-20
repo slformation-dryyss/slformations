@@ -127,8 +127,10 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
           </div>
         </section>
 
-        {/* Pricing Section */}
-        {course.price && <CoursePricing price={course.price} title={course.title} />}
+        {/* Pricing Section - Only for non-Permis courses */}
+        {course.price && !['PERMIS', 'Permis B', 'Permis Moto', 'Permis AAC'].includes(course.type) && (
+          <CoursePricing price={course.price} title={course.title} />
+        )}
 
         <div className="max-w-7xl mx-auto px-6 py-24 space-y-24">
           {/* Intro Cards */}
