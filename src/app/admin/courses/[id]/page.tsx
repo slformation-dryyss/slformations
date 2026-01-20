@@ -332,6 +332,8 @@ export default async function CMSCoursePage({
                         <option value="PERMIS">Permis</option>
                         <option value="TRANSPORT">Transport</option>
                         <option value="CACES">CACES</option>
+                        <option value="SECOURISME">Secourisme / SST</option>
+                        <option value="INCENDIE">Incendie / SSIAP</option>
                         <option value="CYBER">Cyber (Tech)</option>
                         <option value="DEV">Dev (Tech)</option>
                         <option value="MARKETING">Marketing (Tech)</option>

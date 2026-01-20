@@ -50,32 +50,40 @@ export async function createCourseAction(formData: FormData) {
   redirect(`/admin/courses/${course.id}`); // Redirect to edit page
 }
 
-export async function updateCourseAction(formData: FormData) {
-  await requireAdmin();
+  try {
+    const courseId = formData.get("courseId") as string;
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
+    
+    let price = parseFloat(formData.get("price") as string);
+    if (isNaN(price)) price = 0;
 
-  const courseId = formData.get("courseId") as string;
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const price = parseFloat(formData.get("price") as string);
-  const type = formData.get("type") as string;
-  const isPublished = formData.get("isPublished") === "on";
-  const imageUrl = formData.get("imageUrl") as string;
+    const type = formData.get("type") as string;
+    const isPublished = formData.get("isPublished") === "on";
+    const imageUrl = formData.get("imageUrl") as string;
+    
+    let maxStudents = parseInt(formData.get("maxStudents") as string);
+    if (isNaN(maxStudents)) maxStudents = 0;
 
-  await prisma.course.update({
-    where: { id: courseId },
-    data: {
-      title,
-      description,
-      price,
-      type,
-      isPublished,
-      imageUrl,
-      maxStudents: parseInt(formData.get("maxStudents") as string) || 0,
-    },
-  });
+    await prisma.course.update({
+      where: { id: courseId },
+      data: {
+        title,
+        description,
+        price,
+        type,
+        isPublished,
+        imageUrl,
+        maxStudents,
+      },
+    });
 
-  revalidatePath(`/admin/courses/${courseId}`);
-  revalidatePath("/admin/courses");
+    revalidatePath(`/admin/courses/${courseId}`);
+    revalidatePath("/admin/courses");
+  } catch (error) {
+    console.error("Failed to update course:", error);
+    throw error; // Re-throw to show error to user/Next.js
+  }
 }
 
 export async function createModuleAction(formData: FormData) {
