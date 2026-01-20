@@ -1,9 +1,8 @@
+
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
-
-async function seedSSIAP() {
-  console.log('🔥 Creating SSIAP formations with detailed content...');
+export async function seedSSIAP(prisma: PrismaClient) {
+  console.log('🔥 (API) Creating SSIAP formations with detailed content...');
 
   try {
     const category = await prisma.courseCategory.upsert({
@@ -16,8 +15,6 @@ async function seedSSIAP() {
       },
     });
 
-    console.log(`✅ Category: ${category.name}`);
-
     // Helper for upserting courses
     const upsertCourse = async (slug: string, title: string, description: string, price: number, imageUrl: string) => {
       return prisma.course.upsert({
@@ -25,6 +22,45 @@ async function seedSSIAP() {
         update: { title, description, type: 'INCENDIE', imageUrl, isPublished: true, price },
         create: { title, slug, description, type: 'INCENDIE', imageUrl, isPublished: true, price },
       });
+    };
+
+    // Helper to create modules and lessons
+    const createModulesAndLessons = async (courseId: string, modules: any[]) => {
+        // Clean up existing modules
+        const existingModules = await prisma.module.findMany({ where: { courseId } });
+        for (const m of existingModules) {
+            await prisma.lesson.deleteMany({ where: { moduleId: m.id } });
+        }
+        await prisma.module.deleteMany({ where: { courseId } });
+    
+        let position = 0;
+        for (const mod of modules) {
+            const createdModule = await prisma.module.create({
+                data: {
+                    title: mod.title,
+                    description: mod.description,
+                    courseId: courseId,
+                    position: position++,
+                    isPublished: true,
+                },
+            });
+    
+            let lessonPosition = 0;
+            for (const lesson of mod.lessons) {
+                await prisma.lesson.create({
+                    data: {
+                        title: lesson.title,
+                        moduleId: createdModule.id,
+                        position: lessonPosition++,
+                        duration: 3600, 
+                        isFree: false,
+                        isPublished: true,
+                        content: lesson.content,
+                        videoUrl: '',
+                    },
+                });
+            }
+        }
     };
 
     // ==========================================
@@ -106,7 +142,7 @@ Prérequis :
           ] 
         }
     ];
-    await createModulesAndLessons(prisma, ssiap1.id, modulesSSIAP1);
+    await createModulesAndLessons(ssiap1.id, modulesSSIAP1);
 
 
     // Recyclage SSIAP 1
@@ -127,7 +163,7 @@ Prérequis :
             { title: 'Extinction de feux réels', content: 'Exercices pratiques sur feux réels.' }
         ]}
     ];
-    await createModulesAndLessons(prisma, recyclageSsiap1.id, modulesRecyclageSSIAP1);
+    await createModulesAndLessons(recyclageSsiap1.id, modulesRecyclageSSIAP1);
 
 
     // RAN SSIAP 1
@@ -156,7 +192,7 @@ Prérequis :
             { title: 'Main courante', content: 'Tenue de la main courante.' }
         ]}
     ];
-    await createModulesAndLessons(prisma, ranSsiap1.id, modulesRANSSIAP1);
+    await createModulesAndLessons(ranSsiap1.id, modulesRANSSIAP1);
 
 
     // Module Complémentaire SSIAP 1
@@ -181,7 +217,7 @@ Prérequis :
             { title: 'Visites applicatives', content: 'Visite de site et repérage.' }
         ]}
     ];
-    await createModulesAndLessons(prisma, moduleCompSsiap1.id, modulesCompSSIAP1);
+    await createModulesAndLessons(moduleCompSsiap1.id, modulesCompSSIAP1);
 
 
     // ==========================================
@@ -214,7 +250,7 @@ Prérequis :
             { title: 'Conseils techniques aux secours', content: 'Accueillir et renseigner le Commandant des Opérations de Secours (COS).' }
         ]}
     ];
-    await createModulesAndLessons(prisma, ssiap2.id, modulesSSIAP2);
+    await createModulesAndLessons(ssiap2.id, modulesSSIAP2);
 
 
     // Recyclage SSIAP 2
@@ -236,7 +272,7 @@ Prérequis :
             { title: 'Management de l\'équipe', content: 'Gestion des plannings et des conflits.' }
         ]}
     ];
-    await createModulesAndLessons(prisma, recyclageSsiap2.id, modulesRecyclageSSIAP2);
+    await createModulesAndLessons(recyclageSsiap2.id, modulesRecyclageSSIAP2);
 
 
     // RAN SSIAP 2
@@ -266,7 +302,7 @@ Prérequis :
             { title: 'Gestion équipe', content: 'Management opérationnel.' }
         ]}
     ];
-    await createModulesAndLessons(prisma, ranSsiap2.id, modulesRANSSIAP2);
+    await createModulesAndLessons(ranSsiap2.id, modulesRANSSIAP2);
 
 
     // Module Complémentaire SSIAP 2
@@ -284,7 +320,7 @@ Prérequis :
             { title: 'Chef du poste central de sécurité en situation de crise', content: 'Gestion opérationnelle d\'un sinistre depuis le PC.' }
         ]}
     ];
-    await createModulesAndLessons(prisma, moduleCompSsiap2.id, modulesCompSSIAP2);
+    await createModulesAndLessons(moduleCompSsiap2.id, modulesCompSSIAP2);
 
 
     // ==========================================
@@ -329,7 +365,7 @@ Prérequis :
             { title: 'Suivi budgétaire', content: 'Élaboration et suivi du budget sécurité (fonctionnement, investissement).' }
         ]}
     ];
-    await createModulesAndLessons(prisma, ssiap3.id, modulesSSIAP3);
+    await createModulesAndLessons(ssiap3.id, modulesSSIAP3);
 
 
     // Recyclage SSIAP 3
@@ -350,7 +386,7 @@ Prérequis :
             { title: 'Analyse des risques', content: 'Étude de cas sur l\'analyse des risques.' }
         ]}
     ];
-    await createModulesAndLessons(prisma, recyclageSsiap3.id, modulesRecyclageSSIAP3);
+    await createModulesAndLessons(recyclageSsiap3.id, modulesRecyclageSSIAP3);
 
 
     // RAN SSIAP 3
@@ -374,7 +410,7 @@ Prérequis :
             { title: 'Analyse des risques', content: 'Méthodologie d\'analyse.' }
         ]}
     ];
-    await createModulesAndLessons(prisma, ranSsiap3.id, modulesRANSSIAP3);
+    await createModulesAndLessons(ranSsiap3.id, modulesRANSSIAP3);
 
 
     // Module Complémentaire SSIAP 3
@@ -393,7 +429,7 @@ Prérequis :
             { title: 'Organisation et gestion du service', content: 'Management du service de sécurité incendie.' }
         ]}
     ];
-    await createModulesAndLessons(prisma, moduleCompSsiap3.id, modulesCompSSIAP3);
+    await createModulesAndLessons(moduleCompSsiap3.id, modulesCompSSIAP3);
 
 
     // Link all to category
@@ -411,63 +447,10 @@ Prérequis :
         });
     }
 
-    console.log('\n🎉 All 12 SSIAP formations created successfully with DETAILED official programs!');
+    console.log('\n🎉 (API) All 12 SSIAP formations created successfully with DETAILED official programs!');
 
   } catch (error) {
-    console.error('❌ Error creating SSIAP formations:', error);
+    console.error('❌ (API) Error creating SSIAP formations:', error);
     throw error;
   }
 }
-
-// Helper to create modules and lessons
-// Updated to accept lessons as objects with title and content
-async function createModulesAndLessons(prisma: any, courseId: string, modules: any[]) {
-    // Clean up existing modules
-    const existingModules = await prisma.module.findMany({ where: { courseId } });
-    for (const m of existingModules) {
-        await prisma.lesson.deleteMany({ where: { moduleId: m.id } });
-    }
-    await prisma.module.deleteMany({ where: { courseId } });
-
-    let position = 0;
-    for (const mod of modules) {
-        const createdModule = await prisma.module.create({
-            data: {
-                title: mod.title,
-                description: mod.description,
-                courseId: courseId,
-                position: position++,
-                isPublished: true,
-            },
-        });
-
-        let lessonPosition = 0;
-        for (const lesson of mod.lessons) {
-            await prisma.lesson.create({
-                data: {
-                    title: lesson.title,
-                    moduleId: createdModule.id,
-                    position: lessonPosition++,
-                    duration: 3600, // Placeholder
-                    isFree: false,
-                    isPublished: true,
-                    content: lesson.content,
-                    videoUrl: '',
-                },
-            });
-        }
-    }
-}
-
-async function main() {
-  try {
-    await seedSSIAP();
-  } catch (error) {
-    console.error('Error during seeding:', error);
-    process.exit(1);
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
-main();

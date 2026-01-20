@@ -25,6 +25,11 @@ export default async function DashboardLayout({
     if (dbUser) {
       userRole = dbUser.role;
       userRoles = dbUser.roles || [dbUser.role];
+      
+      // CRITICAL: Force redirect for ADMIN/OWNER
+      if (userRole === "ADMIN" || userRole === "OWNER" || userRoles.includes("ADMIN") || userRoles.includes("OWNER")) {
+        redirect("/admin");
+      }
     }
   }
 
