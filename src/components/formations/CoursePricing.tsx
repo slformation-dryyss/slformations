@@ -3,13 +3,16 @@ import { Wallet, CheckCircle2, Building2, CreditCard, Users } from 'lucide-react
 interface CoursePricingProps {
   price: number;
   title: string;
+  pricePersonal?: number;  // Prix paiement personnel (optionnel)
+  priceCPF?: number;       // Prix CPF (optionnel)
+  priceCompany?: number;   // Prix entreprise (optionnel)
 }
 
-export function CoursePricing({ price, title }: CoursePricingProps) {
-  // Calcul du prix CPF (généralement plus élevé)
-  const cpfPrice = Math.round(price * 1.2);
-  // Prix entreprise (peut être négocié)
-  const companyPrice = price;
+export function CoursePricing({ price, title, pricePersonal, priceCPF, priceCompany }: CoursePricingProps) {
+  // Utiliser les prix personnalisés si fournis, sinon calculer à partir du prix de base
+  const personalPrice = pricePersonal || price;
+  const cpfPrice = priceCPF || Math.round(price * 1.2);
+  const companyPrice = priceCompany || price;
 
   return (
     <section className="py-16 bg-gradient-to-br from-slate-50 to-white border-y border-slate-100">
@@ -38,7 +41,7 @@ export function CoursePricing({ price, title }: CoursePricingProps) {
             
             <div className="mb-6">
               <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-4xl font-black text-slate-900">{price}€</span>
+                <span className="text-4xl font-black text-slate-900">{personalPrice}€</span>
                 <span className="text-slate-500 text-sm">TTC</span>
               </div>
               <p className="text-xs text-slate-400">Paiement en 1 à 4 fois sans frais</p>
