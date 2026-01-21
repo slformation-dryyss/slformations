@@ -50,6 +50,9 @@ export async function createCourseAction(formData: FormData) {
   redirect(`/admin/courses/${course.id}`); // Redirect to edit page
 }
 
+export async function updateCourseAction(formData: FormData) {
+  await requireAdmin();
+
   try {
     const courseId = formData.get("courseId") as string;
     const title = formData.get("title") as string;
