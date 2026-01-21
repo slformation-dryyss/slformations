@@ -90,6 +90,7 @@ export async function updateCourseAction(formData: FormData) {
         throw new Error("Course ID is missing");
     }
 
+    /* SMOKE TEST: Commenting out DB call to check if crash persists
     await prisma.course.update({
       where: { id: courseId },
       data: {
@@ -102,12 +103,14 @@ export async function updateCourseAction(formData: FormData) {
         maxStudents,
       },
     });
+    */
+    console.log("🔥 [SMOKE TEST] DB Update skipped to verify 500 error source.");
 
     revalidatePath(`/admin/courses/${courseId}`);
     revalidatePath("/admin/courses");
   } catch (error) {
     console.error("Failed to update course:", error);
-    throw error; // Re-throw to show error to user/Next.js
+    // throw error; // Commenting out re-throw for smoke test
   }
 }
 
