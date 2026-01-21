@@ -55,15 +55,24 @@ export async function updateCourseAction(formData: FormData) {
 
   try {
     const courseId = formData.get("courseId") as string;
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
+    
+    // Safety check: Title and Description are required Strings in schema
+    const title = (formData.get("title") as string) || "Sans titre"; 
+    const description = (formData.get("description") as string) || "";
     
     let price = parseFloat(formData.get("price") as string);
     if (isNaN(price)) price = 0;
 
-    const type = formData.get("type") as string;
+    // Safety check: Type is required String
+    const type = (formData.get("type") as string) || "AUTRE";
+    
     const isPublished = formData.get("isPublished") === "on";
-    const imageUrl = formData.get("imageUrl") as string;
+    
+    // ImageUrl is optional (String?), empty string should be treated as null or empty
+    let imageUrl: string | null = formData.get("imageUrl") as string;
+    if (!imageUrl || imageUrl.trim() === "") {
+        imageUrl = null;
+    }
     
     let maxStudents = parseInt(formData.get("maxStudents") as string);
     if (isNaN(maxStudents)) maxStudents = 0;
