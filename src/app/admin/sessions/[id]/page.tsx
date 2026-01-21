@@ -187,12 +187,28 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
 
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-slate-500">Début</label>
-                  <input type="datetime-local" name="start" required className="w-full rounded-lg border-slate-200 text-sm" />
+                  <input 
+                    type="datetime-local" 
+                    name="start" 
+                    required 
+                    min={format(session.startDate, "yyyy-MM-dd'T'00:00")}
+                    max={session.endDate ? format(session.endDate, "yyyy-MM-dd'T'23:59") : undefined}
+                    defaultValue={format(session.startDate, "yyyy-MM-dd'T'09:00")}
+                    className="w-full rounded-lg border-slate-200 text-sm" 
+                  />
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-slate-500">Fin</label>
-                  <input type="datetime-local" name="end" required className="w-full rounded-lg border-slate-200 text-sm" />
+                  <input 
+                    type="datetime-local" 
+                    name="end" 
+                    required 
+                    min={format(session.startDate, "yyyy-MM-dd'T'00:00")}
+                    max={session.endDate ? format(session.endDate, "yyyy-MM-dd'T'23:59") : undefined}
+                    defaultValue={format(session.startDate, "yyyy-MM-dd'T'17:00")}
+                    className="w-full rounded-lg border-slate-200 text-sm" 
+                  />
                 </div>
 
                 <div className="md:col-span-2 space-y-1">
