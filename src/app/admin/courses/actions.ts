@@ -51,9 +51,8 @@ export async function createCourseAction(formData: FormData) {
 }
 
 export async function updateCourseAction(formData: FormData) {
-  await requireAdmin();
-
   try {
+    await requireAdmin();
     const courseId = formData.get("courseId") as string;
     
     // Safety check: Title and Description are required Strings in schema
