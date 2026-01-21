@@ -68,6 +68,19 @@ export async function updateCourseAction(formData: FormData) {
     let maxStudents = parseInt(formData.get("maxStudents") as string);
     if (isNaN(maxStudents)) maxStudents = 0;
 
+    console.log("🚀 [DEBUG] Update Course Action:", {
+      id: courseId,
+      title,
+      price,
+      type,
+      isPublished,
+      maxStudents
+    });
+
+    if (!courseId) {
+        throw new Error("Course ID is missing");
+    }
+
     await prisma.course.update({
       where: { id: courseId },
       data: {
