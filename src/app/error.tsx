@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { RefreshCw, Home, MessageSquare } from 'lucide-react';
+import { RefreshCw, Home, MessageSquare, AlertCircle } from 'lucide-react';
 
 export default function Error({
     error,
@@ -17,82 +17,91 @@ export default function Error({
     }, [error]);
 
     return (
-        <div className="min-h-screen bg-navy-900 flex items-center justify-center px-4 overflow-hidden relative text-white">
-            {/* Background patterns */}
-            <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                <div className="absolute -top-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-red-600 blur-[120px]"></div>
-                <div className="absolute -bottom-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-gold-600 blur-[120px]"></div>
+        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4 overflow-hidden relative font-sans antialiased text-white">
+            {/* Background Atmosphere */}
+            <div className="absolute inset-0 z-0">
+                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-red-900/20 blur-[130px]" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-gold-900/10 blur-[130px]" />
+                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] bg-[length:50px_50px]" />
             </div>
 
-            <div className="max-w-2xl w-full text-center relative z-10">
-                {/* Logo */}
-                <div className="flex justify-center mb-12">
+            <div className="max-w-2xl w-full text-center relative z-10 px-6">
+                {/* Logo Section */}
+                <div className="flex justify-center mb-16">
                     <Link href="/">
-                        <div className="relative h-12 w-48 md:h-16 md:w-64 transform hover:scale-105 transition-transform duration-300">
+                        <div className="relative h-14 w-56 md:h-20 md:w-80 group">
+                            <div className="absolute inset-0 bg-red-500/10 blur-2xl group-hover:bg-red-500/20 transition-all duration-500 rounded-full" />
                             <Image
                                 src="/logo.svg"
                                 alt="SL Formations"
                                 fill
-                                className="object-contain drop-shadow-2xl brightness-110"
+                                className="object-contain relative z-10 brightness-110 drop-shadow-[0_0_15px_rgba(239,68,68,0.2)]"
                                 priority
                             />
                         </div>
                     </Link>
                 </div>
 
-                {/* Error Code Headline */}
-                <div className="mb-4">
-                    <h1 className="text-[12rem] md:text-[18rem] font-black leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-red-400 via-red-500 to-red-600 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
+                {/* Big Error Code Visual */}
+                <div className="relative mb-8 flex justify-center items-center">
+                    <div className="absolute text-[12rem] md:text-[20rem] font-black text-white/5 tracking-tightest leading-none pointer-events-none select-none">
                         500
-                    </h1>
+                    </div>
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-red-500/20 blur-[50px] group-hover:blur-[80px] transition-all opacity-50" />
+                        <h1 className="text-8xl md:text-[10rem] font-black leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-red-400 to-red-600 drop-shadow-2xl">
+                            500
+                        </h1>
+                    </div>
                 </div>
 
-                {/* Brand Decoration */}
-                <div className="flex items-center justify-center gap-4 mb-8">
-                    <div className="h-[1px] w-12 bg-red-500/50"></div>
-                    <span className="text-red-500 font-bold uppercase tracking-[0.3em] text-sm md:text-base">Erreur Technique</span>
-                    <div className="h-[1px] w-12 bg-red-500/50"></div>
+                {/* Textual Content */}
+                <div className="space-y-6 mb-12">
+                    <div className="flex items-center justify-center gap-4">
+                        <div className="h-px w-16 bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
+                        <span className="text-red-500 text-sm md:text-base font-black uppercase tracking-[0.5em] drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]">Erreur Système</span>
+                        <div className="h-px w-16 bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
+                    </div>
+                    <p className="text-slate-300 text-lg md:text-2xl font-light max-w-lg mx-auto leading-relaxed">
+                        Une erreur inattendue s'est produite. Nos équipes techniques ont été alertées et travaillent sur une résolution.
+                    </p>
                 </div>
 
-                {/* Subtitle */}
-                <p className="text-slate-300 text-xl md:text-2xl font-light mb-12 max-w-lg mx-auto leading-relaxed">
-                    Une erreur inattendue s&apos;est produite sur nos serveurs. Nous mettons tout en œuvre pour la corriger rapidement.
-                </p>
-
-                {/* Action Buttons */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-md mx-auto">
+                {/* Primary Actions */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                     <button
                         onClick={() => reset()}
-                        className="w-full px-8 py-4 bg-white text-navy-900 font-black rounded-full hover:bg-slate-100 transition-all shadow-xl hover:scale-105 active:scale-95 flex items-center justify-center gap-3 uppercase tracking-wider text-sm"
+                        className="w-full sm:w-auto min-w-[220px] px-10 py-5 bg-white text-[#0a0a0a] font-black rounded-full hover:bg-slate-100 transition-all shadow-[0_10px_40px_rgba(255,255,255,0.1)] hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3 uppercase tracking-widest text-xs"
                     >
                         <RefreshCw className="w-5 h-5 text-red-600" />
-                        Réessayer
+                        Réessayer maintenant
                     </button>
                     <Link
                         href="/"
-                        className="w-full px-8 py-4 bg-navy-800 text-gold-500 font-bold rounded-full border border-gold-500/30 hover:border-gold-500 hover:bg-navy-700 transition-all flex items-center justify-center gap-3 uppercase tracking-wider text-sm shadow-lg"
+                        className="w-full sm:w-auto min-w-[220px] px-10 py-5 bg-white/5 text-white font-black rounded-full border border-white/10 hover:border-gold-500/50 hover:bg-white/10 transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3 uppercase tracking-widest text-xs backdrop-blur-sm"
                     >
-                        <Home className="w-5 h-5" />
-                        Accueil
+                        <Home className="w-5 h-5 text-gold-500" />
+                        Retour à l'accueil
                     </Link>
                 </div>
 
                 {/* Support Section */}
-                <div className="mt-16 pt-8 border-t border-white/10">
+                <div className="mt-20 pt-10 border-t border-white/5">
                     <Link
                         href="/contact"
-                        className="inline-flex items-center gap-3 text-gold-500 hover:text-white transition font-semibold uppercase tracking-widest text-xs"
+                        className="inline-flex items-center gap-3 text-gold-500 hover:text-white transition font-bold uppercase tracking-widest text-xs group"
                     >
-                        <MessageSquare className="w-5 h-5" />
-                        Signaler le problème au support
+                        <MessageSquare className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                        Signaler ce bug au support technique
                     </Link>
                 </div>
 
-                {/* Technical Hint */}
+                {/* Technical Metadata */}
                 {error.digest && (
-                    <p className="mt-8 text-[10px] text-white/20 font-mono tracking-widest">
-                        REF: {error.digest}
-                    </p>
+                    <div className="mt-8 flex items-center justify-center gap-2 text-[10px] text-white/20 font-mono tracking-widest uppercase">
+                        <AlertCircle className="w-3 h-3" />
+                        ID Incident: {error.digest}
+                    </div>
                 )}
             </div>
         </div>

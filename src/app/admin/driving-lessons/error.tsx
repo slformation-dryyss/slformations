@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { AlertCircle, RotateCcw } from "lucide-react";
+import { AlertCircle, RotateCcw, ShieldAlert } from "lucide-react";
 
 export default function ErrorBoundary({
   error,
@@ -11,47 +11,57 @@ export default function ErrorBoundary({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
+    console.error("[Driving Lessons Error]:", error);
   }, [error]);
 
   const isPrismaError = error.message.includes("PrismaClient") || error.message.includes("schema");
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] p-6 text-center">
-      <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
-        <AlertCircle className="w-8 h-8 text-red-600" />
-      </div>
+    <div className="min-h-[70vh] flex items-center justify-center p-6 antialiased">
+      <div className="max-w-xl w-full bg-[#0f172a] rounded-3xl border border-slate-800 shadow-2xl overflow-hidden relative group">
+        {/* Abstract background glow */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 blur-3xl group-hover:bg-red-500/20 transition-all duration-700" />
 
-      <h2 className="text-2xl font-bold text-slate-900 mb-3">
-        Une erreur est survenue
-      </h2>
+        <div className="p-8 md:p-12 flex flex-col items-center text-center relative z-10">
+          <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mb-8 rotate-3 group-hover:rotate-6 transition-transform">
+            <ShieldAlert className="w-10 h-10 text-red-500" />
+          </div>
 
-      <p className="max-w-md text-slate-500 mb-8">
-        {isPrismaError
-          ? "Impossible de synchroniser les données. Cela peut arriver après une mise à jour. Veuillez réessayer."
-          : "Le chargement des leçons de conduite a échoué. Si le problème persiste, contactez le support."}
-      </p>
+          <h2 className="text-3xl font-black text-white mb-4 tracking-tight">
+            Oops ! Un incident est survenu
+          </h2>
 
-      <div className="flex gap-4">
-        <button
-          onClick={reset}
-          className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors"
-        >
-          <RotateCcw className="w-4 h-4" />
-          Réessayer
-        </button>
-      </div>
+          <p className="text-slate-400 text-lg mb-10 leading-relaxed font-medium">
+            {isPrismaError
+              ? "Une erreur de synchronisation avec la base de données a été détectée. Cela arrive parfois après une mise à jour système."
+              : "Nous avons rencontré un problème lors du chargement des données de conduite. Notre système de monitoring a été notifié."}
+          </p>
 
-      {process.env.NODE_ENV === "development" && (
-        <div className="mt-8 p-4 bg-slate-100 rounded-lg text-left max-w-2xl w-full overflow-auto">
-          <p className="font-mono text-xs text-red-600 mb-2 font-bold">DEBUG INFO:</p>
-          <pre className="font-mono text-xs text-slate-600">
-            {error.message}
-            {error.digest && `\nDigest: ${error.digest}`}
-          </pre>
+          <div className="w-full flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={reset}
+              className="flex items-center justify-center gap-3 px-8 py-4 bg-white text-[#0f172a] font-black rounded-2xl hover:bg-slate-100 transition-all hover:-translate-y-1 active:scale-95 shadow-xl shadow-white/5"
+            >
+              <RotateCcw className="w-5 h-5 text-red-600" />
+              Relancer la page
+            </button>
+          </div>
+
+          {process.env.NODE_ENV === "development" && (
+            <div className="mt-12 w-full text-left">
+              <div className="h-px w-full bg-slate-800 mb-6" />
+              <p className="font-mono text-[10px] text-red-500 font-black mb-3 flex items-center gap-2 tracking-widest uppercase">
+                <AlertCircle className="w-3 h-3" />
+                Informations de débogage
+              </p>
+              <div className="p-4 bg-black/40 rounded-xl border border-white/5 font-mono text-[11px] text-slate-500 max-h-40 overflow-auto scrollbar-hide">
+                {error.message}
+                {error.digest && <div className="mt-2 text-gold-500/50 italic">Digest: {error.digest}</div>}
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

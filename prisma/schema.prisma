@@ -44,6 +44,8 @@ model User {
   marketingConsent       Boolean?
   roles                  String[]               @default(["STUDENT"])
   primaryRole            String                 @default("STUDENT")
+  mustChangePassword     Boolean                @default(false)
+  passwordChangedAt      DateTime?
   addresses              Address[]
   bookings               Booking[]
   studentChangeRequests  ChangeRequest[]        @relation("StudentChangeRequests")

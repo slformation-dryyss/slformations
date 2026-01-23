@@ -280,7 +280,7 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
       role: mappedRoleLegacy,
       roles: mappedRoles,
       primaryRole: mappedPrimaryRole,
-      // mustChangePassword: true, // Commented out to prevent crash until db push succeeds
+      mustChangePassword: true,
 
       lastLoginAt: new Date(),
     },
@@ -361,12 +361,9 @@ export async function requireVerifiedUser(req?: NextRequest) {
     redirect("/api/auth/login");
   }
 
-  // Redirection désactivée temporairement pour éviter l'erreur 500 (colonne manquante en DB)
-  /*
   if (user.mustChangePassword && !req?.nextUrl?.pathname?.includes("/dashboard/change-password")) {
     redirect("/dashboard/change-password");
   }
-  */
 
   return { user, auth0User };
 }
@@ -379,11 +376,9 @@ export async function requireVerifiedUser(req?: NextRequest) {
 export async function requireOnboardedUser(req?: NextRequest) {
   const { user, auth0User } = await requireVerifiedUser(req);
 
-  /*
   if (user.mustChangePassword) {
     redirect("/dashboard/change-password");
   }
-  */
 
   if (!user.isProfileComplete) {
     redirect("/dashboard/profile?onboarding=1");

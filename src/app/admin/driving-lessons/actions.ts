@@ -449,3 +449,55 @@ export async function searchStudents(query: string) {
         return { success: false, error: "Erreur lors de la recherche" };
     }
 }
+
+/**
+ * Récupérer les détails complets d'un instructeur
+ */
+export async function getInstructorDetails(instructorId: string) {
+    await requireAdmin();
+
+    try {
+        const instructor = await prisma.instructorProfile.findUnique({
+            where: { id: instructorId },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        phone: true,
+                    },
+                },
+                assignments: {
+                    where: { isActive: true },
+                    include: {
+                        student: {
+                            select: {
+                                id: true,
+                                firstName: true,
+                                lastName: true,
+                                email: true,
+                            },
+                        },
+                    },
+                },
+                _count: {
+                    select: {
+                        drivingLessons: true,
+                        assignments: { where: { isActive: true } },
+                    },
+                },
+            },
+        });
+
+        if (!instructor) {
+            return { success: false, error: "Instructeur introuvable" };
+        }
+
+        return { success: true, data: instructor };
+    } catch (error: any) {
+        console.error("Error fetching instructor details:", error);
+        return { success: false, error: "Erreur lors de la récupération des détails" };
+    }
+}

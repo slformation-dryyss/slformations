@@ -11,8 +11,6 @@ export async function GET(req: NextRequest) {
             return NextResponse.redirect(new URL("/api/auth/login", req.url));
         }
 
-        // Temporairement désactivé pour éviter erreur de build (colonne manquante en DB)
-        /*
         await prisma.user.update({
             where: { id: user.id },
             data: {
@@ -20,7 +18,6 @@ export async function GET(req: NextRequest) {
                 passwordChangedAt: new Date()
             }
         });
-        */
 
         // Redirection vers le dashboard, maintenant que c'est ok
         return NextResponse.redirect(new URL("/dashboard", req.url));

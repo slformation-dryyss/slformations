@@ -5,6 +5,20 @@ import { auth0 } from "./lib/auth0";
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Force HTTPS in production
+  const proto = request.headers.get("x-forwarded-proto");
+  const host = request.headers.get("host");
+  if (
+    process.env.NODE_ENV === "production" &&
+    proto === "http" &&
+    host &&
+    !host.includes("localhost")
+  ) {
+    const url = request.nextUrl.clone();
+    url.protocol = "https:";
+    return NextResponse.redirect(url, 301);
+  }
+
   // Redirection publique : /formations -> /formations/catalogue
   if (pathname === "/formations") {
     const url = request.nextUrl.clone();
