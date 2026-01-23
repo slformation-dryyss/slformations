@@ -15,9 +15,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export default async function InstructorDetailPage({ params }: { params: { id: string } }) {
+export default async function InstructorDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     await requireAdmin();
-    const result = await getInstructorDetails(params.id);
+    const result = await getInstructorDetails(id);
 
     if (!result.success || !result.data) {
         return notFound();
