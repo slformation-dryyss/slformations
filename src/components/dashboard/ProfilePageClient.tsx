@@ -6,12 +6,14 @@ import Link from 'next/link';
 import {
   GraduationCap,
   User,
+  KeyRound,
+  Sparkles,
+  Lock,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { ProfileForm } from '@/components/dashboard/ProfileForm';
 import { WelcomeTour } from '@/components/dashboard/WelcomeTour';
-import { Sparkles } from 'lucide-react';
 
 type ProfileResponse = {
   id: string;
@@ -184,11 +186,19 @@ export function ProfilePageClient({
               <div className="pt-4 border-t border-navy-700">
                 <button
                   onClick={() => setShowTour(true)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-navy-900 border border-gold-500/30 text-gold-500 rounded-xl text-xs font-bold hover:bg-gold-500/10 transition"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-navy-900 border border-gold-500/30 text-gold-500 rounded-xl text-xs font-bold hover:bg-gold-500/10 transition mb-3"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   Revoir le tutoriel bienvenue
                 </button>
+
+                <Link
+                  href="/dashboard/change-password"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-navy-950/50 border border-slate-700 text-slate-300 rounded-xl text-xs font-bold hover:bg-slate-700/30 transition shadow-sm"
+                >
+                  <KeyRound className="w-3.5 h-3.5" />
+                  Sécurité : Modifier mon mot de passe
+                </Link>
               </div>
             </div>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Mail, AlertCircle } from 'lucide-react';
 
 interface ProfileFormProps {
   user: {
@@ -150,13 +151,32 @@ export function ProfileForm({ user }: ProfileFormProps) {
           />
         </div>
         <div>
-          <label className="block text-gray-400 mb-1">Email</label>
-          <input
-            type="email"
-            value={user.email}
-            readOnly
-            className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg opacity-80 cursor-not-allowed"
-          />
+          <label className="block text-gray-400 mb-1 flex items-center gap-2">
+            Email
+            <span className="text-[10px] bg-navy-900 border border-navy-600 px-1.5 py-0.5 rounded text-gray-500 font-normal">
+              Non modifiable directement
+            </span>
+          </label>
+          <div className="space-y-2">
+            <input
+              type="email"
+              value={user.email}
+              readOnly
+              className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg opacity-80 cursor-not-allowed text-gray-400"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const subject = encodeURIComponent("Demande de modification d'email");
+                const body = encodeURIComponent(`Bonjour,\n\nSouhaitant modifier l'adresse email associée à mon compte (${user.email}), je vous contacte pour effectuer cette démarche.\n\nNom : ${lastName}\nPrénom : ${firstName}\nNouvel email souhaité : `);
+                window.location.href = `mailto:contact@sl-formations.fr?subject=${subject}&body=${body}`;
+              }}
+              className="flex items-center gap-2 text-[10px] md:text-xs text-gold-500/80 hover:text-gold-500 transition-colors py-1"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              Demander la modification au secrétariat
+            </button>
+          </div>
         </div>
         <div>
           <label className="block text-gray-400 mb-1">Téléphone</label>
