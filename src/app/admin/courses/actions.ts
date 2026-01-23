@@ -51,21 +51,8 @@ export async function createCourseAction(formData: FormData) {
 }
 
 export async function updateCourseAction(formData: FormData) {
-  console.log("🎬 [ST-LOG] updateCourseAction STARTED");
   try {
-    console.log("🔍 [ST-LOG] Checking admin permissions...");
-    try {
-      await requireAdmin();
-      console.log("✅ [ST-LOG] Admin permissions verified");
-    } catch (authError: any) {
-      if (authError?.digest?.startsWith("NEXT_REDIRECT")) {
-        console.log("🔃 [ST-LOG] requireAdmin is triggering a redirect (expected if not admin)");
-        throw authError;
-      }
-      console.error("❌ [ST-LOG] requireAdmin CRASHED with non-redirect error:", authError);
-      throw authError;
-    }
-
+    await requireAdmin();
     const courseId = formData.get("courseId") as string;
     const title = (formData.get("title") as string) || "Sans titre";
     const description = (formData.get("description") as string) || "";
@@ -78,10 +65,6 @@ export async function updateCourseAction(formData: FormData) {
     let maxStudents = parseInt(formData.get("maxStudents") as string);
     if (isNaN(maxStudents)) maxStudents = 0;
 
-    console.log("🚀 [ST-LOG] Attempting Prisma update for ID:", courseId, {
-      title, price, type, isPublished, maxStudents
-    });
-
     if (!courseId) throw new Error("Course ID is missing");
 
     await prisma.course.update({
@@ -89,17 +72,13 @@ export async function updateCourseAction(formData: FormData) {
       data: { title, description, price, type, isPublished, imageUrl, maxStudents },
     });
 
-    console.log("✅ [ST-LOG] Prisma update successful");
-
-    console.log("♻️ [ST-LOG] Revalidating paths...");
     revalidatePath(`/admin/courses/${courseId}`);
     revalidatePath("/admin/courses");
-    console.log("✨ [ST-LOG] updateCourseAction COMPLETED successfully");
   } catch (error: any) {
     if (error?.digest?.startsWith("NEXT_REDIRECT")) {
       throw error;
     }
-    console.error("❌ [ST-LOG] updateCourseAction FAILED:", error);
+    console.error("Failed to update course:", error);
     throw error;
   }
 }
