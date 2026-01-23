@@ -1,10 +1,10 @@
-import { requireAdmin } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import ClientPaymentForm from "../ClientPaymentForm";
 import { syncStripePaymentStatus } from "../../actions";
 
 export default async function GeneratorPage() {
-    await requireAdmin();
+    await requireOwner();
 
     // Fetch pending links to sync (limited to 10 for performance)
     const pendingLinks = await prisma.paymentLink.findMany({

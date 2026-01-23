@@ -30,11 +30,11 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
     { href: "/admin/documents", label: "Dossiers Élèves", icon: FileText }, // New
     { href: "/admin/sessions", label: "Sessions", icon: Calendar },
     { href: "/admin/driving-lessons", label: "Gestion Conduite", icon: Car },
-    { href: "/admin/settings", label: "Paramètres", icon: Settings },
   ];
 
-  if (isOwner || role === "ADMIN" || role === "SECRETARY") {
+  if (isOwner) {
     adminLinks.push({ label: "Finance (Générateur)", href: "/admin/finance/payment-links", icon: Euro });
+    adminLinks.push({ label: "Paramètres", href: "/admin/settings", icon: Settings });
   }
 
   return (
