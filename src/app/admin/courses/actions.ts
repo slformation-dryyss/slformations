@@ -25,13 +25,13 @@ export async function createCourseAction(formData: FormData) {
   const description = formData.get("description") as string;
   const price = parseFloat(formData.get("price") as string);
   const type = formData.get("type") as string;
-  
+
   if (!title || !description || isNaN(price)) {
     throw new Error("Missing required fields");
   }
 
   const imageUrl = formData.get("imageUrl") as string;
-  
+
   const slug = slugifyTitle(title) + "-" + Date.now().toString().slice(-4);
 
   const course = await prisma.course.create({
@@ -51,64 +51,56 @@ export async function createCourseAction(formData: FormData) {
 }
 
 export async function updateCourseAction(formData: FormData) {
+  console.log("🎬 [ST-LOG] updateCourseAction STARTED");
   try {
-    await requireAdmin();
+    console.log("🔍 [ST-LOG] Checking admin permissions...");
+    try {
+      await requireAdmin();
+      console.log("✅ [ST-LOG] Admin permissions verified");
+    } catch (authError: any) {
+      if (authError?.digest?.startsWith("NEXT_REDIRECT")) {
+        console.log("🔃 [ST-LOG] requireAdmin is triggering a redirect (expected if not admin)");
+        throw authError;
+      }
+      console.error("❌ [ST-LOG] requireAdmin CRASHED with non-redirect error:", authError);
+      throw authError;
+    }
+
     const courseId = formData.get("courseId") as string;
-    
-    // Safety check: Title and Description are required Strings in schema
-    const title = (formData.get("title") as string) || "Sans titre"; 
+    const title = (formData.get("title") as string) || "Sans titre";
     const description = (formData.get("description") as string) || "";
-    
     let price = parseFloat(formData.get("price") as string);
     if (isNaN(price)) price = 0;
-
-    // Safety check: Type is required String
     const type = (formData.get("type") as string) || "AUTRE";
-    
     const isPublished = formData.get("isPublished") === "on";
-    
-    // ImageUrl is optional (String?), empty string should be treated as null or empty
     let imageUrl: string | null = formData.get("imageUrl") as string;
-    if (!imageUrl || imageUrl.trim() === "") {
-        imageUrl = null;
-    }
-    
+    if (!imageUrl || imageUrl.trim() === "") imageUrl = null;
     let maxStudents = parseInt(formData.get("maxStudents") as string);
     if (isNaN(maxStudents)) maxStudents = 0;
 
-    console.log("🚀 [DEBUG] Update Course Action:", {
-      id: courseId,
-      title,
-      price,
-      type,
-      isPublished,
-      maxStudents
+    console.log("🚀 [ST-LOG] Attempting Prisma update for ID:", courseId, {
+      title, price, type, isPublished, maxStudents
     });
 
-    if (!courseId) {
-        throw new Error("Course ID is missing");
-    }
+    if (!courseId) throw new Error("Course ID is missing");
 
     await prisma.course.update({
       where: { id: courseId },
-      data: {
-        title,
-        description,
-        price,
-        type,
-        isPublished,
-        imageUrl,
-        maxStudents,
-      },
+      data: { title, description, price, type, isPublished, imageUrl, maxStudents },
     });
-    
-    // console.log("🔥 [SMOKE TEST] DB Update skipped to verify 500 error source.");
 
+    console.log("✅ [ST-LOG] Prisma update successful");
+
+    console.log("♻️ [ST-LOG] Revalidating paths...");
     revalidatePath(`/admin/courses/${courseId}`);
     revalidatePath("/admin/courses");
-  } catch (error) {
-    console.error("Failed to update course:", error);
-    throw error; // Re-throw to show error to user/Next.js
+    console.log("✨ [ST-LOG] updateCourseAction COMPLETED successfully");
+  } catch (error: any) {
+    if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+      throw error;
+    }
+    console.error("❌ [ST-LOG] updateCourseAction FAILED:", error);
+    throw error;
   }
 }
 
@@ -135,7 +127,7 @@ export async function createModuleAction(formData: FormData) {
       title,
       description,
       position: (lastModule?.position ?? -1) + 1,
-      isPublished: true, 
+      isPublished: true,
       dayNumber,
       duration,
     },
@@ -173,10 +165,10 @@ export async function deleteModuleAction(formData: FormData) {
   await requireAdmin();
   const moduleId = formData.get("moduleId") as string;
   const courseId = formData.get("courseId") as string;
-  
+
   if (moduleId) {
-      await prisma.module.delete({ where: { id: moduleId } });
-      revalidatePath(`/admin/courses/${courseId}`);
+    await prisma.module.delete({ where: { id: moduleId } });
+    revalidatePath(`/admin/courses/${courseId}`);
   }
 }
 
@@ -214,14 +206,14 @@ export async function createLessonAction(formData: FormData) {
 }
 
 export async function deleteLessonAction(formData: FormData) {
-    await requireAdmin();
-    const lessonId = formData.get("lessonId") as string;
-    const courseId = formData.get("courseId") as string;
+  await requireAdmin();
+  const lessonId = formData.get("lessonId") as string;
+  const courseId = formData.get("courseId") as string;
 
-    if (lessonId) {
-        await prisma.lesson.delete({ where: { id: lessonId } });
-        revalidatePath(`/admin/courses/${courseId}`);
-    }
+  if (lessonId) {
+    await prisma.lesson.delete({ where: { id: lessonId } });
+    revalidatePath(`/admin/courses/${courseId}`);
+  }
 }
 
 export async function deleteCourseAction(formData: FormData) {
