@@ -11,9 +11,12 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        /* 
+        Temporairement désactivé pour éviter erreur de build (colonne manquante en DB)
         if (!user.mustChangePassword) {
             return NextResponse.redirect(new URL("/dashboard", req.url));
         }
+        */
 
         const appUrl = process.env.AUTH0_BASE_URL || "https://sl-formations.fr";
         const resultUrl = `${appUrl}/api/auth/password-changed-callback`;
