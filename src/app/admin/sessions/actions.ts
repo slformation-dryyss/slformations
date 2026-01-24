@@ -15,10 +15,10 @@ export async function createSessionAction(formData: FormData) {
   const location = formData.get("location") as string;
   const maxSpots = parseInt(formData.get("maxSpots") as string) || 10;
   const mainTeacherId = formData.get("mainTeacherId") as string;
-  
+
   const format = (formData.get("format") as string) || "IN_PERSON";
   const meetingUrl = formData.get("meetingUrl") as string;
-  
+
   if (!courseId || !startDate || !endDate) {
     throw new Error("Missing required fields");
   }
@@ -27,7 +27,7 @@ export async function createSessionAction(formData: FormData) {
   const startDateObj = new Date(startDate);
   const minStartDate = new Date();
   minStartDate.setDate(minStartDate.getDate() + 10);
-  
+
   if (startDateObj < minStartDate) {
     throw new Error("La date de début doit être au minimum 10 jours après aujourd'hui");
   }
@@ -46,7 +46,7 @@ export async function createSessionAction(formData: FormData) {
       location,
       maxSpots,
       mainTeacherId: mainTeacherId || null,
-      isPublished: true, 
+      isPublished: true,
       meetingUrl: meetingUrl || null,
     },
   });
@@ -104,7 +104,7 @@ export async function addParticipantAction(formData: FormData) {
   await prisma.courseSession.update({
     where: { id: sessionId },
     data: {
-        bookedSpots: { increment: 1 }
+      bookedSpots: { increment: 1 }
     }
   });
 
@@ -116,20 +116,20 @@ export async function addParticipantAction(formData: FormData) {
   });
 
   if (session) {
-      await prisma.enrollment.upsert({
-          where: {
-              userId_courseId: {
-                  userId: user.id,
-                  courseId: session.courseId,
-              }
-          },
-          update: { status: "ACTIVE" },
-          create: {
-              userId: user.id,
-              courseId: session.courseId,
-              status: "ACTIVE",
-          }
-      });
+    await prisma.enrollment.upsert({
+      where: {
+        userId_courseId: {
+          userId: user.id,
+          courseId: session.courseId,
+        }
+      },
+      update: { status: "ACTIVE" },
+      create: {
+        userId: user.id,
+        courseId: session.courseId,
+        status: "ACTIVE",
+      }
+    });
   }
 
 
@@ -137,39 +137,56 @@ export async function addParticipantAction(formData: FormData) {
 }
 
 export async function createSessionSlotAction(formData: FormData) {
-    await requireAdmin();
+  await requireAdmin();
 
-    const sessionId = formData.get("sessionId") as string;
-    const start = new Date(formData.get("start") as string);
-    const end = new Date(formData.get("end") as string);
-    const moduleId = formData.get("moduleId") as string;
-    const teacherId = formData.get("teacherId") as string;
-    const location = formData.get("location") as string;
-    const meetingUrl = formData.get("meetingUrl") as string;
+  const sessionId = formData.get("sessionId") as string;
+  const start = new Date(formData.get("start") as string);
+  const end = new Date(formData.get("end") as string);
+  const moduleId = formData.get("moduleId") as string;
+  const teacherId = formData.get("teacherId") as string;
+  const location = formData.get("location") as string;
+  const meetingUrl = formData.get("meetingUrl") as string;
 
-    await prisma.sessionSlot.create({
-        data: {
-            sessionId,
-            start,
-            end,
-            moduleId: moduleId || null,
-            teacherId: teacherId || null,
-            location: location || null,
-            meetingUrl: meetingUrl || null,
-        }
-    });
+  await prisma.sessionSlot.create({
+    data: {
+      sessionId,
+      start,
+      end,
+      moduleId: moduleId || null,
+      teacherId: teacherId || null,
+      location: location || null,
+      meetingUrl: meetingUrl || null,
+    }
+  });
 
-    revalidatePath(`/admin/sessions/${sessionId}`);
+  revalidatePath(`/admin/sessions/${sessionId}`);
 }
 
 export async function deleteSessionSlotAction(formData: FormData) {
-    await requireAdmin();
-    const slotId = formData.get("slotId") as string;
-    const sessionId = formData.get("sessionId") as string;
+  await requireAdmin();
+  const slotId = formData.get("slotId") as string;
+  const sessionId = formData.get("sessionId") as string;
 
-    if (slotId) {
-        await prisma.sessionSlot.delete({ where: { id: slotId } });
-        revalidatePath(`/admin/sessions/${sessionId}`);
-    }
+  if (slotId) {
+    await prisma.sessionSlot.delete({ where: { id: slotId } });
+    revalidatePath(`/admin/sessions/${sessionId}`);
+  }
+}
+
+export async function deleteSessionAction(sessionId: string) {
+  await requireAdmin();
+
+  if (!sessionId) {
+    throw new Error("Missing sessionId");
+  }
+
+  // Prisma onDelete: Cascade should handle bookings and slots if defined in schema.
+  // However, CourseSessionBooking and SessionSlot both have CourseSession as relation with onDelete: Cascade
+
+  await prisma.courseSession.delete({
+    where: { id: sessionId },
+  });
+
+  revalidatePath("/admin/sessions");
 }
 
