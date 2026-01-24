@@ -39,6 +39,11 @@ export async function GET(request: Request) {
                 tables: existingTables.length,
             },
             existing_tables: existingTables,
+            column_checks: {
+                user_columns: (await prisma.$queryRaw<any[]>`SELECT column_name FROM information_schema.columns WHERE table_name = 'User'`).map(c => c.column_name),
+                instructor_columns: (await prisma.$queryRaw<any[]>`SELECT column_name FROM information_schema.columns WHERE table_name = 'InstructorProfile'`).map(c => c.column_name),
+                teacher_columns: (await prisma.$queryRaw<any[]>`SELECT column_name FROM information_schema.columns WHERE table_name = 'TeacherProfile'`).map(c => c.column_name),
+            },
             users_summary: await prisma.$queryRaw`SELECT id, email, role, roles, "primaryRole" FROM "User" LIMIT 10`,
             currentUserTest: userResult ? {
                 id: (userResult as any).id,
