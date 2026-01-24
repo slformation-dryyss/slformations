@@ -195,14 +195,20 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
     const timeSinceLastLogin = Date.now() - (dbUser.lastLoginAt?.getTime() || 0);
     const ONE_HOUR = 60 * 60 * 1000;
 
-    const expectedRole = mappedRoleLegacy;
-
     // Check if roles need update (simple equality check on sorted arrays)
-    const currentRolesAuth0 = JSON.stringify(mappedRoles.sort());
-    const dbRoles = JSON.stringify((dbUser.roles || []).sort());
+    // IMPORTANT: If Auth0 doesn't provide roles for an existing user, keep the current ones in DB
+    const hasAuth0Roles = auth0Roles && auth0Roles.length > 0;
 
-    const needsRolesUpdate = currentRolesAuth0 !== dbRoles;
-    const needsRoleUpdate = dbUser.role !== expectedRole;
+    let needsRolesUpdate = false;
+    let needsRoleUpdate = false;
+
+    if (hasAuth0Roles) {
+      const currentRolesAuth0 = JSON.stringify(mappedRoles.sort());
+      const dbRoles = JSON.stringify((dbUser.roles || []).sort());
+      needsRolesUpdate = currentRolesAuth0 !== dbRoles;
+      needsRoleUpdate = dbUser.role !== mappedRoleLegacy;
+    }
+
     const needsNameUpdate = (auth0User.name || auth0User.nickname) && dbUser.name !== (auth0User.name || auth0User.nickname);
     const needsEmailUpdate = (auth0User.email && dbUser.email !== auth0User.email);
     const needsAuth0IdUpdate = dbUser.auth0Id !== auth0Id;
@@ -214,9 +220,11 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
       dbUser = await prisma.user.update({
         where: { id: dbUser.id },
         data: {
-          role: expectedRole, // Legacy
-          roles: mappedRoles, // New
-          primaryRole: mappedPrimaryRole, // New
+          ...(hasAuth0Roles ? {
+            role: mappedRoleLegacy, // Legacy
+            roles: mappedRoles, // New
+            primaryRole: mappedPrimaryRole, // New
+          } : {}),
 
           name: auth0User.name || auth0User.nickname || dbUser.name,
           email: auth0User.email ?? dbUser.email,

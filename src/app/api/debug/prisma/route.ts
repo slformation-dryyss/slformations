@@ -20,6 +20,11 @@ export async function GET(request: Request) {
         return NextResponse.json({
             status: "success",
             database: "reachable",
+            env: {
+                has_db_url: !!process.env.DATABASE_URL,
+                db_url_masked: process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:[^@:]+@/, ":****@") : null,
+                node_env: process.env.NODE_ENV,
+            },
             counts: {
                 users: userCount,
                 courses: courseCount,
@@ -37,6 +42,9 @@ export async function GET(request: Request) {
             message: error.message,
             code: error.code,
             meta: error.meta,
+            env_check: {
+                has_db_url: !!process.env.DATABASE_URL,
+            },
             stack: process.env.NODE_ENV === "development" ? error.stack : undefined
         }, { status: 500 });
     }

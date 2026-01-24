@@ -16,7 +16,6 @@ export default async function DashboardLayout({
 
   if (session?.user) {
     // Try to get role from DB for more accuracy/updates
-    // Using sub (Auth0 ID) to find user
     const dbUser = await prisma.user.findUnique({
       where: { auth0Id: session.user.sub },
       select: { role: true, roles: true }
@@ -25,7 +24,6 @@ export default async function DashboardLayout({
     if (dbUser) {
       userRole = dbUser.role;
       userRoles = dbUser.roles || [dbUser.role];
-      
       // CRITICAL: Force redirect for ADMIN/OWNER
       if (userRole === "ADMIN" || userRole === "OWNER" || userRoles.includes("ADMIN") || userRoles.includes("OWNER")) {
         redirect("/admin");
