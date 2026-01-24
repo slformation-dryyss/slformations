@@ -9,7 +9,6 @@ import {
     type RecurrencePattern,
 } from "@/lib/lessons/recurrence";
 import { notifyLessonConfirmed, notifyLessonCancelled } from "@/lib/lessons/notifications";
-import { randomUUID } from "crypto";
 
 /**
  * Créer un créneau de disponibilité (ponctuel ou récurrent)
@@ -83,7 +82,7 @@ export async function createAvailabilitySlot(formData: {
                 return { success: false, error: "Aucune date générée pour cette récurrence" };
             }
 
-            const recurrenceGroupId = randomUUID();
+            const recurrenceGroupId = Date.now().toString(36) + Math.random().toString(36).substring(2);
             console.log("🆔 [CREATE_SLOT] Group ID created", recurrenceGroupId);
 
             // Créer les créneaux individuels en une transaction
@@ -97,7 +96,7 @@ export async function createAvailabilitySlot(formData: {
                             endTime: formData.endTime,
                             isRecurring: true,
                             recurrenceGroupId,
-                        },
+                        } as any,
                     })
                 )
             );
@@ -224,11 +223,11 @@ export async function deleteAvailabilitySlot(slotId: string, deleteAllInGroup: b
             // Supprimer tous les futurs créneaux du groupe qui ne sont pas réservés
             await prisma.instructorAvailability.deleteMany({
                 where: {
-                    recurrenceGroupId: slot.recurrenceGroupId,
+                    recurrenceGroupId: (slot as any).recurrenceGroupId,
                     instructor: { userId: user.id },
                     isBooked: false,
                     date: { gte: slot.date || new Date() }
-                }
+                } as any
             });
         } else {
             await prisma.instructorAvailability.delete({

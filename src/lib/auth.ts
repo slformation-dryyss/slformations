@@ -113,31 +113,22 @@ import type { NextRequest } from "next/server";
 
 // Ajout de providedSession pour l'injection depuis afterCallback
 export async function getOrCreateUser(req?: NextRequest, providedSession?: any) {
-  console.log("🔒 [AUTH DEBUG] getOrCreateUser called");
   let session;
 
   if (providedSession) {
     session = providedSession;
-  } else if (req) {
-    // Try both with and without request to see which one works in this environment
-    session = await auth0.getSession(req);
-    if (!session) {
-      console.log("🔒 [AUTH DEBUG] getSession(req) failed, trying getSession()...");
-      session = await auth0.getSession();
-    }
   } else {
-    session = await auth0.getSession();
+    // Dans Next.js 15+, getSession() sans arguments utilise les headers de la requête courante
+    // Cela fonctionne à la fois dans les Server Actions et les Route Handlers
+    try {
+      session = await auth0.getSession();
+    } catch (e) {
+      console.error("🔒 [AUTH DEBUG] getSession() error:", e);
+    }
   }
 
-  console.log("🔒 [AUTH DEBUG] Session retrieved:", session ? "YES" : "NO");
-
   if (!session?.user) {
-    if (req) {
-      const cookieHeader = req.headers.get("cookie");
-      console.log("🔒 [AUTH DEBUG] Cookies present in request:", cookieHeader ? "YES (length: " + cookieHeader.length + ")" : "NO");
-      console.log("🔒 [AUTH DEBUG] Host header:", req.headers.get("host"));
-    }
-    console.log("🔒 [AUTH DEBUG] No user in session");
+    console.log("🔒 [AUTH DEBUG] No session found");
     return null;
   }
 
@@ -283,7 +274,7 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
       });
     }
 
-    return dbUser;
+    return dbUser as any;
   }
 
   // Si non trouvé, on le crée
@@ -336,7 +327,7 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
     } catch (err) { }
   }
 
-  return created;
+  return created as any;
 }
 
 /**
