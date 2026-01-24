@@ -16,9 +16,7 @@ type Availability = {
     startTime: string;
     endTime: string;
     isRecurring: boolean;
-    recurrencePattern: string | null;
-    recurrenceDays: number[];
-    recurrenceEndDate: Date | null;
+    recurrenceGroupId: string | null;
     isBooked: boolean;
     lessons: Array<{
         id: string;
@@ -103,10 +101,25 @@ export default function AvailabilityPage() {
         setSubmitting(false);
     }
 
-    async function handleDelete(slotId: string) {
-        if (!confirm("Êtes-vous sûr de vouloir supprimer ce créneau ?")) return;
+    async function handleDelete(slot: Availability) {
+        let deleteAllInGroup = false;
 
-        const result = await deleteAvailabilitySlot(slotId);
+        if (slot.recurrenceGroupId) {
+            const choice = confirm(
+                "Ce créneau fait partie d'une série récurrente.\n\n" +
+                "Voulez-vous supprimer toute la série (OK) ou juste ce créneau (Annuler) ?"
+            );
+            if (choice) {
+                if (!confirm("Êtes-vous sûr de vouloir supprimer TOUTE la série ?")) return;
+                deleteAllInGroup = true;
+            } else {
+                if (!confirm("Voulez-vous supprimer ce créneau unique ?")) return;
+            }
+        } else {
+            if (!confirm("Êtes-vous sûr de vouloir supprimer ce créneau ?")) return;
+        }
+
+        const result = await deleteAvailabilitySlot(slot.id, deleteAllInGroup);
         if (result.success) {
             loadAvailabilities();
         } else {
@@ -338,32 +351,15 @@ export default function AvailabilityPage() {
                                             </span>
                                         )}
                                     </div>
-                                    {slot.isRecurring ? (
-                                        <p className="text-sm text-slate-600">
-                                            {slot.recurrencePattern === "WEEKLY" && (
-                                                <>
-                                                    Tous les{" "}
-                                                    {slot.recurrenceDays
-                                                        .map((d) => DAYS_OF_WEEK.find((day) => day.value === d)?.label)
-                                                        .join(", ")}
-                                                </>
-                                            )}
-                                            {slot.recurrencePattern === "DAILY" && "Tous les jours"}
-                                            {slot.recurrencePattern === "MONTHLY" && "Tous les mois"}
-                                            {slot.recurrenceEndDate && (
-                                                <> jusqu'au {new Date(slot.recurrenceEndDate).toLocaleDateString()}</>
-                                            )}
-                                        </p>
-                                    ) : (
-                                        <p className="text-sm text-slate-600">
-                                            {slot.date ? new Date(slot.date).toLocaleDateString("fr-FR", {
-                                                weekday: "long",
-                                                year: "numeric",
-                                                month: "long",
-                                                day: "numeric",
-                                            }) : "Date non définie"}
-                                        </p>
-                                    )}
+                                    <p className="text-sm text-slate-600">
+                                        {slot.date ? new Date(slot.date).toLocaleDateString("fr-FR", {
+                                            weekday: "long",
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                        }) : "Date non définie"}
+                                        {slot.isRecurring && " (Série récurrente)"}
+                                    </p>
                                     {slot.lessons.length > 0 && (
                                         <div className="mt-2 text-sm text-slate-600">
                                             Cours réservé par:{" "}
@@ -372,12 +368,16 @@ export default function AvailabilityPage() {
                                     )}
                                 </div>
                                 {!slot.isBooked && (
-                                    <button
-                                        onClick={() => handleDelete(slot.id)}
-                                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </button>
+                                <div className="flex items-center gap-2">
+                                    {!slot.isBooked && (
+                                        <button
+                                            onClick={() => handleDelete(slot)}
+                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
+                                    )}
+                                </div>
                                 )}
                             </div>
                         </div>

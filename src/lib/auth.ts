@@ -113,6 +113,7 @@ import type { NextRequest } from "next/server";
 
 // Ajout de providedSession pour l'injection depuis afterCallback
 export async function getOrCreateUser(req?: NextRequest, providedSession?: any) {
+  console.log("🔒 [AUTH DEBUG] getOrCreateUser called");
   let session;
 
   if (providedSession) {
@@ -125,8 +126,10 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
     session = await auth0.getSession();
   }
 
-  if (!session?.user) {
+  console.log("🔒 [AUTH DEBUG] Session retrieved:", session ? "YES" : "NO");
 
+  if (!session?.user) {
+    console.log("🔒 [AUTH DEBUG] No user in session");
     return null;
   }
 

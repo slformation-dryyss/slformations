@@ -25,18 +25,7 @@ export async function getAvailableSlots(courseType: string = "PERMIS_B") {
         where: {
             instructorId: assignment.instructorId,
             isBooked: false,
-            OR: [
-                // Créneaux ponctuels futurs
-                {
-                    isRecurring: false,
-                    date: { gte: new Date() },
-                },
-                // Créneaux récurrents actifs
-                {
-                    isRecurring: true,
-                    recurrenceEndDate: { gte: new Date() },
-                },
-            ],
+            date: { gte: new Date() },
         },
         orderBy: [{ date: "asc" }, { startTime: "asc" }],
     });

@@ -582,9 +582,7 @@ model InstructorAvailability {
   startTime         String
   endTime           String
   isRecurring       Boolean           @default(false)
-  recurrencePattern String?
-  recurrenceDays    Int[]             @default([])
-  recurrenceEndDate DateTime?
+  recurrenceGroupId String?
   isBooked          Boolean           @default(false)
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt

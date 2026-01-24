@@ -9,6 +9,7 @@ import {
     type RecurrencePattern,
 } from "@/lib/lessons/recurrence";
 import { notifyLessonConfirmed, notifyLessonCancelled } from "@/lib/lessons/notifications";
+import { randomUUID } from "crypto";
 
 /**
  * Créer un créneau de disponibilité (ponctuel ou récurrent)
@@ -60,21 +61,33 @@ export async function createAvailabilitySlot(formData: {
                 return { success: false, error: validation.error };
             }
 
-            // Créer le créneau récurrent
-            const slot = await prisma.instructorAvailability.create({
-                data: {
-                    instructorId: instructorProfile.id,
-                    startTime: formData.startTime,
-                    endTime: formData.endTime,
-                    isRecurring: true,
-                    recurrencePattern: formData.recurrencePattern,
-                    recurrenceDays: formData.recurrenceDays || [],
-                    recurrenceEndDate: new Date(formData.recurrenceEndDate),
-                },
-            });
+            const dates = generateRecurringDates(
+                new Date(),
+                formData.recurrencePattern,
+                new Date(formData.recurrenceEndDate),
+                formData.recurrenceDays
+            );
+
+            const recurrenceGroupId = randomUUID();
+
+            // Créer les créneaux individuels en une transaction
+            await prisma.$transaction(
+                dates.map((date) =>
+                    prisma.instructorAvailability.create({
+                        data: {
+                            instructorId: instructorProfile.id,
+                            date,
+                            startTime: formData.startTime,
+                            endTime: formData.endTime,
+                            isRecurring: true,
+                            recurrenceGroupId,
+                        },
+                    })
+                )
+            );
 
             revalidatePath("/dashboard/instructor/availability");
-            return { success: true, data: slot };
+            return { success: true };
         } else {
             // Créneau ponctuel
             if (!formData.date) {
@@ -115,19 +128,14 @@ export async function createAvailabilitySlot(formData: {
 export async function getMyAvailabilities() {
     const user = await requireUser();
 
-    if (!hasRole(user, "INSTRUCTOR")) {
-        return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
-    }
-
     try {
         const instructorProfile = await prisma.instructorProfile.findUnique({
             where: { userId: user.id },
             include: {
                 availabilities: {
                     orderBy: [
-                        { isRecurring: "desc" }, // Recurring first
-                        { date: "asc" },         // Then by date for one-time slots
-                        { startTime: "asc" }     // Then by start time
+                        { date: "asc" },
+                        { startTime: "asc" }
                     ],
                     include: {
                         lessons: {
@@ -158,7 +166,7 @@ export async function getMyAvailabilities() {
 /**
  * Supprimer un créneau de disponibilité
  */
-export async function deleteAvailabilitySlot(slotId: string) {
+export async function deleteAvailabilitySlot(slotId: string, deleteAllInGroup: boolean = false) {
     const user = await requireUser();
 
     if (!hasRole(user, "INSTRUCTOR")) {
@@ -187,19 +195,23 @@ export async function deleteAvailabilitySlot(slotId: string) {
             return { success: false, error: "Créneau introuvable" };
         }
 
-        // Vérifier qu'il n'y a pas de cours réservés
-        if (slot.lessons.length > 0) {
-            return {
-                success: false,
-                error: "Impossible de supprimer un créneau avec des cours réservés",
-            };
+        if (deleteAllInGroup && slot.recurrenceGroupId) {
+            // Supprimer tous les futurs créneaux du groupe qui ne sont pas réservés
+            await prisma.instructorAvailability.deleteMany({
+                where: {
+                    recurrenceGroupId: slot.recurrenceGroupId,
+                    instructor: { userId: user.id },
+                    isBooked: false,
+                    date: { gte: slot.date || new Date() }
+                }
+            });
+        } else {
+            await prisma.instructorAvailability.delete({
+                where: { id: slotId },
+            });
         }
 
-        await prisma.instructorAvailability.delete({
-            where: { id: slotId },
-        });
-
-        revalidatePath("/instructor/availability");
+        revalidatePath("/dashboard/instructor/availability");
         return { success: true };
     } catch (error: any) {
         console.error("Error deleting availability slot:", error);
@@ -309,7 +321,7 @@ export async function confirmLesson(lessonId: string) {
             });
         }
 
-        revalidatePath("/instructor/lessons");
+        revalidatePath("/dashboard/instructor/lessons");
         return { success: true, data: updated };
     } catch (error: any) {
         console.error("Error confirming lesson:", error);
@@ -386,7 +398,7 @@ export async function rejectLesson(lessonId: string, reason?: string) {
             });
         }
 
-        revalidatePath("/instructor/lessons");
+        revalidatePath("/dashboard/instructor/lessons");
         return { success: true, data: updated };
     } catch (error: any) {
         console.error("Error rejecting lesson:", error);
