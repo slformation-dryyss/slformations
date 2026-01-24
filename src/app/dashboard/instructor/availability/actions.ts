@@ -23,25 +23,33 @@ export async function createAvailabilitySlot(formData: {
     recurrenceDays?: number[];
     recurrenceEndDate?: string; // ISO date
 }) {
-    const user = await requireUser();
-
-    // Vérifier que l'utilisateur est instructeur
-    if (!hasRole(user, "INSTRUCTOR")) {
-        return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
-    }
-
-    // Récupérer le profil instructeur
-    const instructorProfile = await prisma.instructorProfile.findUnique({
-        where: { userId: user.id },
-    });
-
-    if (!instructorProfile) {
-        return { success: false, error: "Profil instructeur introuvable" };
-    }
-
+    console.log("🚀 [CREATE_SLOT] Action started", { isRecurring: formData.isRecurring });
+    
     try {
+        const user = await requireUser();
+        console.log("👤 [CREATE_SLOT] User authenticated", user.id);
+
+        // Vérifier que l'utilisateur est instructeur
+        if (!hasRole(user, "INSTRUCTOR")) {
+            console.warn("🚫 [CREATE_SLOT] User is not an instructor");
+            return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
+        }
+
+        // Récupérer le profil instructeur
+        const instructorProfile = await prisma.instructorProfile.findUnique({
+            where: { userId: user.id },
+        });
+
+        if (!instructorProfile) {
+            console.warn("🚫 [CREATE_SLOT] Instructor profile not found for user", user.id);
+            return { success: false, error: "Profil instructeur introuvable" };
+        }
+
+        console.log("📋 [CREATE_SLOT] Instructor profile found", instructorProfile.id);
+
         // Si récurrent, valider et générer les dates
         if (formData.isRecurring) {
+            console.log("🔄 [CREATE_SLOT] Handling recurring slot");
             if (!formData.recurrencePattern || !formData.recurrenceEndDate) {
                 return {
                     success: false,
@@ -58,6 +66,7 @@ export async function createAvailabilitySlot(formData: {
             });
 
             if (!validation.valid) {
+                console.warn("⚠️ [CREATE_SLOT] Validation failed", validation.error);
                 return { success: false, error: validation.error };
             }
 
@@ -67,8 +76,15 @@ export async function createAvailabilitySlot(formData: {
                 new Date(formData.recurrenceEndDate),
                 formData.recurrenceDays
             );
+            
+            console.log(`📅 [CREATE_SLOT] Generated ${dates.length} dates`);
+
+            if (dates.length === 0) {
+                return { success: false, error: "Aucune date générée pour cette récurrence" };
+            }
 
             const recurrenceGroupId = randomUUID();
+            console.log("🆔 [CREATE_SLOT] Group ID created", recurrenceGroupId);
 
             // Créer les créneaux individuels en une transaction
             await prisma.$transaction(
@@ -86,10 +102,12 @@ export async function createAvailabilitySlot(formData: {
                 )
             );
 
+            console.log("✅ [CREATE_SLOT] All slots created successfully (recurring)");
             revalidatePath("/dashboard/instructor/availability");
             return { success: true };
         } else {
             // Créneau ponctuel
+            console.log("📅 [CREATE_SLOT] Handling one-time slot");
             if (!formData.date) {
                 return { success: false, error: "Date requise pour un créneau ponctuel" };
             }
@@ -99,6 +117,7 @@ export async function createAvailabilitySlot(formData: {
                 return { success: false, error: "Format de date invalide" };
             }
 
+            console.log("💾 [CREATE_SLOT] Creating one-time slot in DB...");
             const slot = await prisma.instructorAvailability.create({
                 data: {
                     instructorId: instructorProfile.id,
@@ -109,15 +128,21 @@ export async function createAvailabilitySlot(formData: {
                 },
             });
 
+            console.log("✅ [CREATE_SLOT] One-time slot created", slot.id);
             revalidatePath("/dashboard/instructor/availability");
             return { success: true, data: slot };
         }
     } catch (error: any) {
-        console.error("Error creating availability slot:", error);
+        // Important for Next.js: Don't catch redirect errors
+        if (error.digest?.includes("NEXT_REDIRECT")) {
+            throw error;
+        }
+
+        console.error("❌ [CREATE_SLOT] Critical error:", error);
         return {
             success: false,
             error: `Erreur lors de la création : ${error.message || "Erreur inconnue"}`,
-            _debug: { message: error.message, code: error.code }
+            _debug: { message: error.message, stack: error.stack }
         };
     }
 }
