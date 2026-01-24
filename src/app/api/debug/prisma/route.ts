@@ -9,11 +9,13 @@ export async function GET(request: Request) {
         const userCount = await prisma.user.count();
         const courseCount = await prisma.course.count();
 
-        let instructorCount = 0;
-        try { instructorCount = await prisma.instructorProfile.count(); } catch (e) { }
-
-        let teacherCount = 0;
-        try { teacherCount = await prisma.teacherProfile.count(); } catch (e) { }
+        // Comprehensive table check
+        const tableCheck = await prisma.$queryRaw<any[]>`
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public'
+        `;
+        const existingTables = tableCheck.map(t => t.table_name);
 
         let userResult = null;
         try {
@@ -34,13 +36,9 @@ export async function GET(request: Request) {
             counts: {
                 users: userCount,
                 courses: courseCount,
-                instructors: instructorCount,
-                teachers: teacherCount,
+                tables: existingTables.length,
             },
-            tables: {
-                instructorProfile: instructorCount >= 0,
-                teacherProfile: teacherCount >= 0,
-            },
+            existing_tables: existingTables,
             currentUserTest: userResult ? {
                 id: (userResult as any).id,
                 email: (userResult as any).email,
