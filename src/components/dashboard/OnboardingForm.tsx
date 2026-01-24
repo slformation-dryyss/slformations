@@ -57,12 +57,15 @@ export function OnboardingForm({ userPromise }: { userPromise?: Promise<any> }) 
         }),
       });
 
-      if (!res.ok) throw new Error("Erreur lors de la sauvegarde");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Erreur lors de la sauvegarde");
+      }
 
       router.push("/dashboard");
       router.refresh();
-    } catch (err) {
-      setError("Une erreur est survenue. Veuillez réessayer.");
+    } catch (err: any) {
+      setError(err.message || "Une erreur est survenue. Veuillez réessayer.");
       setIsLoading(false);
     }
   };

@@ -154,6 +154,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // 2. Préparation des données
+    // Validation de la date de naissance
+    if (body.birthDate) {
+      const bDate = new Date(body.birthDate);
+      if (bDate > new Date()) {
+        return NextResponse.json(
+          { error: "La date de naissance ne peut pas être dans le futur." },
+          { status: 400 }
+        );
+      }
+    }
+
     // On marque le profil comme complet si c'est explicitement demandé (Onboarding)
     const isProfileComplete = body.isOnboarding ? true : user.isProfileComplete;
 
@@ -215,9 +226,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(updated);
 
   } catch (error: any) {
-    console.error("[ONBOARDING ERROR]", error);
+    console.error("[PROFILE API ERROR]", error);
     return NextResponse.json(
-      { error: "Erreur serveur" },
+      { error: (error instanceof Error ? error.message : "Une erreur est survenue lors de la sauvegarde") },
       { status: 500 }
     );
   }
