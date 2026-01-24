@@ -73,7 +73,7 @@ export async function createAvailabilitySlot(formData: {
                 },
             });
 
-            revalidatePath("/instructor/availability");
+            revalidatePath("/dashboard/instructor/availability");
             return { success: true, data: slot };
         } else {
             // Créneau ponctuel
@@ -81,22 +81,31 @@ export async function createAvailabilitySlot(formData: {
                 return { success: false, error: "Date requise pour un créneau ponctuel" };
             }
 
+            const slotDate = new Date(formData.date);
+            if (isNaN(slotDate.getTime())) {
+                return { success: false, error: "Format de date invalide" };
+            }
+
             const slot = await prisma.instructorAvailability.create({
                 data: {
                     instructorId: instructorProfile.id,
-                    date: new Date(formData.date),
+                    date: slotDate,
                     startTime: formData.startTime,
                     endTime: formData.endTime,
                     isRecurring: false,
                 },
             });
 
-            revalidatePath("/instructor/availability");
+            revalidatePath("/dashboard/instructor/availability");
             return { success: true, data: slot };
         }
     } catch (error: any) {
         console.error("Error creating availability slot:", error);
-        return { success: false, error: error.message || "Erreur lors de la création du créneau" };
+        return {
+            success: false,
+            error: `Erreur lors de la création : ${error.message || "Erreur inconnue"}`,
+            _debug: { message: error.message, code: error.code }
+        };
     }
 }
 

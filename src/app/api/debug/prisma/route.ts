@@ -9,78 +9,68 @@ export async function GET(request: NextRequest) {
         const userCount = await prisma.user.count();
         const courseCount = await prisma.course.count();
 
-        // Comprehensive table check
+        // 1. Comprehensive table check
         const tableCheck = await prisma.$queryRaw<any[]>`
-            SELECT table_name 
-            FROM information_schema.tables 
-            WHERE table_schema = 'public'
+            SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'
         `;
         const existingTables = tableCheck.map(t => t.table_name);
 
+        // 2. Session Attempt
         let userResult = null;
         try {
             // @ts-ignore
             userResult = await getOrCreateUser(request);
         } catch (e: any) {
-            userResult = { error: e.message, stack: e.stack };
+            userResult = { error: e.message };
         }
 
+        // 3. File System Check (Deep)
         const fs = require('fs');
         const path = require('path');
-        const listDir = (dir: string): any => {
+        const checkPath = (p: string) => {
             try {
-                if (!fs.existsSync(dir)) return `Not found: ${dir}`;
-                return {
-                    path: dir,
-                    contents: fs.readdirSync(dir)
-                };
-            } catch (e: any) { return e.message; }
+                if (!fs.existsSync(p)) return `Missing: ${p}`;
+                const stats = fs.statSync(p);
+                if (stats.isDirectory()) return { type: "dir", contents: fs.readdirSync(p) };
+                return { type: "file", size: stats.size };
+            } catch (e: any) { return `Error: ${e.message}`; }
         };
 
-        const headers: Record<string, string> = {};
-        request.headers.forEach((val, key) => {
-            headers[key] = key.toLowerCase().includes('cookie') || key.toLowerCase().includes('auth') ? '***' : val;
-        });
+        const root = process.cwd();
+        // Trace the teacher dashboard files in the standalone build
+        const teacherPath = path.join(root, ".next/server/app/dashboard/teacher");
 
-        // Try to find app directory in standalone build structure
-        const possibleAppDirs = [
-            path.join(process.cwd(), '.next/server/app/dashboard/teacher'),
-            path.join(process.cwd(), 'server/app/dashboard/teacher'),
-            path.join(process.cwd(), 'src/app/dashboard/teacher'),
-        ];
+        // 4. Headers & Cookies
+        const allCookies = request.cookies.getAll().map(c => ({ name: c.name, value: "***" }));
 
         return NextResponse.json({
             status: "success",
             timestamp: new Date().toISOString(),
-            database: "reachable",
+            env: {
+                AUTH0_BASE_URL: process.env.AUTH0_BASE_URL ? "Set (Check domain match)" : "NOT SET",
+                NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || "NOT SET",
+                AUTH0_ISSUER_BASE_URL: process.env.AUTH0_ISSUER_BASE_URL ? "Set" : "NOT SET",
+            },
             request: {
+                host: request.headers.get("host"),
+                proto: request.headers.get("x-forwarded-proto"),
                 url: request.url,
-                method: request.method,
-                headers,
-                has_auth_cookie: request.cookies.has('appSession') || Array.from(request.cookies.getAll()).some(c => c.name.includes('auth')),
-                cookies_list: request.cookies.getAll().map(c => c.name),
+                cookies: allCookies,
             },
             file_system: {
-                cwd: process.cwd(),
-                possible_teacher_dirs: possibleAppDirs.map(d => ({ dir: d, result: listDir(d) })),
+                cwd: root,
+                teacher_dir: checkPath(teacherPath),
+                teacher_courses: checkPath(path.join(teacherPath, "courses")),
+                teacher_courses_page: checkPath(path.join(teacherPath, "courses/page.js")),
             },
-            counts: {
+            database: {
                 users: userCount,
-                courses: courseCount,
-                tables: existingTables.length,
-            },
-            column_checks: {
-                user_columns: (await prisma.$queryRaw<any[]>`SELECT column_name FROM information_schema.columns WHERE table_name = 'User'`).map(c => c.column_name),
-                instructor_columns: (await prisma.$queryRaw<any[]>`SELECT column_name FROM information_schema.columns WHERE table_name = 'InstructorProfile'`).map(c => c.column_name),
-                availability_columns: (await prisma.$queryRaw<any[]>`SELECT column_name FROM information_schema.columns WHERE table_name = 'InstructorAvailability'`).map(c => c.column_name),
+                tables_count: existingTables.length,
             },
             currentUserSession: userResult,
             users_summary: await prisma.$queryRaw`SELECT id, email, role, roles, "primaryRole" FROM "User" LIMIT 5`,
         });
     } catch (error: any) {
-        return NextResponse.json({
-            status: "error",
-            message: error.message,
-        }, { status: 500 });
+        return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
     }
 }
