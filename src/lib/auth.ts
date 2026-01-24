@@ -119,16 +119,24 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
   if (providedSession) {
     session = providedSession;
   } else if (req) {
-    // Dans les Route Handlers (API), il faut passer req/res pour que getSession fonctionne avec Next 15+
+    // Try both with and without request to see which one works in this environment
     session = await auth0.getSession(req);
+    if (!session) {
+      console.log("🔒 [AUTH DEBUG] getSession(req) failed, trying getSession()...");
+      session = await auth0.getSession();
+    }
   } else {
-    // Dans les Server Components, getSession() fonctionne implicitement
     session = await auth0.getSession();
   }
 
   console.log("🔒 [AUTH DEBUG] Session retrieved:", session ? "YES" : "NO");
 
   if (!session?.user) {
+    if (req) {
+      const cookieHeader = req.headers.get("cookie");
+      console.log("🔒 [AUTH DEBUG] Cookies present in request:", cookieHeader ? "YES (length: " + cookieHeader.length + ")" : "NO");
+      console.log("🔒 [AUTH DEBUG] Host header:", req.headers.get("host"));
+    }
     console.log("🔒 [AUTH DEBUG] No user in session");
     return null;
   }
