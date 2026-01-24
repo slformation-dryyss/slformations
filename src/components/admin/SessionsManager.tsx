@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useTransition } from "react";
 import { LayoutList, Calendar as CalendarIcon, MapPin, Users, Calendar, Plus, Trash2, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -53,8 +55,8 @@ export function SessionsManager({ sessions }: { sessions: Session[] }) {
           <button
             onClick={() => setViewMode("list")}
             className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${viewMode === "list"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-500 hover:text-slate-700"
               }`}
           >
             <LayoutList className="w-4 h-4" />
@@ -63,8 +65,8 @@ export function SessionsManager({ sessions }: { sessions: Session[] }) {
           <button
             onClick={() => setViewMode("calendar")}
             className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${viewMode === "calendar"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-500 hover:text-slate-700"
               }`}
           >
             <CalendarIcon className="w-4 h-4" />
@@ -127,8 +129,8 @@ export function SessionsManager({ sessions }: { sessions: Session[] }) {
                     <div className="flex items-center gap-6 md:w-auto border-t md:border-t-0 pt-3 md:pt-0 border-slate-100 pr-12">
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${session.isPublished
-                            ? "bg-green-50 text-green-700 border-green-200"
-                            : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                          ? "bg-green-50 text-green-700 border-green-200"
+                          : "bg-yellow-50 text-yellow-700 border-yellow-200"
                           }`}>
                           {session.isPublished ? "Publié" : "Brouillon"}
                         </span>
