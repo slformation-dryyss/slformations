@@ -9,6 +9,12 @@ export async function GET(request: Request) {
         const userCount = await prisma.user.count();
         const courseCount = await prisma.course.count();
 
+        let instructorCount = 0;
+        try { instructorCount = await prisma.instructorProfile.count(); } catch (e) { }
+
+        let teacherCount = 0;
+        try { teacherCount = await prisma.teacherProfile.count(); } catch (e) { }
+
         let userResult = null;
         try {
             // @ts-ignore
@@ -28,6 +34,12 @@ export async function GET(request: Request) {
             counts: {
                 users: userCount,
                 courses: courseCount,
+                instructors: instructorCount,
+                teachers: teacherCount,
+            },
+            tables: {
+                instructorProfile: instructorCount >= 0,
+                teacherProfile: teacherCount >= 0,
             },
             currentUserTest: userResult ? {
                 id: (userResult as any).id,
