@@ -85,23 +85,19 @@ export async function createAvailabilitySlot(formData: {
             const recurrenceGroupId = Date.now().toString(36) + Math.random().toString(36).substring(2);
             console.log("🆔 [CREATE_SLOT] Group ID created", recurrenceGroupId);
 
-            // Créer les créneaux individuels en une transaction
-            await prisma.$transaction(
-                dates.map((date) =>
-                    prisma.instructorAvailability.create({
-                        data: {
-                            instructorId: instructorProfile.id,
-                            date,
-                            startTime: formData.startTime,
-                            endTime: formData.endTime,
-                            isRecurring: true,
-                            recurrenceGroupId,
-                        } as any,
-                    })
-                )
-            );
+            // Créer les créneaux en rafale (plus performant que $transaction avec des crée individuels)
+            await (prisma.instructorAvailability as any).createMany({
+                data: dates.map((date) => ({
+                    instructorId: instructorProfile.id,
+                    date,
+                    startTime: formData.startTime,
+                    endTime: formData.endTime,
+                    isRecurring: true,
+                    recurrenceGroupId: recurrenceGroupId,
+                })),
+            });
 
-            console.log("✅ [CREATE_SLOT] All slots created successfully (recurring)");
+            console.log("✅ [CREATE_SLOT] All slots created successfully (recurring batch)");
             revalidatePath("/dashboard/instructor/availability");
             return { success: true };
         } else {

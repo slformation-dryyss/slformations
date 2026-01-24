@@ -118,17 +118,22 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
   if (providedSession) {
     session = providedSession;
   } else {
-    // Dans Next.js 15+, getSession() sans arguments utilise les headers de la requête courante
-    // Cela fonctionne à la fois dans les Server Actions et les Route Handlers
     try {
-      session = await auth0.getSession();
+      // In Next.js 15+, for Route Handlers, getSession(req) is often required.
+      // For Server Actions, getSession() is usually enough.
+      session = req ? await auth0.getSession(req) : await auth0.getSession();
+      
+      if (!session) {
+        console.log("🔒 [AUTH] getSession primary failed, trying fallback...");
+        session = await auth0.getSession();
+      }
     } catch (e) {
-      console.error("🔒 [AUTH DEBUG] getSession() error:", e);
+      console.error("🔒 [AUTH] getSession() exception:", e);
     }
   }
 
   if (!session?.user) {
-    console.log("🔒 [AUTH DEBUG] No session found");
+    console.log("🔒 [AUTH] No session user found in any context.");
     return null;
   }
 
