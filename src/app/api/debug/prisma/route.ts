@@ -39,6 +39,7 @@ export async function GET(request: Request) {
                 tables: existingTables.length,
             },
             existing_tables: existingTables,
+            users_summary: await prisma.$queryRaw`SELECT id, email, role, roles, "primaryRole" FROM "User" LIMIT 10`,
             currentUserTest: userResult ? {
                 id: (userResult as any).id,
                 email: (userResult as any).email,
