@@ -28,9 +28,7 @@ export async function createCheckoutSession(user: User, courseId: string, sessio
 
   const session = await (stripe.checkout.sessions.create as any)({
     mode: "payment",
-    automatic_payment_methods: {
-      enabled: true,
-    },
+    payment_method_types: ["card"],
     customer: user.stripeCustomerId || undefined,
     customer_email: user.stripeCustomerId ? undefined : user.email || undefined,
     line_items: [
