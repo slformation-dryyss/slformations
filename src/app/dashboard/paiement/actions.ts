@@ -1,3 +1,5 @@
+"use server";
+
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createCheckoutSession } from "@/lib/checkout-store";
