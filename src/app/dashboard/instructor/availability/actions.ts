@@ -21,6 +21,7 @@ export async function createAvailabilitySlot(formData: {
     recurrencePattern?: RecurrencePattern;
     recurrenceDays?: number[];
     recurrenceEndDate?: string; // ISO date
+    licenseTypes?: string[];
 }) {
     console.log("🚀 [CREATE_SLOT] Action started", { isRecurring: formData.isRecurring });
 
@@ -98,6 +99,7 @@ export async function createAvailabilitySlot(formData: {
                     endTime: formData.endTime,
                     isRecurring: true,
                     recurrenceGroupId: recurrenceGroupId,
+                    licenseTypes: formData.licenseTypes || ["B"],
                 })),
             });
 
@@ -124,6 +126,7 @@ export async function createAvailabilitySlot(formData: {
                     startTime: formData.startTime,
                     endTime: formData.endTime,
                     isRecurring: false,
+                    licenseTypes: formData.licenseTypes || ["B"],
                 },
             });
 

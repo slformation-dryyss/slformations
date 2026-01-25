@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   CalendarDays,
   Euro,
@@ -13,6 +14,7 @@ import {
 import Image from "next/image";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 type PaymentLink = {
   id: string;
@@ -41,6 +43,28 @@ type Props = {
 
 export default function PaiementContent({ paymentLinks, drivingPacks = [] }: Props) {
   const { user } = useUser();
+  const [selectedLicense, setSelectedLicense] = useState<string | null>(null);
+
+  // Define license types for filtering
+  const licenseTypes = [
+    { id: "B", label: "Permis B", icon: "🚗", description: "Voiture classique" },
+    { id: "VTC", label: "Permis VTC", icon: "🎩", description: "Transport de personnes" },
+    { id: "MOTO", label: "Permis Moto", icon: "🏍️", description: "Deux roues" },
+    { id: "P_POINTS", label: "Récup. Points", icon: "📈", description: "Stage de sensibilisation" },
+  ];
+
+  // Filter packs based on selected license
+  const filteredPacks = selectedLicense
+    ? drivingPacks.filter(p => {
+      // Simple heuristic: check if license ID is in title or type (this can be refined)
+      const content = (p.title + " " + p.description).toUpperCase();
+      if (selectedLicense === "B") return content.includes("PERMIS B") || content.includes("VOITURE");
+      if (selectedLicense === "VTC") return content.includes("VTC");
+      if (selectedLicense === "MOTO") return content.includes("MOTO");
+      if (selectedLicense === "P_POINTS") return content.includes("POINTS");
+      return true;
+    })
+    : [];
 
   return (
     <>
@@ -149,47 +173,104 @@ export default function PaiementContent({ paymentLinks, drivingPacks = [] }: Pro
               </div>
             )}
 
-            {/* Driving Packs Section */}
-            {drivingPacks.length > 0 && (
-              <div className="mb-12">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-900">Nos forfaits de conduite</h2>
-                    <p className="text-sm text-slate-500">Créditez votre compte pour réserver vos cours</p>
+            {/* Multi-step Driving Packs Section */}
+            <div className="mb-12 bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+              <div className="bg-slate-900 p-8 text-white">
+                <h2 className="text-2xl font-black mb-2 flex items-center gap-3">
+                  <CreditCardIcon className="text-gold-500" />
+                  Prêt à commencer ?
+                </h2>
+                <p className="text-slate-400">Choisissez votre formation et créditez vos heures de conduite en quelques clics.</p>
+              </div>
+
+              <div className="p-8">
+                {/* Step 1: License Selection */}
+                <div className="mb-10">
+                  <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+                    <span className="w-6 h-6 bg-gold-500 text-slate-900 rounded-full flex items-center justify-center text-[10px]">1</span>
+                    QUELLE FORMATION PRÉPAREZ-VOUS ?
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {licenseTypes.map((type) => (
+                      <button
+                        key={type.id}
+                        onClick={() => setSelectedLicense(type.id)}
+                        className={cn(
+                          "relative p-6 rounded-2xl border-2 transition-all text-left group",
+                          selectedLicense === type.id
+                            ? "border-gold-500 bg-gold-50 ring-4 ring-gold-100 shadow-lg"
+                            : "border-slate-100 bg-slate-50 hover:border-gold-300 hover:bg-white"
+                        )}
+                      >
+                        <span className="text-4xl mb-4 block group-hover:scale-110 transition-transform">{type.icon}</span>
+                        <div className="font-black text-slate-900 text-lg leading-tight">{type.label}</div>
+                        <div className="text-xs text-slate-500 mt-1">{type.description}</div>
+                        {selectedLicense === type.id && (
+                          <div className="absolute top-4 right-4 bg-gold-500 text-white rounded-full p-1 shadow-md">
+                            <CheckCircle2 className="w-4 h-4" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {drivingPacks.map((pack) => (
-                    <div key={pack.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-all group">
-                      <div className="relative h-40 w-full">
-                        <Image
-                          src={pack.imageUrl || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80"}
-                          alt={pack.title}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute top-3 right-3 bg-gold-500 text-slate-900 px-3 py-1 rounded-full text-xs font-black shadow-lg">
-                          {pack.drivingHours}H INCLUSES
-                        </div>
+
+                {/* Step 2: Pack Selection (Conditionnel) */}
+                {selectedLicense && (
+                  <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+                      <span className="w-6 h-6 bg-gold-500 text-slate-900 rounded-full flex items-center justify-center text-[10px]">2</span>
+                      SÉLECTIONNEZ VOTRE FORFAIT
+                    </h3>
+
+                    {filteredPacks.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filteredPacks.map((pack) => (
+                          <div key={pack.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-all group">
+                            <div className="relative h-40 w-full">
+                              <Image
+                                src={pack.imageUrl || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80"}
+                                alt={pack.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute top-3 right-3 bg-gold-500 text-slate-900 px-3 py-1 rounded-full text-xs font-black shadow-lg">
+                                {pack.drivingHours}H INCLUSES
+                              </div>
+                            </div>
+                            <div className="p-5 flex-1 flex flex-col">
+                              <h3 className="font-bold text-lg text-slate-900 mb-2 truncate">{pack.title}</h3>
+                              <p className="text-sm text-slate-500 mb-6 line-clamp-2">{pack.description}</p>
+                              <div className="mt-auto flex items-center justify-between border-t pt-4">
+                                <div className="text-2xl font-black text-slate-900 tracking-tight">{pack.price}€</div>
+                                <Link
+                                  href={`/formations/${pack.slug}`}
+                                  className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-black hover:bg-gold-500 hover:text-slate-900 transition-all active:scale-95"
+                                >
+                                  VOIR & ACHETER
+                                </Link>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <div className="p-5 flex-1 flex flex-col">
-                        <h3 className="font-bold text-lg text-slate-900 mb-2 truncate">{pack.title}</h3>
-                        <p className="text-sm text-slate-500 mb-6 line-clamp-2">{pack.description}</p>
-                        <div className="mt-auto flex items-center justify-between">
-                          <div className="text-2xl font-black text-slate-900">{pack.price}€</div>
-                          <Link
-                            href={`/formations/${pack.slug}`}
-                            className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-gold-500 hover:text-slate-900 transition-colors"
-                          >
-                            Détails & Achat
-                          </Link>
-                        </div>
+                    ) : (
+                      <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center">
+                        <div className="text-slate-300 text-5xl mb-4">🔍</div>
+                        <p className="text-slate-500 font-bold">Aucun forfait n'est actuellement disponible pour ce type de permis.</p>
+                        <p className="text-slate-400 text-sm mt-2">Veuillez contacter l'administration pour plus d'informations.</p>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    )}
+                  </div>
+                )}
+
+                {!selectedLicense && (
+                  <div className="bg-slate-50 rounded-2xl p-12 text-center border-2 border-dashed border-slate-200">
+                    <p className="text-slate-400 italic">Veuillez sélectionner un type de permis ci-dessus pour voir les forfaits adaptés.</p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
             <div className="mb-8">
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
                 <div className="flex items-center justify-between mb-6">

@@ -586,6 +586,7 @@ model InstructorAvailability {
   isRecurring       Boolean           @default(false)
   recurrenceGroupId String?
   isBooked          Boolean           @default(false)
+  licenseTypes      String[]          @default(["B"])
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   lessons           DrivingLesson[]

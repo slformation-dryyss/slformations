@@ -54,6 +54,7 @@ export default function AvailabilityPage() {
     const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern>("WEEKLY");
     const [recurrenceDays, setRecurrenceDays] = useState<number[]>([1, 2, 3, 4, 5]); // Lun-Ven par défaut
     const [recurrenceEndDate, setRecurrenceEndDate] = useState("");
+    const [licenseTypes, setLicenseTypes] = useState<string[]>(["B"]);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -90,6 +91,7 @@ export default function AvailabilityPage() {
             recurrencePattern: isRecurring ? recurrencePattern : undefined,
             recurrenceDays: isRecurring ? recurrenceDays : undefined,
             recurrenceEndDate: isRecurring ? recurrenceEndDate : undefined,
+            licenseTypes,
         });
 
         if (result.success) {
@@ -100,6 +102,7 @@ export default function AvailabilityPage() {
             setStartTime("09:00");
             setEndTime("18:00");
             setRecurrenceDays([1, 2, 3, 4, 5]);
+            setLicenseTypes(["B"]);
         } else {
             setError(result.error || "Erreur lors de la création");
         }
@@ -138,6 +141,16 @@ export default function AvailabilityPage() {
             setRecurrenceDays(recurrenceDays.filter((d) => d !== day));
         } else {
             setRecurrenceDays([...recurrenceDays, day].sort());
+        }
+    }
+
+    function toggleLicense(type: string) {
+        if (licenseTypes.includes(type)) {
+            if (licenseTypes.length > 1) {
+                setLicenseTypes(licenseTypes.filter(t => t !== type));
+            }
+        } else {
+            setLicenseTypes([...licenseTypes, type]);
         }
     }
 
@@ -287,6 +300,38 @@ export default function AvailabilityPage() {
                             </div>
                         </div>
 
+                        {/* Types de formation couverts */}
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <label className="block text-sm font-bold text-slate-700 mb-3">
+                                Formations couvertes par ce créneau
+                            </label>
+                            <div className="flex flex-wrap gap-3">
+                                {[
+                                    { id: "B", label: "Permis B" },
+                                    { id: "VTC", label: "VTC" },
+                                    { id: "MOTO", label: "Moto" },
+                                    { id: "P_POINTS", label: "Récup. Points" }
+                                ].map((type) => (
+                                    <button
+                                        key={type.id}
+                                        type="button"
+                                        onClick={() => toggleLicense(type.id)}
+                                        className={cn(
+                                            "px-4 py-2 rounded-full text-sm font-bold border transition-all",
+                                            licenseTypes.includes(type.id)
+                                                ? "bg-gold-500 border-gold-600 text-slate-900 shadow-sm"
+                                                : "bg-white border-slate-200 text-slate-500 hover:border-gold-300"
+                                        )}
+                                    >
+                                        {type.label}
+                                    </button>
+                                ))}
+                            </div>
+                            <p className="text-[10px] text-slate-400 mt-2 italic">
+                                Seuls les élèves inscrits à ces formations verront ce créneau.
+                            </p>
+                        </div>
+
                         {/* Récurrence */}
                         {isRecurring && (
                             <>
@@ -360,89 +405,92 @@ export default function AvailabilityPage() {
                             </button>
                         </div>
                     </form>
-                </div>
-            )}
+                </div >
+            )
+            }
 
             {/* Liste des créneaux */}
-            {loading ? (
-                <div className="text-center py-12">
-                    <RefreshCw className="w-8 h-8 animate-spin text-gold-500 mx-auto mb-4" />
-                    <p className="text-slate-500">Chargement...</p>
-                </div>
-            ) : availabilities.length === 0 ? (
-                <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-                    <Calendar className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">Aucun créneau disponible</h3>
-                    <p className="text-slate-500 mb-6">
-                        Commencez par ajouter vos disponibilités pour que les élèves puissent réserver des cours
-                    </p>
-                </div>
-            ) : viewMode === "calendar" ? (
-                <WeeklyCalendar
-                    availabilities={availabilities}
-                    onDelete={handleDelete}
-                    onConfirmLesson={handleConfirmLesson}
-                    onRejectLesson={handleRejectLesson}
-                />
-            ) : (
-                <div className="space-y-4">
-                    {availabilities.map((slot) => (
-                        <div
-                            key={slot.id}
-                            className={cn(
-                                "bg-white rounded-xl border p-4 transition-colors",
-                                slot.isBooked ? "border-green-200 bg-green-50" : "border-slate-200"
-                            )}
-                        >
-                            <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <Clock className="w-5 h-5 text-slate-400" />
-                                        <span className="font-bold text-slate-900">
-                                            {slot.startTime} - {slot.endTime}
-                                        </span>
-                                        {slot.isRecurring && (
-                                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">
-                                                Récurrent
+            {
+                loading ? (
+                    <div className="text-center py-12">
+                        <RefreshCw className="w-8 h-8 animate-spin text-gold-500 mx-auto mb-4" />
+                        <p className="text-slate-500">Chargement...</p>
+                    </div>
+                ) : availabilities.length === 0 ? (
+                    <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+                        <Calendar className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">Aucun créneau disponible</h3>
+                        <p className="text-slate-500 mb-6">
+                            Commencez par ajouter vos disponibilités pour que les élèves puissent réserver des cours
+                        </p>
+                    </div>
+                ) : viewMode === "calendar" ? (
+                    <WeeklyCalendar
+                        availabilities={availabilities}
+                        onDelete={handleDelete}
+                        onConfirmLesson={handleConfirmLesson}
+                        onRejectLesson={handleRejectLesson}
+                    />
+                ) : (
+                    <div className="space-y-4">
+                        {availabilities.map((slot) => (
+                            <div
+                                key={slot.id}
+                                className={cn(
+                                    "bg-white rounded-xl border p-4 transition-colors",
+                                    slot.isBooked ? "border-green-200 bg-green-50" : "border-slate-200"
+                                )}
+                            >
+                                <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <Clock className="w-5 h-5 text-slate-400" />
+                                            <span className="font-bold text-slate-900">
+                                                {slot.startTime} - {slot.endTime}
                                             </span>
-                                        )}
-                                        {slot.isBooked && (
-                                            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">
-                                                Réservé
-                                            </span>
+                                            {slot.isRecurring && (
+                                                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">
+                                                    Récurrent
+                                                </span>
+                                            )}
+                                            {slot.isBooked && (
+                                                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">
+                                                    Réservé
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-sm text-slate-600">
+                                            {slot.date ? new Date(slot.date).toLocaleDateString("fr-FR", {
+                                                weekday: "long",
+                                                year: "numeric",
+                                                month: "long",
+                                                day: "numeric",
+                                            }) : "Date non définie"}
+                                            {slot.isRecurring && " (Série récurrente)"}
+                                        </p>
+                                        {slot.lessons.length > 0 && (
+                                            <div className="mt-2 text-sm text-slate-600">
+                                                Cours réservé par:{" "}
+                                                {slot.lessons.map((l) => `${l.student.firstName} ${l.student.lastName}`).join(", ")}
+                                            </div>
                                         )}
                                     </div>
-                                    <p className="text-sm text-slate-600">
-                                        {slot.date ? new Date(slot.date).toLocaleDateString("fr-FR", {
-                                            weekday: "long",
-                                            year: "numeric",
-                                            month: "long",
-                                            day: "numeric",
-                                        }) : "Date non définie"}
-                                        {slot.isRecurring && " (Série récurrente)"}
-                                    </p>
-                                    {slot.lessons.length > 0 && (
-                                        <div className="mt-2 text-sm text-slate-600">
-                                            Cours réservé par:{" "}
-                                            {slot.lessons.map((l) => `${l.student.firstName} ${l.student.lastName}`).join(", ")}
+                                    {!slot.isBooked && (
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => handleDelete(slot)}
+                                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                                            >
+                                                <Trash2 className="w-5 h-5" />
+                                            </button>
                                         </div>
                                     )}
                                 </div>
-                                {!slot.isBooked && (
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => handleDelete(slot)}
-                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                                        >
-                                            <Trash2 className="w-5 h-5" />
-                                        </button>
-                                    </div>
-                                )}
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
+                        ))}
+                    </div>
+                )
+            }
+        </div >
     );
 }

@@ -22,11 +22,19 @@ export async function getAvailableSlots(courseType: string = "PERMIS_B") {
     }
 
     // Récupérer les disponibilités de l'instructeur
+    // On filtre par type de permis (ex: "B")
+    // Le type stocké en base est souvent "PERMIS_B" ou "VTC", on adapte pour correspondre au schéma
+    const licenseFilter = courseType.replace("PERMIS_", "");
+
     const availabilities = await prisma.instructorAvailability.findMany({
         where: {
             instructorId: assignment.instructorId,
             isBooked: false,
             date: { gte: new Date() },
+            // Filtrer par licenseTypes (si le champ existe et n'est pas vide)
+            licenseTypes: {
+                has: licenseFilter
+            }
         },
         orderBy: [{ date: "asc" }, { startTime: "asc" }],
     });
@@ -76,6 +84,12 @@ export async function bookLesson(data: {
 
         if (!availability) {
             return { success: false, error: "Créneau introuvable" };
+        }
+
+        // Vérifier la compatibilité du type de permis
+        const licenseFilter = courseType.replace("PERMIS_", "");
+        if (availability.licenseTypes && !availability.licenseTypes.includes(licenseFilter)) {
+            return { success: false, error: `Ce moniteur ne propose pas de cours de type ${licenseFilter} sur ce créneau.` };
         }
 
         if (availability.isBooked) {
