@@ -145,8 +145,11 @@ export async function POST(request: NextRequest) {
     const user = await getOrCreateUser(request);
 
     if (!user) {
+      console.error("[PROFILE_POST] Auth failed. Check session. Request headers:", 
+        JSON.stringify(Object.fromEntries(request.headers.entries()))
+      );
       return NextResponse.json(
-        { error: "Non autorisé" },
+        { error: "Non autorisé (session absente)" },
         { status: 401 }
       );
     }
@@ -193,9 +196,8 @@ export async function POST(request: NextRequest) {
       await prisma.instructorProfile.upsert({
         where: { userId: updated.id },
         update: {
-          city: body.city || "À définir",
-          department: body.postalCode ? body.postalCode.substring(0, 2) : "À définir",
-          postalCode: body.postalCode || null,
+          city: body.city || undefined,
+          postalCode: body.postalCode || undefined,
         },
         create: {
           userId: updated.id,
