@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { getOrCreateUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { canCancelLesson, shouldDeductHour, isSlotAvailable } from "@/lib/lessons/validation";
 import { getStudentInstructor } from "@/lib/lessons/assignment";
@@ -11,7 +11,8 @@ import { notifyLessonBooked, notifyLessonCancelled, notifyChangeRequest } from "
  * Récupérer les créneaux disponibles de l'instructeur attitré
  */
 export async function getAvailableSlots(courseType: string = "PERMIS_B") {
-    const user = await requireUser();
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
     // Récupérer l'instructeur attitré
     const assignment = await getStudentInstructor(user.id, courseType);
@@ -52,7 +53,8 @@ export async function bookLesson(data: {
     notes?: string;
     courseType?: string;
 }) {
-    const user = await requireUser();
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
     const courseType = data.courseType || "PERMIS_B";
 
     try {

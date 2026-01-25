@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireUser, hasRole } from "@/lib/auth";
+import { getOrCreateUser, hasRole } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import {
     generateRecurringDates,
@@ -25,7 +25,11 @@ export async function createAvailabilitySlot(formData: {
     console.log("🚀 [CREATE_SLOT] Action started", { isRecurring: formData.isRecurring });
     
     try {
-        const user = await requireUser();
+        const user = await getOrCreateUser();
+        if (!user) {
+            console.warn("🚫 [CREATE_SLOT] No session found");
+            return { success: false, error: "Votre session a expiré. Merci de vous reconnecter." };
+        }
         console.log("👤 [CREATE_SLOT] User authenticated", user.id);
 
         // Vérifier que l'utilisateur est instructeur
@@ -146,7 +150,8 @@ export async function createAvailabilitySlot(formData: {
  * Récupérer les disponibilités d'un instructeur
  */
 export async function getMyAvailabilities() {
-    const user = await requireUser();
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
     try {
         const instructorProfile = await prisma.instructorProfile.findUnique({
@@ -187,7 +192,8 @@ export async function getMyAvailabilities() {
  * Supprimer un créneau de disponibilité
  */
 export async function deleteAvailabilitySlot(slotId: string, deleteAllInGroup: boolean = false) {
-    const user = await requireUser();
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
     if (!hasRole(user, "INSTRUCTOR")) {
         return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
@@ -215,7 +221,7 @@ export async function deleteAvailabilitySlot(slotId: string, deleteAllInGroup: b
             return { success: false, error: "Créneau introuvable" };
         }
 
-        if (deleteAllInGroup && slot.recurrenceGroupId) {
+        if (deleteAllInGroup && (slot as any).recurrenceGroupId) {
             // Supprimer tous les futurs créneaux du groupe qui ne sont pas réservés
             await prisma.instructorAvailability.deleteMany({
                 where: {
@@ -243,7 +249,8 @@ export async function deleteAvailabilitySlot(slotId: string, deleteAllInGroup: b
  * Récupérer les cours réservés de l'instructeur
  */
 export async function getMyLessons(status?: string) {
-    const user = await requireUser();
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
     if (!hasRole(user, "INSTRUCTOR")) {
         return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
@@ -288,7 +295,8 @@ export async function getMyLessons(status?: string) {
  * Confirmer un cours (côté instructeur)
  */
 export async function confirmLesson(lessonId: string) {
-    const user = await requireUser();
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
     if (!hasRole(user, "INSTRUCTOR")) {
         return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
@@ -353,7 +361,8 @@ export async function confirmLesson(lessonId: string) {
  * Refuser un cours
  */
 export async function rejectLesson(lessonId: string, reason?: string) {
-    const user = await requireUser();
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
     if (!hasRole(user, "INSTRUCTOR")) {
         return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };
@@ -430,7 +439,8 @@ export async function rejectLesson(lessonId: string, reason?: string) {
  * Récupérer les élèves attribués à l'instructeur
  */
 export async function getMyStudents() {
-    const user = await requireUser();
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
     if (!hasRole(user, "INSTRUCTOR")) {
         return { success: false, error: "Accès réservé aux instructeurs (ou administrateurs)" };

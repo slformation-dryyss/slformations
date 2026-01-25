@@ -119,21 +119,41 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
     session = providedSession;
   } else {
     try {
-      // In Next.js 15+, for Route Handlers, getSession(req) is often required.
-      // For Server Actions, getSession() is usually enough.
-      session = req ? await auth0.getSession(req) : await auth0.getSession();
-      
-      if (!session) {
-        console.log("🔒 [AUTH] getSession primary failed, trying fallback...");
+      // In Next.js 15+, try getSession with and without req
+      if (req) {
+        session = await auth0.getSession(req);
+        if (!session) {
+          console.log("🔒 [AUTH] getSession(req) returned null, trying fallback...");
+          session = await auth0.getSession();
+        }
+      } else {
         session = await auth0.getSession();
       }
-    } catch (e) {
-      console.error("🔒 [AUTH] getSession() exception:", e);
+    } catch (e: any) {
+      // Don't log expected dynamic server usage errors during build
+      if (!e.message?.includes("Dynamic server usage")) {
+         console.error("🔒 [AUTH] getSession() exception:", e.message);
+      }
     }
   }
 
   if (!session?.user) {
-    console.log("🔒 [AUTH] No session user found in any context.");
+    // Only log "No session" at runtime, not during static generation
+    if (process.env.NODE_ENV === "production" && !req) {
+       // We can use headers() to see if cookies exist
+       try {
+         const { headers } = await import("next/headers");
+         const h = await headers();
+         const cookie = h.get("cookie");
+         if (cookie) {
+           console.log("🔒 [AUTH] No session found but cookies are present (length: " + cookie.length + ")");
+           const hasAppSession = cookie.includes("appSession");
+           console.log("🔒 [AUTH] Cookie 'appSession' present:", hasAppSession);
+         } else {
+           console.log("🔒 [AUTH] No session and NO cookies found in headers.");
+         }
+       } catch (e) {}
+    }
     return null;
   }
 

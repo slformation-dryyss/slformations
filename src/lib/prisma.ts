@@ -9,7 +9,7 @@ const prismaClientSingleton = () => {
      const separator = url.includes("?") ? "&" : "?";
      datasources = {
        db: {
-         url: `${url}${separator}connection_limit=5`
+         url: `${url}${separator}connection_limit=3`
        }
      };
   }
@@ -27,5 +27,6 @@ const globalForPrisma = globalThis as unknown as {
 
 export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+// ALWAYS save to globalThis in both environments to be absolutely safe against leaks
+globalForPrisma.prisma = prisma;
 
