@@ -23,7 +23,7 @@ export async function createAvailabilitySlot(formData: {
     recurrenceEndDate?: string; // ISO date
 }) {
     console.log("🚀 [CREATE_SLOT] Action started", { isRecurring: formData.isRecurring });
-    
+
     try {
         const user = await getOrCreateUser();
         if (!user) {
@@ -79,7 +79,7 @@ export async function createAvailabilitySlot(formData: {
                 new Date(formData.recurrenceEndDate),
                 formData.recurrenceDays
             );
-            
+
             console.log(`📅 [CREATE_SLOT] Generated ${dates.length} dates`);
 
             if (dates.length === 0) {
@@ -90,7 +90,7 @@ export async function createAvailabilitySlot(formData: {
             console.log("🆔 [CREATE_SLOT] Group ID created", recurrenceGroupId);
 
             // Créer les créneaux en rafale (plus performant que $transaction avec des crée individuels)
-            await (prisma.instructorAvailability as any).createMany({
+            await prisma.instructorAvailability.createMany({
                 data: dates.map((date) => ({
                     instructorId: instructorProfile.id,
                     date,
