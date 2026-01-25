@@ -187,10 +187,15 @@ export default function DrivingLessonsPage() {
                     <div className="flex items-start gap-3">
                         <AlertCircle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-1" />
                         <div>
-                            <h3 className="font-bold text-orange-900 mb-2">Aucun instructeur attitré</h3>
                             <p className="text-orange-700 mb-4">
-                                Vous n'avez pas encore d'instructeur assigné. Veuillez contacter l'administration.
+                                Vous n'avez pas encore d'instructeur assigné. Si vous n'avez pas encore de forfait, vous pouvez en acheter un pour commencer.
                             </p>
+                            <Link
+                                href="/dashboard/paiement"
+                                className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg font-bold hover:bg-orange-700 transition"
+                            >
+                                Acheter des heures / Voir les forfaits
+                            </Link>
                         </div>
                     </div>
                 </div>
