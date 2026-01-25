@@ -37,6 +37,8 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ aut
     switch (slug) {
       case 'callback':
         return client.handleCallback(req);
+      case 'logout':
+        return client.handleLogout(req);
       default:
         return new NextResponse("Method Not Allowed", { status: 405 });
     }

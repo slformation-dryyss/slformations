@@ -9,7 +9,7 @@ const prismaClientSingleton = () => {
      const separator = url.includes("?") ? "&" : "?";
      datasources = {
        db: {
-         url: `${url}${separator}connection_limit=2`
+         url: `${url}${separator}connection_limit=5`
        }
      };
   }
