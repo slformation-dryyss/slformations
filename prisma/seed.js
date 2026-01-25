@@ -139,6 +139,38 @@ async function main() {
       type: 'P_POINTS',
       isPublished: true,
       imageUrl: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2070&auto=format&fit=crop'
+    },
+
+    // --- HEURES À L'UNITÉ ---
+    {
+      title: '1h de conduite (Boîte Manuelle)',
+      slug: '1h-conduite-manuelle',
+      description: "Heure de conduite supplémentaire en boîte manuelle.",
+      price: 50,
+      drivingHours: 1,
+      type: 'PERMIS_B',
+      isPublished: true,
+      imageUrl: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2070&auto=format&fit=crop'
+    },
+    {
+      title: '1h de conduite (Boîte Auto)',
+      slug: '1h-conduite-auto',
+      description: "Heure de conduite supplémentaire en boîte automatique.",
+      price: 40,
+      drivingHours: 1,
+      type: 'PERMIS_B',
+      isPublished: true,
+      imageUrl: 'https://images.unsplash.com/photo-1580273916550-e323be2ed5fa?q=80&w=1964&auto=format&fit=crop'
+    },
+    {
+      title: '1h de conduite (Moto)',
+      slug: '1h-conduite-moto',
+      description: "Heure de conduite moto supplémentaire.",
+      price: 50,
+      drivingHours: 1,
+      type: 'MOTO',
+      isPublished: true,
+      imageUrl: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?q=80&w=2070&auto=format&fit=crop'
     }
   ]
 
