@@ -6,6 +6,8 @@ import {
     createAvailabilitySlot,
     getMyAvailabilities,
     deleteAvailabilitySlot,
+    confirmLesson,
+    rejectLesson,
 } from "./actions";
 import { WeeklyCalendar } from "@/components/dashboard/instructor/WeeklyCalendar";
 import { List, LayoutGrid } from "lucide-react";
@@ -136,6 +138,24 @@ export default function AvailabilityPage() {
             setRecurrenceDays(recurrenceDays.filter((d) => d !== day));
         } else {
             setRecurrenceDays([...recurrenceDays, day].sort());
+        }
+    }
+
+    async function handleConfirmLesson(lessonId: string) {
+        const result = await confirmLesson(lessonId);
+        if (result.success) {
+            loadAvailabilities();
+        } else {
+            alert(result.error);
+        }
+    }
+
+    async function handleRejectLesson(lessonId: string, reason: string) {
+        const result = await rejectLesson(lessonId, reason);
+        if (result.success) {
+            loadAvailabilities();
+        } else {
+            alert(result.error);
         }
     }
 
@@ -361,6 +381,8 @@ export default function AvailabilityPage() {
                 <WeeklyCalendar
                     availabilities={availabilities}
                     onDelete={handleDelete}
+                    onConfirmLesson={handleConfirmLesson}
+                    onRejectLesson={handleRejectLesson}
                 />
             ) : (
                 <div className="space-y-4">
