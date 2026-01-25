@@ -6,12 +6,12 @@ const prismaClientSingleton = () => {
   let datasources = undefined;
 
   if (url && process.env.NODE_ENV === "production" && !url.includes("connection_limit")) {
-     const separator = url.includes("?") ? "&" : "?";
-     datasources = {
-       db: {
-         url: `${url}${separator}connection_limit=3`
-       }
-     };
+    const separator = url.includes("?") ? "&" : "?";
+    datasources = {
+      db: {
+        url: `${url}${separator}connection_limit=2`
+      }
+    };
   }
 
   return new PrismaClient({

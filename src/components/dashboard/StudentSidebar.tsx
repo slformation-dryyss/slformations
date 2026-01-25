@@ -142,7 +142,7 @@ export function StudentSidebar({ role = "STUDENT", roles, socialLinks = {} }: Si
       </div>
 
       <div className="flex-shrink-0 flex border-t border-slate-800 p-4">
-        <Link
+        <a
           href="/api/auth/logout"
           className="flex-shrink-0 w-full group block"
         >
@@ -152,7 +152,7 @@ export function StudentSidebar({ role = "STUDENT", roles, socialLinks = {} }: Si
               <span className="text-sm font-medium">Déconnexion</span>
             </div>
           </div>
-        </Link>
+        </a>
       </div>
     </div>
   );

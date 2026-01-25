@@ -121,9 +121,16 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
     try {
       // In Next.js 15+, try getSession with and without req
       if (req) {
+        console.log("🔒 [AUTH] getSession(req) for path:", req.nextUrl?.pathname);
         session = await auth0.getSession(req);
         if (!session) {
-          console.log("🔒 [AUTH] getSession(req) returned null, trying fallback...");
+          console.log("🔒 [AUTH] getSession(req) returned null. Headers check:");
+          const cookieHeader = req.headers.get("cookie") || "";
+          console.log("🔒 [AUTH] Request Cookies length:", cookieHeader.length);
+          if (cookieHeader.length > 0) {
+            console.log("🔒 [AUTH] Cookies names:", cookieHeader.split(';').map(c => c.split('=')[0].trim()).join(', '));
+          }
+          console.log("🔒 [AUTH] trying fallback to getSession()...");
           session = await auth0.getSession();
         }
       } else {
@@ -132,7 +139,7 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
     } catch (e: any) {
       // Don't log expected dynamic server usage errors during build
       if (!e.message?.includes("Dynamic server usage")) {
-         console.error("🔒 [AUTH] getSession() exception:", e.message);
+        console.error("🔒 [AUTH] getSession() exception:", e.message);
       }
     }
   }
@@ -140,19 +147,19 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
   if (!session?.user) {
     // Only log "No session" at runtime, not during static generation
     if (process.env.NODE_ENV === "production" && !req) {
-       // We can use headers() to see if cookies exist
-       try {
-         const { headers } = await import("next/headers");
-         const h = await headers();
-         const cookie = h.get("cookie");
-         if (cookie) {
-           console.log("🔒 [AUTH] No session found but cookies are present (length: " + cookie.length + ")");
-           const hasAppSession = cookie.includes("appSession");
-           console.log("🔒 [AUTH] Cookie 'appSession' present:", hasAppSession);
-         } else {
-           console.log("🔒 [AUTH] No session and NO cookies found in headers.");
-         }
-       } catch (e) {}
+      // We can use headers() to see if cookies exist
+      try {
+        const { headers } = await import("next/headers");
+        const h = await headers();
+        const cookie = h.get("cookie");
+        if (cookie) {
+          console.log("🔒 [AUTH] No session found but cookies are present (length: " + cookie.length + ")");
+          const hasAppSession = cookie.includes("appSession");
+          console.log("🔒 [AUTH] Cookie 'appSession' present:", hasAppSession);
+        } else {
+          console.log("🔒 [AUTH] No session and NO cookies found in headers.");
+        }
+      } catch (e) { }
     }
     return null;
   }
@@ -301,6 +308,8 @@ export async function getOrCreateUser(req?: NextRequest, providedSession?: any) 
 
     return dbUser as any;
   }
+
+  console.log("🔍 [AUTH] User not found (email: " + auth0User.email + "), creating new...");
 
   // Si non trouvé, on le crée
   let created = await prisma.user.create({
