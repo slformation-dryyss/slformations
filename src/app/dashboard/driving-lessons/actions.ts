@@ -165,7 +165,8 @@ export async function bookLesson(data: {
  * Annuler un cours
  */
 export async function cancelLesson(lessonId: string, reason?: string) {
-    const user = await requireUser();
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
     try {
         const lesson = await prisma.drivingLesson.findFirst({
@@ -257,7 +258,8 @@ export async function cancelLesson(lessonId: string, reason?: string) {
  * Récupérer les cours de l'élève
  */
 export async function getMyLessonsAsStudent(courseType: string = "PERMIS_B") {
-    const user = await requireUser();
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
     const lessons = await prisma.drivingLesson.findMany({
         where: {
@@ -294,7 +296,8 @@ export async function requestInstructorChange(data: {
     requestedInstructorId?: string;
     courseType?: string;
 }) {
-    const user = await requireUser();
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
     try {
         const changeRequest = await prisma.changeRequest.create({
