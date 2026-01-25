@@ -15,6 +15,9 @@ import Image from "next/image";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { createCheckoutAction } from "./actions";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 type PaymentLink = {
   id: string;
@@ -44,13 +47,29 @@ type Props = {
 export default function PaiementContent({ paymentLinks, drivingPacks = [] }: Props) {
   const { user } = useUser();
   const [selectedLicense, setSelectedLicense] = useState<string | null>(null);
+  const [buyingId, setBuyingId] = useState<string | null>(null);
+
+  async function handleBuy(courseId: string) {
+    setBuyingId(courseId);
+    try {
+      const result = await createCheckoutAction(courseId);
+      if (result.success && result.url) {
+        window.location.href = result.url;
+      } else {
+        toast.error(result.error || "Une erreur est survenue");
+        setBuyingId(null);
+      }
+    } catch (e) {
+      toast.error("Erreur de connexion");
+      setBuyingId(null);
+    }
+  }
 
   // Define license types for filtering
   const licenseTypes = [
     { id: "B", label: "Permis B", icon: "🚗", description: "Voiture classique" },
     { id: "VTC", label: "Permis VTC", icon: "🎩", description: "Transport de personnes" },
     { id: "MOTO", label: "Permis Moto", icon: "🏍️", description: "Deux roues" },
-    { id: "P_POINTS", label: "Récup. Points", icon: "📈", description: "Stage de sensibilisation" },
   ];
 
   // Filter packs based on selected license
@@ -243,12 +262,14 @@ export default function PaiementContent({ paymentLinks, drivingPacks = [] }: Pro
                               <p className="text-sm text-slate-500 mb-6 line-clamp-2">{pack.description}</p>
                               <div className="mt-auto flex items-center justify-between border-t pt-4">
                                 <div className="text-2xl font-black text-slate-900 tracking-tight">{pack.price}€</div>
-                                <Link
-                                  href={`/formations/${pack.slug}`}
-                                  className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-black hover:bg-gold-500 hover:text-slate-900 transition-all active:scale-95"
+                                <button
+                                  onClick={() => handleBuy(pack.id)}
+                                  disabled={buyingId === pack.id}
+                                  className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-black hover:bg-gold-500 hover:text-slate-900 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 >
-                                  VOIR & ACHETER
-                                </Link>
+                                  {buyingId === pack.id && <Loader2 className="w-4 h-4 animate-spin" />}
+                                  {buyingId === pack.id ? "REDIRECTION..." : "ACHETER"}
+                                </button>
                               </div>
                             </div>
                           </div>
