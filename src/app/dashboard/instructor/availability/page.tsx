@@ -7,12 +7,15 @@ import {
     getMyAvailabilities,
     deleteAvailabilitySlot,
 } from "./actions";
+import { WeeklyCalendar } from "@/components/dashboard/instructor/WeeklyCalendar";
+import { List, LayoutGrid } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type RecurrencePattern = "DAILY" | "WEEKLY" | "MONTHLY";
 
 type Availability = {
     id: string;
-    date: Date | null;
+    date: Date | string | null;
     startTime: string;
     endTime: string;
     isRecurring: boolean;
@@ -39,6 +42,7 @@ export default function AvailabilityPage() {
     const [availabilities, setAvailabilities] = useState<Availability[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [viewMode, setViewMode] = useState<"list" | "calendar">("calendar");
 
     // Form state
     const [isRecurring, setIsRecurring] = useState(false);
@@ -144,13 +148,41 @@ export default function AvailabilityPage() {
                         Gérez vos créneaux disponibles pour les cours de conduite
                     </p>
                 </div>
-                <button
-                    onClick={() => setShowForm(!showForm)}
-                    className="flex items-center gap-2 px-4 py-2 bg-gold-500 text-slate-900 rounded-lg font-semibold hover:bg-gold-600 transition"
-                >
-                    <Plus className="w-5 h-5" />
-                    Ajouter un créneau
-                </button>
+                <div className="flex items-center gap-3">
+                    <div className="flex bg-slate-100 p-1 rounded-lg">
+                        <button
+                            onClick={() => setViewMode("calendar")}
+                            className={cn(
+                                "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition",
+                                viewMode === "calendar"
+                                    ? "bg-white text-slate-900 shadow-sm"
+                                    : "text-slate-500 hover:text-slate-700"
+                            )}
+                        >
+                            <LayoutGrid className="w-4 h-4" />
+                            Planning
+                        </button>
+                        <button
+                            onClick={() => setViewMode("list")}
+                            className={cn(
+                                "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition",
+                                viewMode === "list"
+                                    ? "bg-white text-slate-900 shadow-sm"
+                                    : "text-slate-500 hover:text-slate-700"
+                            )}
+                        >
+                            <List className="w-4 h-4" />
+                            Liste
+                        </button>
+                    </div>
+                    <button
+                        onClick={() => setShowForm(!showForm)}
+                        className="flex items-center gap-2 px-4 py-2 bg-gold-500 text-slate-900 rounded-lg font-semibold hover:bg-gold-600 transition"
+                    >
+                        <Plus className="w-5 h-5" />
+                        Ajouter un créneau
+                    </button>
+                </div>
             </div>
 
             {error && !showForm && (
@@ -325,13 +357,20 @@ export default function AvailabilityPage() {
                         Commencez par ajouter vos disponibilités pour que les élèves puissent réserver des cours
                     </p>
                 </div>
+            ) : viewMode === "calendar" ? (
+                <WeeklyCalendar
+                    availabilities={availabilities}
+                    onDelete={handleDelete}
+                />
             ) : (
                 <div className="space-y-4">
                     {availabilities.map((slot) => (
                         <div
                             key={slot.id}
-                            className={`bg-white rounded-xl border p-4 ${slot.isBooked ? "border-green-200 bg-green-50" : "border-slate-200"
-                                }`}
+                            className={cn(
+                                "bg-white rounded-xl border p-4 transition-colors",
+                                slot.isBooked ? "border-green-200 bg-green-50" : "border-slate-200"
+                            )}
                         >
                             <div className="flex items-start justify-between">
                                 <div className="flex-1">
@@ -368,16 +407,14 @@ export default function AvailabilityPage() {
                                     )}
                                 </div>
                                 {!slot.isBooked && (
-                                <div className="flex items-center gap-2">
-                                    {!slot.isBooked && (
+                                    <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => handleDelete(slot)}
                                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
                                         >
                                             <Trash2 className="w-5 h-5" />
                                         </button>
-                                    )}
-                                </div>
+                                    </div>
                                 )}
                             </div>
                         </div>
