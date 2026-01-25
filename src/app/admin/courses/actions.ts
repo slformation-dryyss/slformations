@@ -25,6 +25,7 @@ export async function createCourseAction(formData: FormData) {
   const description = formData.get("description") as string;
   const price = parseFloat(formData.get("price") as string);
   const type = formData.get("type") as string;
+  const drivingHours = parseInt(formData.get("drivingHours") as string) || 0;
 
   if (!title || !description || isNaN(price)) {
     throw new Error("Missing required fields");
@@ -43,6 +44,7 @@ export async function createCourseAction(formData: FormData) {
       type: type || "AUTRE",
       isPublished: false, // Default draft
       imageUrl: imageUrl || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80", // Better placeholder
+      drivingHours,
     },
   });
 
@@ -64,12 +66,13 @@ export async function updateCourseAction(formData: FormData) {
     if (!imageUrl || imageUrl.trim() === "") imageUrl = null;
     let maxStudents = parseInt(formData.get("maxStudents") as string);
     if (isNaN(maxStudents)) maxStudents = 0;
+    const drivingHours = parseInt(formData.get("drivingHours") as string) || 0;
 
     if (!courseId) throw new Error("Course ID is missing");
 
     await prisma.course.update({
       where: { id: courseId },
-      data: { title, description, price, type, isPublished, imageUrl, maxStudents },
+      data: { title, description, price, type, isPublished, imageUrl, maxStudents, drivingHours },
     });
 
     revalidatePath(`/admin/courses/${courseId}`);

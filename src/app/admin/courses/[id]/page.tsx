@@ -311,6 +311,12 @@ export default async function CMSCoursePage({
                             </div>
 
                             <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Nombre d'heures de conduite (si applicable)</label>
+                                <input type="number" name="drivingHours" defaultValue={course.drivingHours || 0} className="w-full text-sm border-slate-300 rounded p-2 border" placeholder="Ex: 20 pour un pack permis B" />
+                                <p className="text-[10px] text-slate-400 mt-1 italic">Crédit automatique au solde de l'élève après paiement.</p>
+                            </div>
+
+                            <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Limite de Participants (0 = illimité)</label>
                                 <input type="number" name="maxStudents" defaultValue={course.maxStudents || 0} className="w-full text-sm border-slate-300 rounded p-2 border" />
                             </div>

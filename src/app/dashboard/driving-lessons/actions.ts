@@ -108,6 +108,22 @@ export async function bookLesson(data: {
             return { success: false, error: slotCheck.reason };
         }
 
+        // --- NOUVEAU: Vérifier le solde d'heures ---
+        const userWithBalance = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { drivingBalance: true }
+        });
+
+        if (!userWithBalance || userWithBalance.drivingBalance < data.duration) {
+            const missingMin = data.duration - (userWithBalance?.drivingBalance || 0);
+            const missingHours = Math.ceil(missingMin / 60);
+            return {
+                success: false,
+                error: `Solde insuffisant. Il vous manque ${missingHours}h pour réserver ce créneau.`,
+                code: "INSUFFICIENT_BALANCE"
+            };
+        }
+
         // Créer la réservation
         const lesson = await prisma.drivingLesson.create({
             data: {
@@ -124,6 +140,12 @@ export async function bookLesson(data: {
                 status: "PENDING",
                 studentConfirmed: true, // L'élève confirme en réservant
             },
+        });
+
+        // Débiter le solde
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { drivingBalance: { decrement: data.duration } }
         });
 
         // Marquer le créneau comme réservé
@@ -208,6 +230,14 @@ export async function cancelLesson(lessonId: string, reason?: string) {
                 isDeducted: shouldDeduct,
             },
         });
+
+        // --- NOUVEAU: Recréditer le solde si annulation valide ---
+        if (!shouldDeduct) {
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { drivingBalance: { increment: lesson.duration } }
+            });
+        }
 
         // Libérer le créneau si applicable
         if (lesson.availabilityId) {
@@ -332,4 +362,25 @@ export async function requestInstructorChange(data: {
         console.error("Error requesting instructor change:", error);
         return { success: false, error: error.message || "Erreur lors de la demande" };
     }
+}
+
+/**
+ * Récupérer le solde de l'élève
+ */
+export async function getMyDrivingBalance() {
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
+
+    const dbUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { drivingBalance: true }
+    });
+
+    return {
+        success: true,
+        data: {
+            minutes: dbUser?.drivingBalance || 0,
+            hours: (dbUser?.drivingBalance || 0) / 60
+        }
+    };
 }

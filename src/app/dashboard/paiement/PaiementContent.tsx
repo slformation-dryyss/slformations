@@ -28,9 +28,18 @@ type PaymentLink = {
 
 type Props = {
   paymentLinks: PaymentLink[];
+  drivingPacks?: {
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    drivingHours: number;
+    imageUrl: string | null;
+    slug: string;
+  }[];
 };
 
-export default function PaiementContent({ paymentLinks }: Props) {
+export default function PaiementContent({ paymentLinks, drivingPacks = [] }: Props) {
   const { user } = useUser();
 
   return (
@@ -140,7 +149,47 @@ export default function PaiementContent({ paymentLinks }: Props) {
               </div>
             )}
 
-            {/* Résumé financier + moyens de paiement */}
+            {/* Driving Packs Section */}
+            {drivingPacks.length > 0 && (
+              <div className="mb-12">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900">Nos forfaits de conduite</h2>
+                    <p className="text-sm text-slate-500">Créditez votre compte pour réserver vos cours</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {drivingPacks.map((pack) => (
+                    <div key={pack.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-all group">
+                      <div className="relative h-40 w-full">
+                        <Image
+                          src={pack.imageUrl || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80"}
+                          alt={pack.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-3 right-3 bg-gold-500 text-slate-900 px-3 py-1 rounded-full text-xs font-black shadow-lg">
+                          {pack.drivingHours}H INCLUSES
+                        </div>
+                      </div>
+                      <div className="p-5 flex-1 flex flex-col">
+                        <h3 className="font-bold text-lg text-slate-900 mb-2 truncate">{pack.title}</h3>
+                        <p className="text-sm text-slate-500 mb-6 line-clamp-2">{pack.description}</p>
+                        <div className="mt-auto flex items-center justify-between">
+                          <div className="text-2xl font-black text-slate-900">{pack.price}€</div>
+                          <Link
+                            href={`/formations/${pack.slug}`}
+                            className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-gold-500 hover:text-slate-900 transition-colors"
+                          >
+                            Détails & Achat
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="mb-8">
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
                 <div className="flex items-center justify-between mb-6">

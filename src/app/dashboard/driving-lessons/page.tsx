@@ -14,12 +14,14 @@ import {
     XCircle,
     RefreshCw,
 } from "lucide-react";
+import Link from "next/link";
 import {
     getAvailableSlots,
     bookLesson,
     cancelLesson,
     getMyLessonsAsStudent,
     requestInstructorChange,
+    getMyDrivingBalance,
 } from "./actions";
 
 type Instructor = {
@@ -77,6 +79,7 @@ export default function DrivingLessonsPage() {
     const [duration, setDuration] = useState<1 | 2>(1);
     const [meetingPoint, setMeetingPoint] = useState("");
     const [notes, setNotes] = useState("");
+    const [balance, setBalance] = useState<{ minutes: number; hours: number } | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -98,6 +101,12 @@ export default function DrivingLessonsPage() {
         const lessonsResult = await getMyLessonsAsStudent();
         if (lessonsResult.success && lessonsResult.data) {
             setLessons(lessonsResult.data as any);
+        }
+
+        // Charger le solde
+        const balanceResult = await getMyDrivingBalance();
+        if (balanceResult.success && balanceResult.data) {
+            setBalance(balanceResult.data as any);
         }
 
         setLoading(false);
@@ -187,6 +196,42 @@ export default function DrivingLessonsPage() {
                 </div>
             ) : (
                 <>
+                    {/* Solde d'heures */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex items-center justify-between col-span-1 md:col-span-2">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                                    <Clock className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-slate-500">Votre solde de conduite</p>
+                                    <div className="flex items-baseline gap-2">
+                                        <h2 className="text-3xl font-black text-slate-900">{balance?.hours || 0}h</h2>
+                                        {balance && balance.minutes % 60 !== 0 && (
+                                            <span className="text-sm text-slate-500 font-medium">({balance.minutes % 60}min)</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            <Link
+                                href="/dashboard/paiement"
+                                className="px-4 py-2 bg-gold-500 text-slate-900 rounded-lg font-bold hover:bg-gold-600 transition shadow-sm"
+                            >
+                                Acheter des heures
+                            </Link>
+                        </div>
+
+                        <div className="bg-gold-50 border border-gold-100 rounded-xl p-6 shadow-sm flex flex-col justify-center">
+                            <div className="flex items-center gap-2 text-gold-700 mb-1">
+                                <AlertCircle className="w-4 h-4" />
+                                <span className="text-xs font-bold uppercase tracking-wider">Note</span>
+                            </div>
+                            <p className="text-sm text-gold-800 leading-relaxed font-medium">
+                                Une heure de conduite correspond à 60 minutes créditées sur votre solde.
+                            </p>
+                        </div>
+                    </div>
+
                     {/* Carte Instructeur */}
                     <div className="bg-white rounded-xl border border-slate-200 p-6 mb-8 shadow-sm">
                         <div className="flex items-start gap-4">
@@ -404,8 +449,8 @@ export default function DrivingLessonsPage() {
                                     <div
                                         key={lesson.id}
                                         className={`border rounded-lg p-4 ${lesson.status === "CONFIRMED"
-                                                ? "border-green-200 bg-green-50"
-                                                : "border-orange-200 bg-orange-50"
+                                            ? "border-green-200 bg-green-50"
+                                            : "border-orange-200 bg-orange-50"
                                             }`}
                                     >
                                         <div className="flex items-start justify-between">
@@ -469,8 +514,8 @@ export default function DrivingLessonsPage() {
                                             </span>
                                             <span
                                                 className={`px-2 py-1 rounded text-xs font-bold ${lesson.status === "COMPLETED"
-                                                        ? "bg-blue-100 text-blue-700"
-                                                        : "bg-red-100 text-red-700"
+                                                    ? "bg-blue-100 text-blue-700"
+                                                    : "bg-red-100 text-red-700"
                                                     }`}
                                             >
                                                 {lesson.status === "COMPLETED" ? "Terminé" : "Annulé"}

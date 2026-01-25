@@ -25,7 +25,7 @@ async function getCourses(params: { q?: string; type?: string; sort?: string }) 
   }
 
   const where: any = {};
-  
+
   if (q) {
     where.OR = [
       { title: { contains: q, mode: "insensitive" } },
@@ -41,9 +41,9 @@ async function getCourses(params: { q?: string; type?: string; sort?: string }) 
     where,
     orderBy,
     include: {
-        _count: {
-            select: { modules: true, enrollments: true }
-        }
+      _count: {
+        select: { modules: true, enrollments: true }
+      }
     }
   });
 }
@@ -102,29 +102,33 @@ export default async function AdminCoursesPage({
                             <p className="text-lg font-medium text-slate-900 truncate mr-4">
                               {course.title}
                             </p>
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              course.isPublished ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                            }`}>
+                            {course.drivingHours > 0 && (
+                              <span className="mr-2 px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                                {course.drivingHours}h conduite
+                              </span>
+                            )}
+                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${course.isPublished ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                              }`}>
                               {course.isPublished ? "Publié" : "Brouillon"}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                              <Link
-                                  href={`/admin/courses/${course.id}`} // Edit CMS
-                                  className="p-2 text-slate-400 hover:text-gold-600 transition-colors"
-                                  title="Éditer le contenu"
-                              >
-                                  <Edit className="w-5 h-5" />
-                              </Link>
-                               <Link
-                                  href={`/formations/${course.slug}`} // Public View
-                                  target="_blank"
-                                  className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
-                                  title="Voir la page publique"
-                              >
-                                  <Eye className="w-5 h-5" />
-                              </Link>
-                              <DeleteCourseButton courseId={course.id} courseName={course.title} />
+                            <Link
+                              href={`/admin/courses/${course.id}`} // Edit CMS
+                              className="p-2 text-slate-400 hover:text-gold-600 transition-colors"
+                              title="Éditer le contenu"
+                            >
+                              <Edit className="w-5 h-5" />
+                            </Link>
+                            <Link
+                              href={`/formations/${course.slug}`} // Public View
+                              target="_blank"
+                              className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
+                              title="Voir la page publique"
+                            >
+                              <Eye className="w-5 h-5" />
+                            </Link>
+                            <DeleteCourseButton courseId={course.id} courseName={course.title} />
                           </div>
                         </div>
                         <div className="mt-2 sm:flex sm:justify-between">
@@ -132,7 +136,7 @@ export default async function AdminCoursesPage({
                             <p className="flex items-center text-sm text-slate-500">
                               {course.price > 0 ? `${course.price} €` : "Gratuit / Sur devis"}
                             </p>
-                             <p className="mt-2 flex items-center text-sm text-slate-500 sm:mt-0 sm:ml-6">
+                            <p className="mt-2 flex items-center text-sm text-slate-500 sm:mt-0 sm:ml-6">
                               {course._count.modules} Modules • {course._count.enrollments} Inscrits
                             </p>
                           </div>

@@ -66,6 +66,7 @@ model User {
   teachingSlots          SessionSlot[]
   teacherProfile         TeacherProfile?
   documents              UserDocument[]
+  drivingBalance         Int                    @default(0)
 }
 
 model TeacherProfile {
@@ -103,6 +104,7 @@ model Course {
   paymentLinks   PaymentLink[]
   quizzes        Quiz[]
   sessions       Session[]
+  drivingHours   Int?               @default(0)
 
   @@index([type])
   @@index([isPublished, type])

@@ -8,7 +8,7 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 if (!stripeSecretKey || !webhookSecret) {
-   
+
   console.warn("[Stripe] STRIPE_SECRET_KEY ou STRIPE_WEBHOOK_SECRET manquant.");
 }
 
@@ -105,13 +105,13 @@ export async function POST(request: Request) {
                 status: "BOOKED",
               }
             });
-            
+
             // Incrémenter les places réservées
             await prisma.courseSession.update({
               where: { id: sessionId },
               data: { bookedSpots: { increment: 1 } }
             });
-            
+
             console.log(`[Stripe Webhook] Réservation automatique effectuée pour Session=${sessionId}`);
           } catch (e) {
             console.error(`[Stripe Webhook] Erreur lors de la réservation automatique de la session ${sessionId}:`, e);
@@ -123,6 +123,36 @@ export async function POST(request: Request) {
           where: { stripeSessionId: session.id },
           data: { status: "PAID" }
         });
+
+        // --- NOUVEAU: Créditer les heures de conduite ---
+        try {
+          const course = await prisma.course.findUnique({
+            where: { id: courseId },
+            select: { drivingHours: true }
+          });
+
+          // 1. Si achat via forfait (Course avec drivingHours)
+          if (course?.drivingHours && course.drivingHours > 0) {
+            const minutesToCredit = course.drivingHours * 60;
+            await prisma.user.update({
+              where: { id: userId },
+              data: { drivingBalance: { increment: minutesToCredit } }
+            });
+            console.log(`[Stripe Webhook] ${minutesToCredit} min créditées à l'utilisateur ${userId} (via forfait)`);
+          }
+
+          // 2. Si achat à l'unité (via métadonnées spécifiques)
+          if (metadata.productType === "DRIVING_HOURS" && metadata.hoursCount) {
+            const minutesToCredit = parseInt(metadata.hoursCount) * 60;
+            await prisma.user.update({
+              where: { id: userId },
+              data: { drivingBalance: { increment: minutesToCredit } }
+            });
+            console.log(`[Stripe Webhook] ${minutesToCredit} min créditées à l'utilisateur ${userId} (via achat unité)`);
+          }
+        } catch (creditError) {
+          console.error("[Stripe Webhook] Erreur lors du crédit des heures:", creditError);
+        }
 
         // --- NOUVEAU: Envoyer un email de confirmation à l'élève ---
         try {
