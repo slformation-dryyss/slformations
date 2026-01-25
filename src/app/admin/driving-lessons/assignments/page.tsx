@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/auth";
 import { getAllAssignments, getInstructors, searchStudents } from "../actions";
 import { Users, UserPlus, Trash2, Mail, Car, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { AssignmentManager } from "@/components/admin/driving-lessons/AssignmentManager";
 
 export default async function AdminAssignmentsPage() {
     await requireAdmin();
@@ -68,23 +69,9 @@ export default async function AdminAssignmentsPage() {
                     </div>
                 </div>
 
-                {/* Sidebar pour nouvelle attribution Rapide (Statique pour l'instant) */}
+                {/* Sidebar pour nouvelle attribution Rapide */}
                 <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                        <div className="flex items-center gap-2 mb-4">
-                            <UserPlus className="w-5 h-5 text-gold-500" />
-                            <h2 className="font-bold text-slate-900">Nouvelle Attribution</h2>
-                        </div>
-                        <p className="text-sm text-slate-500 mb-6">
-                            Pour attribuer un moniteur, utilisez le moteur de recherche global ou allez dans le profil de l'élève.
-                        </p>
-                        <Link
-                            href="/admin/users"
-                            className="block w-full bg-slate-900 text-white text-center py-2.5 rounded-lg font-bold hover:bg-slate-800 transition"
-                        >
-                            Chercher un élève
-                        </Link>
-                    </div>
+                    <AssignmentManager instructors={instructors as any} />
 
                     <div className="bg-gold-50 p-6 rounded-xl border border-gold-100">
                         <h3 className="font-bold text-gold-900 mb-2">Note</h3>
