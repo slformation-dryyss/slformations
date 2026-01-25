@@ -36,6 +36,13 @@ try {
                     stdio: 'inherit',
                     env: { ...process.env, DATABASE_URL: limitedDbUrl }
                 });
+
+                console.log('🌱 Seeding database...');
+                execSync('npx prisma db seed', {
+                    stdio: 'inherit',
+                    env: { ...process.env, DATABASE_URL: limitedDbUrl }
+                });
+
                 success = true;
             } catch (err) {
                 console.error(`⚠️ Migration failed on attempt ${attempt}:`, err.message);
