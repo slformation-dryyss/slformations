@@ -42,9 +42,22 @@ type Props = {
     imageUrl: string | null;
     slug: string;
   }[];
+  drivingBalance?: number;
+  totalPaid?: number;
+  totalPending?: number;
+  totalHoursPurchased?: number;
+  orders?: any[];
 };
 
-export default function PaiementContent({ paymentLinks, drivingPacks = [] }: Props) {
+export default function PaiementContent({ 
+  paymentLinks, 
+  drivingPacks = [],
+  drivingBalance = 0,
+  totalPaid = 0,
+  totalPending = 0,
+  totalHoursPurchased = 0,
+  orders = []
+}: Props) {
   const { user } = useUser();
   const [selectedLicense, setSelectedLicense] = useState<string | null>(null);
   const [buyingId, setBuyingId] = useState<string | null>(null);
@@ -369,14 +382,14 @@ export default function PaiementContent({ paymentLinks, drivingPacks = [] }: Pro
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 text-sm">
                   <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
                     <div className="flex items-center space-x-2 mb-2 text-slate-500">
                       <Euro className="w-4 h-4 text-green-600" />
                       <span>Total payé</span>
                     </div>
                     <div className="text-2xl font-bold text-green-600">
-                      0€
+                      {totalPaid}€
                     </div>
                   </div>
 
@@ -386,19 +399,30 @@ export default function PaiementContent({ paymentLinks, drivingPacks = [] }: Pro
                       <span>En attente</span>
                     </div>
                     <div className="text-2xl font-bold text-orange-500">
-                      0€
+                      {totalPending}€
                     </div>
                   </div>
 
                   <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
                     <div className="flex items-center space-x-2 mb-2 text-slate-500">
-                      <CalendarDays className="w-4 h-4 text-slate-400" />
-                      <span>Prochain paiement</span>
+                      <Clock className="w-4 h-4 text-blue-500" />
+                      <span>Heures achetées</span>
                     </div>
-                    <div className="text-lg font-bold text-slate-400">
-                      Aucun
+                    <div className="text-2xl font-bold text-blue-500">
+                      {totalHoursPurchased}h
                     </div>
-                    <div className="text-xs text-slate-400">Pas de paiement prévu</div>
+                    <div className="text-xs text-slate-400">Total cumulé acheté</div>
+                  </div>
+
+                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div className="flex items-center space-x-2 mb-2 text-slate-500">
+                      <Clock className="w-4 h-4 text-gold-500" />
+                      <span>Solde actuel</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gold-500">
+                      {Math.floor(drivingBalance / 60)}h{drivingBalance % 60 > 0 ? ` ${drivingBalance % 60}m` : ""}
+                    </div>
+                    <div className="text-xs text-slate-400">Heures restantes à réserver</div>
                   </div>
                 </div>
               </div>
@@ -437,11 +461,40 @@ export default function PaiementContent({ paymentLinks, drivingPacks = [] }: Pro
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    <tr>
-                      <td colSpan={6} className="p-8 text-center text-slate-400 italic">
-                        Aucun historique de paiement disponible.
-                      </td>
-                    </tr>
+                    {orders.length > 0 ? (
+                      orders.map((order) => (
+                        <tr key={order.id}>
+                          <td className="p-4 text-slate-600">
+                            {new Date(order.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="p-4 font-bold text-slate-900">
+                            {order.course?.title || (order.items && order.items[0]?.course?.title) || "Achat divers"}
+                          </td>
+                          <td className="p-4 font-black">
+                            {order.amount}€
+                          </td>
+                          <td className="p-4">
+                            <span className="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-full uppercase">
+                              Payé
+                            </span>
+                          </td>
+                          <td className="p-4 text-slate-500">
+                            <CreditCardIcon className="w-4 h-4" />
+                          </td>
+                          <td className="p-4 text-center">
+                            <button className="text-gold-600 hover:text-gold-700">
+                              <Download className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="p-8 text-center text-slate-400 italic">
+                          Aucun historique de paiement disponible.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

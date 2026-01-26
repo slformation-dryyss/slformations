@@ -40,5 +40,50 @@ export default async function DashboardPaiementPage() {
         }
     });
 
-    return <PaiementContent paymentLinks={paymentLinks} drivingPacks={drivingPacks as any} />;
+    // Fetch user driving balance
+    const dbUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { drivingBalance: true }
+    });
+
+    // Fetch successful orders (purchases)
+    const orders = await prisma.order.findMany({
+        where: {
+            userId: user.id,
+            status: "COMPLETED"
+        },
+        include: {
+            course: true,
+            items: {
+                include: {
+                    course: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: "desc"
+        }
+    });
+
+    // Calculate total paid
+    const totalPaid = orders.reduce((acc, order) => acc + order.amount, 0);
+
+    // Calculate total hours ever purchased
+    const totalHoursPurchased = orders.reduce((acc, order) => {
+        const orderHours = order.items.reduce((sum, item) => sum + (item.course?.drivingHours || 0) * item.quantity, 0);
+        return acc + orderHours;
+    }, 0);
+
+    // Calculate pending amount from links
+    const totalPending = paymentLinks.reduce((acc, link) => acc + link.amount, 0);
+
+    return <PaiementContent 
+        paymentLinks={paymentLinks} 
+        drivingPacks={drivingPacks as any} 
+        drivingBalance={dbUser?.drivingBalance || 0}
+        totalPaid={totalPaid}
+        totalPending={totalPending}
+        totalHoursPurchased={totalHoursPurchased}
+        orders={orders as any}
+    />;
 }
