@@ -41,6 +41,7 @@ type Props = {
     drivingHours: number;
     imageUrl: string | null;
     slug: string;
+    type: string;
   }[];
   drivingBalance?: number;
   totalPaid?: number;
@@ -89,12 +90,12 @@ export default function PaiementContent({
   // Filter packs based on selected license
   const filteredPacks = selectedLicense
     ? drivingPacks.filter(p => {
-      // Simple heuristic: check if license ID is in title or type (this can be refined)
-      const content = (p.title + " " + p.description).toUpperCase();
-      if (selectedLicense === "B") return content.includes("PERMIS B") || content.includes("VOITURE");
+      if (p.drivingHours === 1) return false; // Hide hourly products from pack grid
+      
+      const content = (p.title + " " + p.description + " " + p.type).toUpperCase();
+      if (selectedLicense === "B") return content.includes("B") || content.includes("VOITURE");
       if (selectedLicense === "VTC") return content.includes("VTC");
       if (selectedLicense === "MOTO") return content.includes("MOTO");
-      if (selectedLicense === "P_POINTS") return content.includes("POINTS");
       return true;
     })
     : [];
@@ -299,9 +300,11 @@ export default function PaiementContent({
 
                     {/* Section Heures à l'unité */}
                     {selectedLicense && drivingPacks.some(p => p.drivingHours === 1 && (
-                      (selectedLicense === "B" && (p.title.includes("B") || p.title.includes("Manuelle") || p.title.includes("Auto"))) ||
-                      (selectedLicense === "VTC" && p.title.includes("VTC")) ||
-                      (selectedLicense === "MOTO" && p.title.includes("Moto"))
+                      (selectedLicense === "B" && p.type === "PERMIS_B") ||
+                      (selectedLicense === "VTC" && p.type === "VTC") ||
+                      (selectedLicense === "MOTO" && p.type === "MOTO") ||
+                      // Fallback if type is not strictly matched
+                      (selectedLicense === "B" && (p.title.toUpperCase().includes("B") || p.title.toUpperCase().includes("MANUELLE") || p.title.toUpperCase().includes("AUTO")))
                     )) && (
                         <div className="mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
                           <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
@@ -310,9 +313,10 @@ export default function PaiementContent({
                           </h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {drivingPacks.filter(p => p.drivingHours === 1 && (
-                              (selectedLicense === "B" && (p.title.includes("B") || p.title.includes("Manuelle") || p.title.includes("Auto"))) ||
-                              (selectedLicense === "VTC" && p.title.includes("VTC")) ||
-                              (selectedLicense === "MOTO" && p.title.includes("Moto"))
+                              (selectedLicense === "B" && p.type === "PERMIS_B") ||
+                              (selectedLicense === "VTC" && p.type === "VTC") ||
+                              (selectedLicense === "MOTO" && p.type === "MOTO") ||
+                              (selectedLicense === "B" && (p.title.toUpperCase().includes("B") || p.title.toUpperCase().includes("MANUELLE") || p.title.toUpperCase().includes("AUTO")))
                             )).map((pack) => {
                               const qty = hourlyQuantities[pack.id] || 1;
                               return (
