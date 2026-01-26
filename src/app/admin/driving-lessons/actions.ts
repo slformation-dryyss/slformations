@@ -92,7 +92,7 @@ export async function approveChangeRequest(requestId: string, newInstructorId?: 
             request.studentId,
             request.currentInstructorId,
             targetInstructorId,
-            "PERMIS_B", // TODO: récupérer le courseType depuis la demande
+            request.courseType,
             "PREFERENCE_CHANGE"
         );
 
@@ -499,5 +499,27 @@ export async function getInstructorDetails(instructorId: string) {
     } catch (error: any) {
         console.error("Error fetching instructor details:", error);
         return { success: false, error: "Erreur lors de la récupération des détails" };
+    }
+}
+/**
+ * Supprimer (désactiver) une attribution
+ */
+export async function removeAssignment(assignmentId: string) {
+    await requireAdmin();
+
+    try {
+        await prisma.instructorAssignment.update({
+            where: { id: assignmentId },
+            data: {
+                isActive: false,
+                endDate: new Date(),
+            },
+        });
+
+        revalidatePath("/admin/driving-lessons/assignments");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error removing assignment:", error);
+        return { success: false, error: "Erreur lors de la suppression de l'attribution" };
     }
 }

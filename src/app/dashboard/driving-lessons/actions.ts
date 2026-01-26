@@ -338,7 +338,7 @@ export async function requestInstructorChange(data: {
     details?: string;
     preferredGender?: "MALE" | "FEMALE" | "NO_PREFERENCE";
     requestedInstructorId?: string;
-    courseType?: string;
+    courseType: string;
 }) {
     const user = await getOrCreateUser();
     if (!user) return { success: false, error: "AUTH_REQUIRED" };
@@ -349,6 +349,7 @@ export async function requestInstructorChange(data: {
                 studentId: user.id,
                 currentInstructorId: data.currentInstructorId,
                 requestedInstructorId: data.requestedInstructorId,
+                courseType: data.courseType,
                 reason: data.reason,
                 details: data.details,
                 preferredGender: data.preferredGender,

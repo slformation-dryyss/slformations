@@ -22,6 +22,8 @@ export async function createAvailabilitySlot(formData: {
     recurrenceDays?: number[];
     recurrenceEndDate?: string; // ISO date
     licenseTypes?: string[];
+    breakStartTime?: string; // "HH:mm"
+    breakEndTime?: string; // "HH:mm"
 }) {
     console.log("🚀 [CREATE_SLOT] Action started", { isRecurring: formData.isRecurring });
 
@@ -90,20 +92,50 @@ export async function createAvailabilitySlot(formData: {
             const recurrenceGroupId = Date.now().toString(36) + Math.random().toString(36).substring(2);
             console.log("🆔 [CREATE_SLOT] Group ID created", recurrenceGroupId);
 
-            // Créer les créneaux en rafale (plus performant que $transaction avec des crée individuels)
-            await prisma.instructorAvailability.createMany({
-                data: dates.map((date) => ({
-                    instructorId: instructorProfile.id,
-                    date,
-                    startTime: formData.startTime,
-                    endTime: formData.endTime,
-                    isRecurring: true,
-                    recurrenceGroupId: recurrenceGroupId,
-                    licenseTypes: formData.licenseTypes || ["B"],
-                })),
+            // Préparer les données pour createMany
+            const slotsData: any[] = [];
+            
+            dates.forEach((date) => {
+                if (formData.breakStartTime && formData.breakEndTime) {
+                    // Créneau matin
+                    slotsData.push({
+                        instructorId: instructorProfile.id,
+                        date,
+                        startTime: formData.startTime,
+                        endTime: formData.breakStartTime,
+                        isRecurring: true,
+                        recurrenceGroupId: recurrenceGroupId,
+                        licenseTypes: formData.licenseTypes || ["B"],
+                    });
+                    // Créneau après-midi
+                    slotsData.push({
+                        instructorId: instructorProfile.id,
+                        date,
+                        startTime: formData.breakEndTime,
+                        endTime: formData.endTime,
+                        isRecurring: true,
+                        recurrenceGroupId: recurrenceGroupId,
+                        licenseTypes: formData.licenseTypes || ["B"],
+                    });
+                } else {
+                    slotsData.push({
+                        instructorId: instructorProfile.id,
+                        date,
+                        startTime: formData.startTime,
+                        endTime: formData.endTime,
+                        isRecurring: true,
+                        recurrenceGroupId: recurrenceGroupId,
+                        licenseTypes: formData.licenseTypes || ["B"],
+                    });
+                }
             });
 
-            console.log("✅ [CREATE_SLOT] All slots created successfully (recurring batch)");
+            // Créer les créneaux en rafale
+            await prisma.instructorAvailability.createMany({
+                data: slotsData,
+            });
+
+            console.log(`✅ [CREATE_SLOT] ${slotsData.length} slots created successfully (recurring batch)`);
             revalidatePath("/dashboard/instructor/availability");
             return { success: true };
         } else {
@@ -118,21 +150,48 @@ export async function createAvailabilitySlot(formData: {
                 return { success: false, error: "Format de date invalide" };
             }
 
-            console.log("💾 [CREATE_SLOT] Creating one-time slot in DB...");
-            const slot = await prisma.instructorAvailability.create({
-                data: {
-                    instructorId: instructorProfile.id,
-                    date: slotDate,
-                    startTime: formData.startTime,
-                    endTime: formData.endTime,
-                    isRecurring: false,
-                    licenseTypes: formData.licenseTypes || ["B"],
-                },
-            });
+            console.log("💾 [CREATE_SLOT] Creating one-time slot(s) in DB...");
+            
+            let createdData;
+            if (formData.breakStartTime && formData.breakEndTime) {
+                createdData = await prisma.$transaction([
+                    prisma.instructorAvailability.create({
+                        data: {
+                            instructorId: instructorProfile.id,
+                            date: slotDate,
+                            startTime: formData.startTime,
+                            endTime: formData.breakStartTime,
+                            isRecurring: false,
+                            licenseTypes: formData.licenseTypes || ["B"],
+                        },
+                    }),
+                    prisma.instructorAvailability.create({
+                        data: {
+                            instructorId: instructorProfile.id,
+                            date: slotDate,
+                            startTime: formData.breakEndTime,
+                            endTime: formData.endTime,
+                            isRecurring: false,
+                            licenseTypes: formData.licenseTypes || ["B"],
+                        },
+                    }),
+                ]);
+            } else {
+                createdData = await prisma.instructorAvailability.create({
+                    data: {
+                        instructorId: instructorProfile.id,
+                        date: slotDate,
+                        startTime: formData.startTime,
+                        endTime: formData.endTime,
+                        isRecurring: false,
+                        licenseTypes: formData.licenseTypes || ["B"],
+                    },
+                });
+            }
 
-            console.log("✅ [CREATE_SLOT] One-time slot created", slot.id);
+            console.log("✅ [CREATE_SLOT] One-time slot(s) created successfully");
             revalidatePath("/dashboard/instructor/availability");
-            return { success: true, data: slot };
+            return { success: true, data: createdData };
         }
     } catch (error: any) {
         // Important for Next.js: Don't catch redirect errors

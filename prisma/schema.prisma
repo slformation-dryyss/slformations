@@ -661,6 +661,7 @@ model ChangeRequest {
   reason                String
   details               String?
   preferredGender       String?
+  courseType            String             @default("PERMIS_B")
   status                String             @default("PENDING")
   reviewedBy            String?
   reviewedAt            DateTime?

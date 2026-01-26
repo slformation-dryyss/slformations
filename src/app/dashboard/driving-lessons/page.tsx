@@ -284,11 +284,12 @@ export default function DrivingLessonsPage() {
                                 onClick={() => {
                                     const reason = prompt("Raison du changement :");
                                     if (reason) {
-                                        requestInstructorChange({
-                                            currentInstructorId: instructor.id,
-                                            reason: "OTHER",
-                                            details: reason,
-                                        }).then(() => alert("Demande envoyée à l'administration"));
+                                            requestInstructorChange({
+                                                currentInstructorId: instructor.id,
+                                                courseType: "PERMIS_B",
+                                                reason: "OTHER",
+                                                details: reason,
+                                            }).then(() => alert("Demande envoyée à l'administration"));
                                     }
                                 }}
                                 className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition text-sm"

@@ -3,6 +3,7 @@ import { getAllAssignments, getInstructors, searchStudents } from "../actions";
 import { Users, UserPlus, Trash2, Mail, Car, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { AssignmentManager } from "@/components/admin/driving-lessons/AssignmentManager";
+import { DeleteAssignmentButton } from "@/components/admin/driving-lessons/DeleteAssignmentButton";
 
 export default async function AdminAssignmentsPage() {
     await requireAdmin();
@@ -53,9 +54,7 @@ export default async function AdminAssignmentsPage() {
                                             <div className="text-xs font-bold text-slate-400 uppercase">Type</div>
                                             <div className="text-sm font-medium text-slate-700">{assignment.courseType}</div>
                                         </div>
-                                        <button className="p-2 text-slate-400 hover:text-red-600 transition">
-                                            <Trash2 className="w-5 h-5" />
-                                        </button>
+                                        <DeleteAssignmentButton assignmentId={assignment.id} />
                                     </div>
                                 </div>
                             ))}

@@ -55,6 +55,9 @@ export default function AvailabilityPage() {
     const [recurrenceDays, setRecurrenceDays] = useState<number[]>([1, 2, 3, 4, 5]); // Lun-Ven par défaut
     const [recurrenceEndDate, setRecurrenceEndDate] = useState("");
     const [licenseTypes, setLicenseTypes] = useState<string[]>(["B"]);
+    const [hasBreak, setHasBreak] = useState(false);
+    const [breakStartTime, setBreakStartTime] = useState("12:00");
+    const [breakEndTime, setBreakEndTime] = useState("13:00");
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -92,6 +95,8 @@ export default function AvailabilityPage() {
             recurrenceDays: isRecurring ? recurrenceDays : undefined,
             recurrenceEndDate: isRecurring ? recurrenceEndDate : undefined,
             licenseTypes,
+            breakStartTime: hasBreak ? breakStartTime : undefined,
+            breakEndTime: hasBreak ? breakEndTime : undefined,
         });
 
         if (result.success) {
@@ -298,6 +303,48 @@ export default function AvailabilityPage() {
                                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500"
                                 />
                             </div>
+                        </div>
+
+                        {/* Heure de pause */}
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <label className="flex items-center gap-2 cursor-pointer mb-3">
+                                <input
+                                    type="checkbox"
+                                    checked={hasBreak}
+                                    onChange={(e) => setHasBreak(e.target.checked)}
+                                    className="w-4 h-4 rounded text-gold-500 focus:ring-gold-500"
+                                />
+                                <span className="text-sm font-bold text-slate-700">Inclure une pause (déjeuner, etc.)</span>
+                            </label>
+                            
+                            {hasBreak && (
+                                <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-500 mb-1">
+                                            Début de pause
+                                        </label>
+                                        <input
+                                            type="time"
+                                            value={breakStartTime}
+                                            onChange={(e) => setBreakStartTime(e.target.value)}
+                                            required
+                                            className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-500 mb-1">
+                                            Fin de pause
+                                        </label>
+                                        <input
+                                            type="time"
+                                            value={breakEndTime}
+                                            onChange={(e) => setBreakEndTime(e.target.value)}
+                                            required
+                                            className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 text-sm"
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Types de formation couverts */}
