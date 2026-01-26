@@ -28,11 +28,11 @@ export default async function PaiementPage() {
     return { paymentLinks };
 }
 
-export async function createCheckoutAction(courseId: string) {
+export async function createCheckoutAction(courseId: string, quantity: number = 1) {
     const user = await requireUser();
 
     try {
-        const session = await createCheckoutSession(user as any, courseId);
+        const session = await createCheckoutSession(user as any, courseId, quantity);
         return { success: true, url: session.url };
     } catch (error: any) {
         console.error("Stripe Checkout Error:", error);

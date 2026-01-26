@@ -48,11 +48,12 @@ export default function PaiementContent({ paymentLinks, drivingPacks = [] }: Pro
   const { user } = useUser();
   const [selectedLicense, setSelectedLicense] = useState<string | null>(null);
   const [buyingId, setBuyingId] = useState<string | null>(null);
+  const [hourlyQuantities, setHourlyQuantities] = useState<Record<string, number>>({});
 
-  async function handleBuy(courseId: string) {
+  async function handleBuy(courseId: string, quantity: number = 1) {
     setBuyingId(courseId);
     try {
-      const result = await createCheckoutAction(courseId);
+      const result = await createCheckoutAction(courseId, quantity);
       if (result.success && result.url) {
         window.location.href = result.url;
       } else {
@@ -282,6 +283,70 @@ export default function PaiementContent({ paymentLinks, drivingPacks = [] }: Pro
                         <p className="text-slate-400 text-sm mt-2">Veuillez contacter l'administration pour plus d'informations.</p>
                       </div>
                     )}
+
+                    {/* Section Heures à l'unité */}
+                    {selectedLicense && drivingPacks.some(p => p.drivingHours === 1 && (
+                      (selectedLicense === "B" && (p.title.includes("B") || p.title.includes("Manuelle") || p.title.includes("Auto"))) ||
+                      (selectedLicense === "VTC" && p.title.includes("VTC")) ||
+                      (selectedLicense === "MOTO" && p.title.includes("Moto"))
+                    )) && (
+                        <div className="mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                          <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+                            <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-[10px]">3</span>
+                            ACHETER DES HEURES À L'UNITÉ
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {drivingPacks.filter(p => p.drivingHours === 1 && (
+                              (selectedLicense === "B" && (p.title.includes("B") || p.title.includes("Manuelle") || p.title.includes("Auto"))) ||
+                              (selectedLicense === "VTC" && p.title.includes("VTC")) ||
+                              (selectedLicense === "MOTO" && p.title.includes("Moto"))
+                            )).map((pack) => {
+                              const qty = hourlyQuantities[pack.id] || 1;
+                              return (
+                                <div key={pack.id} className="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex items-center justify-between group hover:border-gold-500 transition-all">
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl shadow-sm border border-slate-100">
+                                      {selectedLicense === "B" ? "🚗" : selectedLicense === "VTC" ? "🎩" : "🏍️"}
+                                    </div>
+                                    <div>
+                                      <h4 className="font-bold text-slate-900">{pack.title}</h4>
+                                      <p className="text-xs text-slate-500">{pack.price}€ / heure</p>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center gap-6">
+                                    <div className="flex items-center bg-white rounded-lg border border-slate-200 p-1">
+                                      <button
+                                        onClick={() => setHourlyQuantities(prev => ({ ...prev, [pack.id]: Math.max(1, (prev[pack.id] || 1) - 1) }))}
+                                        className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-slate-100 transition"
+                                      >
+                                        -
+                                      </button>
+                                      <span className="w-8 text-center font-black text-slate-900">{qty}</span>
+                                      <button
+                                        onClick={() => setHourlyQuantities(prev => ({ ...prev, [pack.id]: (prev[pack.id] || 1) + 1 }))}
+                                        className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-slate-100 transition"
+                                      >
+                                        +
+                                      </button>
+                                    </div>
+                                    <div className="text-right min-w-[80px]">
+                                      <div className="text-lg font-black text-slate-900">{pack.price * qty}€</div>
+                                      <button
+                                        onClick={() => handleBuy(pack.id, qty)}
+                                        disabled={buyingId === pack.id}
+                                        className="text-xs font-black text-gold-600 hover:text-gold-700 uppercase tracking-wider"
+                                      >
+                                        {buyingId === pack.id ? "..." : "ACHETER"}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                   </div>
                 )}
 

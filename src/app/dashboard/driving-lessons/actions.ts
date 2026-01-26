@@ -8,33 +8,28 @@ import { getStudentInstructor } from "@/lib/lessons/assignment";
 import { notifyLessonBooked, notifyLessonCancelled, notifyChangeRequest } from "@/lib/lessons/notifications";
 
 /**
- * Récupérer les créneaux disponibles de l'instructeur attitré
+ * Récupérer les créneaux disponibles de l'instructeur attitré (étendu sur 14 jours)
  */
 export async function getAvailableSlots(courseType: string = "PERMIS_B") {
     const user = await getOrCreateUser();
     if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
-    // Récupérer l'instructeur attitré
     const assignment = await getStudentInstructor(user.id, courseType);
+    if (!assignment) return { success: false, error: "Aucun instructeur attitré" };
 
-    if (!assignment) {
-        return { success: false, error: "Aucun instructeur attitré" };
-    }
-
-    // Récupérer les disponibilités de l'instructeur
-    // On filtre par type de permis (ex: "B")
-    // Le type stocké en base est souvent "PERMIS_B" ou "VTC", on adapte pour correspondre au schéma
     const licenseFilter = courseType.replace("PERMIS_", "");
+
+    const startDate = new Date();
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date();
+    endDate.setDate(startDate.getDate() + 14);
 
     const availabilities = await prisma.instructorAvailability.findMany({
         where: {
             instructorId: assignment.instructorId,
             isBooked: false,
-            date: { gte: new Date() },
-            // Filtrer par licenseTypes (si le champ existe et n'est pas vide)
-            licenseTypes: {
-                has: licenseFilter
-            }
+            date: { gte: startDate, lte: endDate },
+            licenseTypes: { has: licenseFilter }
         },
         orderBy: [{ date: "asc" }, { startTime: "asc" }],
     });

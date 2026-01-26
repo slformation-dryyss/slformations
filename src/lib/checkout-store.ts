@@ -12,7 +12,7 @@ const stripe = stripeSecretKey
 /**
  * Prépare et crée une session de paiement Stripe pour une formation donnée.
  */
-export async function createCheckoutSession(user: User, courseId: string, sessionId?: string) {
+export async function createCheckoutSession(user: User, courseId: string, quantity: number = 1, sessionId?: string) {
   if (!stripe) {
     throw new Error("Paiement temporairement indisponible (configuration Stripe manquante).");
   }
@@ -33,7 +33,7 @@ export async function createCheckoutSession(user: User, courseId: string, sessio
     customer_email: user.stripeCustomerId ? undefined : user.email || undefined,
     line_items: [
       {
-        quantity: 1,
+        quantity: quantity,
         price_data: {
           currency: "eur",
           unit_amount: Math.round(course.price * 100),

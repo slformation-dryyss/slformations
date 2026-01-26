@@ -23,6 +23,9 @@ import {
     requestInstructorChange,
     getMyDrivingBalance,
 } from "./actions";
+import { Modal } from "@/components/ui/Modal";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 type Instructor = {
     id: string;
@@ -82,6 +85,11 @@ export default function DrivingLessonsPage() {
     const [balance, setBalance] = useState<{ minutes: number; hours: number } | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Modal state for instructor change
+    const [showChangeModal, setShowChangeModal] = useState(false);
+    const [changeReason, setChangeReason] = useState("");
+    const [requestLoading, setRequestLoading] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -154,12 +162,36 @@ export default function DrivingLessonsPage() {
         const result = await cancelLesson(lessonId, reason || undefined);
 
         if (result.success) {
-            if (result.warning) {
-                alert(result.warning);
-            }
             loadData();
         } else {
             alert(result.error);
+        }
+    }
+
+    async function handleSubmitChangeRequest(e: React.FormEvent) {
+        e.preventDefault();
+        if (!instructor || !changeReason.trim()) return;
+
+        setRequestLoading(true);
+        try {
+            const result = await requestInstructorChange({
+                currentInstructorId: instructor.id,
+                courseType: "PERMIS_B",
+                reason: "OTHER",
+                details: changeReason,
+            });
+
+            if (result.success) {
+                toast.success("Demande envoyée à l'administration");
+                setShowChangeModal(false);
+                setChangeReason("");
+            } else {
+                toast.error(result.error || "Une erreur est survenue");
+            }
+        } catch (e) {
+            toast.error("Erreur de connexion");
+        } finally {
+            setRequestLoading(false);
         }
     }
 
@@ -281,17 +313,7 @@ export default function DrivingLessonsPage() {
                                 </div>
                             </div>
                             <button
-                                onClick={() => {
-                                    const reason = prompt("Raison du changement :");
-                                    if (reason) {
-                                            requestInstructorChange({
-                                                currentInstructorId: instructor.id,
-                                                courseType: "PERMIS_B",
-                                                reason: "OTHER",
-                                                details: reason,
-                                            }).then(() => alert("Demande envoyée à l'administration"));
-                                    }
-                                }}
+                                onClick={() => setShowChangeModal(true)}
                                 className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition text-sm"
                             >
                                 Demander un changement
@@ -299,47 +321,113 @@ export default function DrivingLessonsPage() {
                         </div>
                     </div>
 
-                    {/* Créneaux disponibles */}
-                    <div className="bg-white rounded-xl border border-slate-200 p-6 mb-8 shadow-sm">
-                        <h2 className="text-xl font-bold text-slate-900 mb-4">Créneaux Disponibles</h2>
-                        {availabilities.length === 0 ? (
-                            <p className="text-slate-500 text-center py-8">
-                                Aucun créneau disponible pour le moment
+                    {/* Modal pour le changement d'instructeur */}
+                    <Modal
+                        isOpen={showChangeModal}
+                        onClose={() => setShowChangeModal(false)}
+                        title="Demander un changement d'instructeur"
+                        maxWidth="md"
+                    >
+                        <form onSubmit={handleSubmitChangeRequest} className="space-y-4">
+                            <p className="text-sm text-slate-500">
+                                Expliquez brièvement pourquoi vous souhaitez changer d'instructeur. Votre demande sera examinée par l'administration.
                             </p>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-2">
+                                    Raison du changement
+                                </label>
+                                <textarea
+                                    value={changeReason}
+                                    onChange={(e) => setChangeReason(e.target.value)}
+                                    placeholder="Ex: Je souhaite un moniteur avec d'autres disponibilités..."
+                                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-gold-100 focus:border-gold-500 transition-all min-h-[120px]"
+                                    required
+                                />
+                            </div>
+                            <div className="flex gap-3 pt-2">
+                                <button
+                                  type="submit"
+                                  disabled={requestLoading || !changeReason.trim()}
+                                  className="flex-1 px-6 py-3 bg-gold-500 text-slate-900 rounded-2xl font-black hover:bg-gold-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                  {requestLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                                  ENVOYER LA DEMANDE
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowChangeModal(false)}
+                                  className="px-6 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition"
+                                >
+                                  ANNULER
+                                </button>
+                            </div>
+                        </form>
+                    </Modal>
+
+                    {/* Créneaux disponibles - Vue Calendrier */}
+                    <div className="bg-white rounded-xl border border-slate-200 p-6 mb-8 shadow-sm">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold text-slate-900">Prochains créneaux disponibles</h2>
+                            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                                <Calendar className="w-3 h-3" />
+                                14 PROCHAINS JOURS
+                            </div>
+                        </div>
+
+                        {availabilities.length === 0 ? (
+                            <div className="text-center py-12 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                                <Clock className="w-12 h-12 text-slate-200 mx-auto mb-3" />
+                                <p className="text-slate-500 font-medium">Aucun créneau disponible pour le moment</p>
+                                <p className="text-slate-400 text-sm">Réessayez plus tard ou contactez votre moniteur.</p>
+                            </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {availabilities.slice(0, 9).map((slot) => (
-                                    <button
-                                        key={slot.id}
-                                        onClick={() => {
-                                            setSelectedSlot(slot);
-                                            setShowBookingForm(true);
-                                            if (!slot.isRecurring && slot.date) {
-                                                setBookingDate(new Date(slot.date).toISOString().split("T")[0]);
-                                            }
-                                        }}
-                                        className="p-4 border border-slate-200 rounded-lg hover:border-gold-500 hover:bg-gold-50 transition text-left"
-                                    >
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <Clock className="w-4 h-4 text-gold-600" />
-                                            <span className="font-bold text-slate-900">
-                                                {slot.startTime} - {slot.endTime}
-                                            </span>
+                            <div className="space-y-8">
+                                {Object.entries(
+                                    availabilities.reduce((acc: any, slot: any) => {
+                                        const dateKey = new Date(slot.date).toDateString();
+                                        if (!acc[dateKey]) acc[dateKey] = [];
+                                        acc[dateKey].push(slot);
+                                        return acc;
+                                    }, {})
+                                ).map(([dateKey, daySlots]: [string, any]) => (
+                                    <div key={dateKey} className="animate-in fade-in slide-in-from-left-2 duration-300">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="h-px flex-1 bg-slate-100"></div>
+                                            <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                                {new Date(dateKey).toLocaleDateString("fr-FR", {
+                                                    weekday: "long",
+                                                    day: "numeric",
+                                                    month: "long",
+                                                })}
+                                            </h3>
+                                            <div className="h-px flex-1 bg-slate-100"></div>
                                         </div>
-                                        {slot.isRecurring ? (
-                                            <p className="text-sm text-slate-600">Créneau récurrent</p>
-                                        ) : (
-                                            <p className="text-sm text-slate-600">
-                                                {slot.date
-                                                    ? new Date(slot.date).toLocaleDateString("fr-FR", {
-                                                        weekday: "short",
-                                                        day: "numeric",
-                                                        month: "short",
-                                                    })
-                                                    : "Date à définir"}
-                                            </p>
-                                        )}
-                                    </button>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                            {daySlots.map((slot: any) => (
+                                                <button
+                                                    key={slot.id + slot.date}
+                                                    onClick={() => {
+                                                        setSelectedSlot(slot);
+                                                        setShowBookingForm(true);
+                                                        setBookingDate(new Date(slot.date).toISOString().split("T")[0]);
+                                                    }}
+                                                    className="group relative p-3 bg-white border border-slate-200 rounded-2xl hover:border-gold-500 hover:bg-gold-50 hover:shadow-md transition-all text-center"
+                                                >
+                                                    <div className="text-sm font-black text-slate-900 group-hover:text-gold-700">
+                                                        {slot.startTime}
+                                                    </div>
+                                                    <div className="text-[10px] font-bold text-slate-400 group-hover:text-gold-500 uppercase mt-0.5">
+                                                        {slot.endTime}
+                                                    </div>
+                                                    {slot.isRecurring && (
+                                                        <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm" title="Récurrent">
+                                                            <RefreshCw className="w-2 h-2" />
+                                                        </div>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         )}
