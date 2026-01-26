@@ -4,13 +4,16 @@
  */
 
 export async function getManagementApiToken() {
-    const domain = process.env.AUTH0_ISSUER_BASE_URL;
+    const rawDomain = process.env.AUTH0_ISSUER_BASE_URL;
     const clientId = process.env.AUTH0_CLIENT_ID;
     const clientSecret = process.env.AUTH0_CLIENT_SECRET;
 
-    if (!domain || !clientId || !clientSecret) {
+    if (!rawDomain || !clientId || !clientSecret) {
         throw new Error("Missing Auth0 credentials in environment variables");
     }
+
+    // Sanitize domain: remove trailing slash
+    const domain = rawDomain.replace(/\/$/, "");
 
     const response = await fetch(`${domain}/oauth/token`, {
         method: "POST",
@@ -35,7 +38,10 @@ export async function getManagementApiToken() {
 
 export async function createPasswordChangeTicket(auth0UserId: string, resultUrl: string) {
     const token = await getManagementApiToken();
-    const domain = process.env.AUTH0_ISSUER_BASE_URL;
+    const rawDomain = process.env.AUTH0_ISSUER_BASE_URL;
+    if (!rawDomain) throw new Error("Missing AUTH0_ISSUER_BASE_URL");
+    
+    const domain = rawDomain.replace(/\/$/, "");
 
     const response = await fetch(`${domain}/api/v2/tickets/password-change`, {
         method: "POST",
