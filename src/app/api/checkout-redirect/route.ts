@@ -17,7 +17,7 @@ export async function GET(req: Request) {
       return NextResponse.redirect(new URL("/api/auth/login", req.url));
     }
 
-    const checkoutSession = await createCheckoutSession(auth.user, courseId, sessionId || undefined);
+    const checkoutSession = await createCheckoutSession(auth.user, courseId, 1, sessionId || undefined);
     
     if (checkoutSession.url) {
       return NextResponse.redirect(checkoutSession.url);

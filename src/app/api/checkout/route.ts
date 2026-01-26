@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     // 3. Appel de la logique du store
     console.log(`[API /api/checkout] Demande de session pour User=${user.id}, Course=${courseId}, Session=${sessionId}`);
-    const session = await createCheckoutSession(user, courseId, sessionId);
+    const session = await createCheckoutSession(user, courseId, 1, sessionId);
 
     console.log("[API /api/checkout] Session créée avec succès", {
       checkoutSessionId: session.id,
