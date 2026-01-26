@@ -16,8 +16,9 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { createCheckoutAction } from "./actions";
+import { syncUserPaymentHistory } from "./sync-actions";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 
 type PaymentLink = {
   id: string;
@@ -62,7 +63,26 @@ export default function PaiementContent({
   const { user } = useUser();
   const [selectedLicense, setSelectedLicense] = useState<string | null>(null);
   const [buyingId, setBuyingId] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [hourlyQuantities, setHourlyQuantities] = useState<Record<string, number>>({});
+
+  async function handleSync() {
+    setIsSyncing(true);
+    try {
+      const result = await syncUserPaymentHistory();
+      if (result.success) {
+        toast.success(result.message || "Synchronisation terminée");
+        // Reload to show new data
+        window.location.reload();
+      } else {
+        toast.error(result.error || "Échec de la synchronisation");
+      }
+    } catch (e) {
+      toast.error("Erreur technique lors de la synchronisation");
+    } finally {
+      setIsSyncing(false);
+    }
+  }
 
   async function handleBuy(courseId: string, quantity: number = 1) {
     setBuyingId(courseId);
@@ -117,13 +137,14 @@ export default function PaiementContent({
                 </p>
               </div>
               <div className="hidden sm:flex items-center space-x-4">
-                <button className="relative p-2 text-gray-400 hover:text-white transition">
-                  <Bell className="w-5 h-5" />
-                  {paymentLinks.length > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center">
-                      {paymentLinks.length}
-                    </span>
-                  )}
+                <button 
+                  onClick={handleSync}
+                  disabled={isSyncing}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition disabled:opacity-50"
+                  title="Récupérer mes achats Stripe"
+                >
+                  <RefreshCw className={cn("w-3.5 h-3.5", isSyncing && "animate-spin")} />
+                  {isSyncing ? "SYNCHRO..." : "SYNCHRONISER"}
                 </button>
                 <div className="relative h-9 w-9">
                   {user?.picture ? (
