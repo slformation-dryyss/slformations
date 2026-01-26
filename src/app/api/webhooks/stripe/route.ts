@@ -126,29 +126,29 @@ export async function POST(request: Request) {
 
         // --- NOUVEAU: Créditer les heures de conduite ---
         try {
-          const course = await prisma.course.findUnique({
-            where: { id: courseId },
-            select: { drivingHours: true }
-          });
+          let minutesToCredit = 0;
 
-          // 1. Si achat via forfait (Course avec drivingHours)
-          if (course?.drivingHours && course.drivingHours > 0) {
-            const minutesToCredit = course.drivingHours * 60;
-            await prisma.user.update({
-              where: { id: userId },
-              data: { drivingBalance: { increment: minutesToCredit } }
+          // 1. Calculer à partir des métadonnées (plus précis pour les quantités)
+          if (metadata.productType === "DRIVING_HOURS" && metadata.hoursPerUnit && metadata.quantity) {
+            minutesToCredit = parseInt(metadata.hoursPerUnit) * parseInt(metadata.quantity) * 60;
+          } 
+          // 2. Fallback sur le produit si métadonnées absentes (compatibilité ascendante)
+          else {
+            const course = await prisma.course.findUnique({
+              where: { id: courseId },
+              select: { drivingHours: true }
             });
-            console.log(`[Stripe Webhook] ${minutesToCredit} min créditées à l'utilisateur ${userId} (via forfait)`);
+            if (course?.drivingHours && course.drivingHours > 0) {
+              minutesToCredit = course.drivingHours * 60;
+            }
           }
 
-          // 2. Si achat à l'unité (via métadonnées spécifiques)
-          if (metadata.productType === "DRIVING_HOURS" && metadata.hoursCount) {
-            const minutesToCredit = parseInt(metadata.hoursCount) * 60;
+          if (minutesToCredit > 0) {
             await prisma.user.update({
               where: { id: userId },
               data: { drivingBalance: { increment: minutesToCredit } }
             });
-            console.log(`[Stripe Webhook] ${minutesToCredit} min créditées à l'utilisateur ${userId} (via achat unité)`);
+            console.log(`[Stripe Webhook] ${minutesToCredit} min créditées à l'utilisateur ${userId}`);
           }
         } catch (creditError) {
           console.error("[Stripe Webhook] Erreur lors du crédit des heures:", creditError);

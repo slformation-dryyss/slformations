@@ -50,7 +50,7 @@ export default async function DashboardPaiementPage() {
     const orders = await prisma.order.findMany({
         where: {
             userId: user.id,
-            status: "COMPLETED"
+            status: { in: ["PAID", "COMPLETED"] }
         },
         include: {
             course: true,
