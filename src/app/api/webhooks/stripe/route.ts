@@ -53,7 +53,7 @@ export async function POST(request: Request) {
         }
 
         // Créer ou mettre à jour la commande
-        await prisma.order.upsert({
+        const order = await prisma.order.upsert({
           where: {
             stripeSessionId: session.id || "",
           },
@@ -71,6 +71,30 @@ export async function POST(request: Request) {
             stripeSessionId: session.id || "",
           },
         });
+
+        // --- NOUVEAU: Détails de la commande (OrderItem) ---
+        try {
+          const qty = parseInt(metadata.quantity || "1");
+          await prisma.orderItem.upsert({
+            where: {
+              id: `item_${order.id}` // Stable ID based on order to prevent duplicates on webhook retries if needed
+            },
+            update: {
+              quantity: qty,
+              unitPrice: ((session.amount_total || 0) / 100) / qty,
+            },
+            create: {
+              id: `item_${order.id}`,
+              orderId: order.id,
+              courseId: courseId,
+              quantity: qty,
+              unitPrice: ((session.amount_total || 0) / 100) / qty,
+            }
+          });
+        } catch (itemError) {
+          console.error("[Stripe Webhook] Erreur création OrderItem:", itemError);
+          // On continue quand même le workflow
+        }
 
         // Créer l'enrolment si pas déjà présent
         await prisma.enrollment.upsert({

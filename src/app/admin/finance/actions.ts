@@ -49,7 +49,6 @@ export async function createManualPaymentLinkAction(formData: FormData) {
         }
 
         // Create Checkout Session
-        // We reuse the same metadata logic as the public store to ensure the webhook works.
         const session = await (stripe.checkout.sessions.create as any)({
             mode: "payment",
             payment_method_types: ["card", "paypal", "klarna", "sepa_debit"],
@@ -60,7 +59,7 @@ export async function createManualPaymentLinkAction(formData: FormData) {
                     quantity: 1,
                     price_data: {
                         currency: "eur",
-                        unit_amount: Math.round(course.price * 100),
+                        unit_amount: Math.round(amount * 100),
                         product_data: {
                             name: course.title,
                             description: `Paiement manuel généré par l'administration`,
@@ -71,9 +70,11 @@ export async function createManualPaymentLinkAction(formData: FormData) {
             metadata: {
                 userId: user.id,
                 courseId: course.id,
-                isManual: "true"
+                isManual: "true",
+                quantity: "1",
+                productType: (course.drivingHours || 0) > 0 ? "DRIVING_HOURS" : "COURSE",
+                hoursPerUnit: (course.drivingHours || 0).toString(),
             },
-            // Urls can point to dashboard/paiements or similar
             success_url: `${appUrl}/paiement/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${appUrl}/dashboard/paiement`,
         });
@@ -85,7 +86,7 @@ export async function createManualPaymentLinkAction(formData: FormData) {
                 courseId: course.id,
                 stripeSessionId: session.id,
                 stripeUrl: session.url || "",
-                amount: course.price,
+                amount: amount,
                 status: "PENDING",
                 expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h expiration
             }

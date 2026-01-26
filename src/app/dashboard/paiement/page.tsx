@@ -70,7 +70,15 @@ export default async function DashboardPaiementPage() {
 
     // Calculate total hours ever purchased
     const totalHoursPurchased = orders.reduce((acc, order) => {
-        const orderHours = order.items.reduce((sum, item) => sum + (item.course?.drivingHours || 0) * item.quantity, 0);
+        let orderHours = 0;
+        // 1. Try from items (new orders + store orders)
+        if (order.items && order.items.length > 0) {
+            orderHours = order.items.reduce((sum, item) => sum + (item.course?.drivingHours || 0) * item.quantity, 0);
+        } 
+        // 2. Fallback to order-level course (older orders or direct links)
+        else if (order.course) {
+            orderHours = order.course.drivingHours || 0;
+        }
         return acc + orderHours;
     }, 0);
 

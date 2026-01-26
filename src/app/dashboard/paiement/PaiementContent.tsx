@@ -473,6 +473,7 @@ export default function PaiementContent({
                           </td>
                           <td className="p-4 font-bold text-slate-900">
                             {order.course?.title || (order.items && order.items[0]?.course?.title) || "Achat divers"}
+                            {order.items && order.items[0]?.quantity > 1 && ` (x${order.items[0].quantity})`}
                           </td>
                           <td className="p-4 font-black">
                             {order.amount}€
