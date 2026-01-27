@@ -123,8 +123,8 @@ export async function bookLesson(data: {
             select: { drivingBalance: true }
         });
 
-        if (!userWithBalance || userWithBalance.drivingBalance < data.duration) {
-            const missingMin = data.duration - (userWithBalance?.drivingBalance || 0);
+        if (!userWithBalance || userWithBalance.drivingBalance < (data.duration * 60)) {
+            const missingMin = (data.duration * 60) - (userWithBalance?.drivingBalance || 0);
             const missingHours = Math.ceil(missingMin / 60);
             return {
                 success: false,
@@ -151,10 +151,10 @@ export async function bookLesson(data: {
             },
         });
 
-        // Débiter le solde
+        // Débiter le solde (duration est en heures, le solde est en minutes)
         await prisma.user.update({
             where: { id: user.id },
-            data: { drivingBalance: { decrement: data.duration } }
+            data: { drivingBalance: { decrement: data.duration * 60 } }
         });
 
         // Marquer le créneau comme réservé
@@ -240,11 +240,11 @@ export async function cancelLesson(lessonId: string, reason?: string) {
             },
         });
 
-        // --- NOUVEAU: Recréditer le solde si annulation valide ---
+        // --- NOUVEAU: Recréditer le solde si annulation valide (duration est en heures, le solde est en minutes)
         if (!shouldDeduct) {
             await prisma.user.update({
                 where: { id: user.id },
-                data: { drivingBalance: { increment: lesson.duration } }
+                data: { drivingBalance: { increment: lesson.duration * 60 } }
             });
         }
 
@@ -390,7 +390,7 @@ export async function getMyDrivingBalance() {
         success: true,
         data: {
             minutes: dbUser?.drivingBalance || 0,
-            hours: (dbUser?.drivingBalance || 0) / 60
+            hours: Math.floor((dbUser?.drivingBalance || 0) / 60)
         }
     };
 }
