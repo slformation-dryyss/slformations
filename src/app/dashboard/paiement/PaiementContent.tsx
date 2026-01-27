@@ -501,7 +501,7 @@ export default function PaiementContent({
                     className="inline-flex items-center px-4 py-2 bg-gold-500 text-navy-900 rounded-lg font-semibold hover:bg-gold-600 transition"
                   >
                     <Download className="w-4 h-4 mr-2" />
-                    Exporter
+                    Exporter CSV
                   </button>
                 </div>
               </div>
