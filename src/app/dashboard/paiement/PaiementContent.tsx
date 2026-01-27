@@ -474,19 +474,22 @@ export default function PaiementContent({
                         return;
                       }
 
+                      // Excel nécessite un séparateur ; pour la locale FR et un BOM pour l'UTF-8
+                      const separator = ";";
                       const headers = ["Date", "Formation", "Montant", "Statut", "Méthode"];
                       const csvContent = [
-                        headers.join(","),
+                        headers.join(separator),
                         ...orders.map(order => [
                           new Date(order.createdAt).toLocaleDateString(),
-                          `"${(order.course?.title || (order.items && order.items[0]?.course?.title) || "Achat divers").replace(/"/g, '""')}"`,
-                          order.amount,
-                          "Payé", // Statut fixe pour l'instant
+                          `"${(order.course?.title || (order.items && order.items[0]?.course?.title) || "Achat divers").replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+                          (order.amount + "").replace('.', ','), // Format numéraire FR
+                          "Payé",
                           "Carte Bancaire"
-                        ].join(","))
+                        ].join(separator))
                       ].join("\n");
 
-                      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                      // Ajout du BOM (\uFEFF) pour forcer Excel à lire en UTF-8
+                      const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
                       const url = URL.createObjectURL(blob);
                       const link = document.createElement("a");
                       link.setAttribute("href", url);
