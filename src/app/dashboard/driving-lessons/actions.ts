@@ -157,11 +157,63 @@ export async function bookLesson(data: {
             data: { drivingBalance: { decrement: data.duration * 60 } }
         });
 
-        // Marquer le créneau comme réservé
+        // --- SPLIT LOGIC: Gestion des créneaux partiels ---
+
+        // 1. Marquer le créneau original comme réservé (ou "consommé")
         await prisma.instructorAvailability.update({
             where: { id: data.availabilityId },
             data: { isBooked: true },
         });
+
+        // 2. Créer les nouveaux créneaux pour les restes (Avant et Après)
+        const slotStartHour = parseInt(availability.startTime.split(':')[0]);
+        const slotStartMin = parseInt(availability.startTime.split(':')[1]);
+        const slotEndHour = parseInt(availability.endTime.split(':')[0]);
+        const slotEndMin = parseInt(availability.endTime.split(':')[1]);
+
+        const lessonStartHour = parseInt(data.startTime.split(':')[0]);
+        const lessonStartMin = parseInt(data.startTime.split(':')[1]);
+
+        // Calculer l'heure de fin de la leçon basée sur la durée demandée
+        const lessonEndHour = lessonStartHour + data.duration;
+        const lessonEndMin = lessonStartMin;
+        const calculatedLessonEndTime = `${lessonEndHour.toString().padStart(2, '0')}:${lessonEndMin.toString().padStart(2, '0')}`;
+
+        // Convertir en minutes pour comparer facilement
+        const slotStartTotal = slotStartHour * 60 + slotStartMin;
+        const slotEndTotal = slotEndHour * 60 + slotEndMin;
+        const lessonStartTotal = lessonStartHour * 60 + lessonStartMin;
+        const lessonEndTotal = lessonEndHour * 60 + lessonEndMin;
+
+        // Créer le créneau "AVANT" si espace suffisant (au moins 1h ?)
+        if (lessonStartTotal > slotStartTotal) {
+            await prisma.instructorAvailability.create({
+                data: {
+                    instructorId: availability.instructorId,
+                    date: availability.date,
+                    startTime: availability.startTime,
+                    endTime: data.startTime,
+                    isRecurring: false, // Les splits ne sont pas récurrents
+                    licenseTypes: availability.licenseTypes,
+                    isBooked: false
+                }
+            });
+        }
+
+        // Créer le créneau "APRÈS" si espace suffisant
+        if (lessonEndTotal < slotEndTotal) {
+            await prisma.instructorAvailability.create({
+                data: {
+                    instructorId: availability.instructorId,
+                    date: availability.date,
+                    startTime: calculatedLessonEndTime,
+                    endTime: availability.endTime,
+                    isRecurring: false,
+                    licenseTypes: availability.licenseTypes,
+                    isBooked: false
+                }
+            });
+        }
 
         // Notifications
         const instructor = await prisma.user.findUnique({

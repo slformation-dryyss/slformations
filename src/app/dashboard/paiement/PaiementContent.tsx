@@ -51,8 +51,8 @@ type Props = {
   orders?: any[];
 };
 
-export default function PaiementContent({ 
-  paymentLinks, 
+export default function PaiementContent({
+  paymentLinks,
   drivingPacks = [],
   drivingBalance = 0,
   totalPaid = 0,
@@ -112,7 +112,7 @@ export default function PaiementContent({
   const filteredPacks = selectedLicense
     ? drivingPacks.filter(p => {
       if (p.drivingHours === 1) return false; // Hide hourly products from pack grid
-      
+
       const content = (p.title + " " + p.description + " " + p.type).toUpperCase();
       if (selectedLicense === "B") return content.includes("B") || content.includes("VOITURE");
       if (selectedLicense === "VTC") return content.includes("VTC");
@@ -138,7 +138,7 @@ export default function PaiementContent({
                 </p>
               </div>
               <div className="hidden sm:flex items-center space-x-4">
-                <button 
+                <button
                   onClick={handleSync}
                   disabled={isSyncing}
                   className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition disabled:opacity-50"
@@ -446,7 +446,7 @@ export default function PaiementContent({
                       <span>Solde actuel</span>
                     </div>
                     <div className="text-2xl font-bold text-gold-500">
-                      {Math.floor(drivingBalance / 60)}h{drivingBalance % 60 > 0 ? ` ${drivingBalance % 60}m` : ""}
+                      {Math.floor(drivingBalance / 60)}h
                     </div>
                     <div className="text-xs text-slate-400">Heures restantes à réserver</div>
                   </div>
@@ -509,7 +509,13 @@ export default function PaiementContent({
                             <CreditCardIcon className="w-4 h-4" />
                           </td>
                           <td className="p-4 text-center">
-                            <button className="text-gold-600 hover:text-gold-700">
+                            <button
+                              onClick={() => {
+                                window.open(`/api/orders/${order.id}/invoice`, '_blank');
+                              }}
+                              className="text-gold-600 hover:text-gold-700"
+                              title="Télécharger la facture"
+                            >
                               <Download className="w-4 h-4" />
                             </button>
                           </td>

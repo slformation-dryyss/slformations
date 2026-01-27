@@ -120,21 +120,45 @@ export default function DrivingLessonsPage() {
         setLoading(false);
     }
 
+    const [bookingTime, setBookingTime] = useState("");
+
+    // Calculer les heures de début possibles pour le créneau sélectionné
+    const availableStartTimes = selectedSlot ? (() => {
+        const start = parseInt(selectedSlot.startTime.split(':')[0]);
+        const end = parseInt(selectedSlot.endTime.split(':')[0]);
+        const times = [];
+        // On permet de réserver chaque heure tant que la durée tient dans le créneau
+        for (let h = start; h <= end - duration; h++) {
+            times.push(`${h.toString().padStart(2, '0')}:00`); // On suppose des créneaux piles pour l'instant
+        }
+        return times;
+    })() : [];
+
+    // Mettre à jour l'heure par défaut quand le slot ou la durée change
+    useEffect(() => {
+        if (availableStartTimes.length > 0) {
+            // Si l'heure actuelle n'est pas dans la liste (ex: changement de durée qui invalide), on reset
+            if (!availableStartTimes.includes(bookingTime)) {
+                setBookingTime(availableStartTimes[0]);
+            }
+        }
+    }, [selectedSlot, duration, availableStartTimes]); // bookingTime removed from dependency to avoid loop
+
     async function handleBooking(e: React.FormEvent) {
         e.preventDefault();
-        if (!selectedSlot) return;
+        if (!selectedSlot || !bookingTime) return;
 
         setSubmitting(true);
         setError(null);
 
-        const [hours, minutes] = selectedSlot.startTime.split(":").map(Number);
+        const [hours, minutes] = bookingTime.split(":").map(Number);
         const endHours = hours + duration;
         const endTime = `${endHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 
         const result = await bookLesson({
             availabilityId: selectedSlot.id,
             date: bookingDate,
-            startTime: selectedSlot.startTime,
+            startTime: bookingTime,
             endTime,
             duration,
             meetingPoint: meetingPoint || undefined,
@@ -244,9 +268,6 @@ export default function DrivingLessonsPage() {
                                     <p className="text-sm font-medium text-slate-500">Votre solde de conduite</p>
                                     <div className="flex items-baseline gap-2">
                                         <h2 className="text-3xl font-black text-slate-900">{balance?.hours || 0}h</h2>
-                                        {balance && balance.minutes % 60 !== 0 && (
-                                            <span className="text-sm text-slate-500 font-medium">({balance.minutes % 60}min)</span>
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -346,19 +367,19 @@ export default function DrivingLessonsPage() {
                             </div>
                             <div className="flex gap-3 pt-2">
                                 <button
-                                  type="submit"
-                                  disabled={requestLoading || !changeReason.trim()}
-                                  className="flex-1 px-6 py-3 bg-gold-500 text-slate-900 rounded-2xl font-black hover:bg-gold-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                                    type="submit"
+                                    disabled={requestLoading || !changeReason.trim()}
+                                    className="flex-1 px-6 py-3 bg-gold-500 text-slate-900 rounded-2xl font-black hover:bg-gold-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
-                                  {requestLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                                  ENVOYER LA DEMANDE
+                                    {requestLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                                    ENVOYER LA DEMANDE
                                 </button>
                                 <button
-                                  type="button"
-                                  onClick={() => setShowChangeModal(false)}
-                                  className="px-6 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition"
+                                    type="button"
+                                    onClick={() => setShowChangeModal(false)}
+                                    className="px-6 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition"
                                 >
-                                  ANNULER
+                                    ANNULER
                                 </button>
                             </div>
                         </form>
@@ -459,14 +480,19 @@ export default function DrivingLessonsPage() {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">
-                                            Heure
+                                            Heure de début
                                         </label>
-                                        <input
-                                            type="text"
-                                            value={`${selectedSlot.startTime} - ${selectedSlot.endTime}`}
-                                            disabled
-                                            className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50"
-                                        />
+                                        <select
+                                            value={bookingTime}
+                                            onChange={(e) => setBookingTime(e.target.value)}
+                                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500"
+                                        >
+                                            {availableStartTimes.map((time) => (
+                                                <option key={time} value={time}>
+                                                    {time}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -505,11 +531,28 @@ export default function DrivingLessonsPage() {
                                             className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500"
                                         />
                                     </div>
+                                    <div className="pt-2">
+                                        <label className="flex items-start gap-3 cursor-pointer group">
+                                            <div className="relative flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    required
+                                                    className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-slate-300 shadow-sm checked:border-gold-500 checked:bg-gold-500 hover:border-gold-400 focus:outline-none focus:ring-2 focus:ring-gold-500/20 transition-all"
+                                                />
+                                                <svg className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            <span className="text-xs text-slate-500 leading-snug group-hover:text-slate-700 transition-colors">
+                                                J'accepte que toute demande de report ou d'annulation doit avoir lieu <span className="font-bold text-red-500">48h avant</span> le début du cours. En cas d'annulation tardive ou d'absence, l'heure sera décomptée et non remboursée.
+                                            </span>
+                                        </label>
+                                    </div>
                                     <div className="flex gap-3 pt-4">
                                         <button
                                             type="submit"
                                             disabled={submitting}
-                                            className="flex-1 px-4 py-2 bg-gold-500 text-slate-900 rounded-lg font-semibold hover:bg-gold-600 transition disabled:opacity-50"
+                                            className="flex-1 px-4 py-2 bg-gold-500 text-slate-900 rounded-lg font-semibold hover:bg-gold-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             {submitting ? "Réservation..." : "Réserver"}
                                         </button>
