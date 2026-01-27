@@ -467,7 +467,36 @@ export default function PaiementContent({
                     <option>En attente</option>
                     <option>Échoué</option>
                   </select>
-                  <button className="inline-flex items-center px-4 py-2 bg-gold-500 text-navy-900 rounded-lg font-semibold hover:bg-gold-600 transition">
+                  <button
+                    onClick={() => {
+                      if (!orders.length) {
+                        toast.error("Aucune donnée à exporter");
+                        return;
+                      }
+
+                      const headers = ["Date", "Formation", "Montant", "Statut", "Méthode"];
+                      const csvContent = [
+                        headers.join(","),
+                        ...orders.map(order => [
+                          new Date(order.createdAt).toLocaleDateString(),
+                          `"${(order.course?.title || (order.items && order.items[0]?.course?.title) || "Achat divers").replace(/"/g, '""')}"`,
+                          order.amount,
+                          "Payé", // Statut fixe pour l'instant
+                          "Carte Bancaire"
+                        ].join(","))
+                      ].join("\n");
+
+                      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                      const url = URL.createObjectURL(blob);
+                      const link = document.createElement("a");
+                      link.setAttribute("href", url);
+                      link.setAttribute("download", `paiements_slformations_${new Date().toISOString().split('T')[0]}.csv`);
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    className="inline-flex items-center px-4 py-2 bg-gold-500 text-navy-900 rounded-lg font-semibold hover:bg-gold-600 transition"
+                  >
                     <Download className="w-4 h-4 mr-2" />
                     Exporter
                   </button>
