@@ -1,13 +1,36 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle2, ArrowRight, PlayCircle } from 'lucide-react';
+import { CheckCircle2, ArrowRight, PlayCircle, Loader2 } from 'lucide-react';
+import { verifyAndSyncSession } from '@/app/dashboard/paiement/sync-actions';
+import { toast } from 'sonner';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  useEffect(() => {
+    async function sync() {
+      if (sessionId) {
+        setIsSyncing(true);
+        try {
+          const result = await verifyAndSyncSession(sessionId);
+          if (result.success) {
+            setSyncMessage(result.message || null);
+          }
+        } catch (e) {
+          console.error("Auto-sync error:", e);
+        } finally {
+          setIsSyncing(false);
+        }
+      }
+    }
+    sync();
+  }, [sessionId]);
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -20,10 +43,25 @@ function SuccessContent() {
           Paiement Validé !
         </h1>
         
-        <p className="text-slate-600 mb-8 leading-relaxed">
+        <p className="text-slate-600 mb-6 leading-relaxed">
           Merci pour votre confiance. Votre inscription est en cours de finalisation. 
-          Un email de confirmation vous a été envoyé.
         </p>
+
+        {isSyncing ? (
+          <div className="flex items-center justify-center gap-2 text-gold-600 font-bold mb-8 animate-pulse">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            Mise à jour de votre compte...
+          </div>
+        ) : syncMessage ? (
+          <div className="bg-green-50 text-green-700 p-4 rounded-xl mb-8 flex items-center gap-3 text-sm font-bold border border-green-100 shadow-sm">
+            <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+            {syncMessage}
+          </div>
+        ) : (
+          <p className="text-slate-500 mb-8 text-sm italic">
+            Un email de confirmation vous a été envoyé.
+          </p>
+        )}
 
         <div className="space-y-4">
           <Link 

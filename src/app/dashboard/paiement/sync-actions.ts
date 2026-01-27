@@ -123,9 +123,102 @@ export async function syncUserPaymentHistory() {
                 ? `${syncCount} commande(s) synchronisée(s). ${hoursCredited}h créditées.` 
                 : "Votre historique est déjà à jour."
         };
-
     } catch (error: any) {
         console.error("[SYNC_ERROR]", error);
         return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Synchroniser une session Stripe spécifique (ex: après redirection success)
+ */
+export async function verifyAndSyncSession(sessionId: string) {
+    const user = await requireUser();
+    if (!stripe) return { success: false, error: "Stripe non configuré" };
+
+    try {
+        console.log(`[SYNC_SINGLE] Vérification de la session ${sessionId}`);
+        
+        const session = await stripe.checkout.sessions.retrieve(sessionId, {
+            expand: ['line_items']
+        });
+
+        if (session.payment_status !== "paid") {
+            return { success: false, error: "Le paiement n'est pas encore confirmé par Stripe." };
+        }
+
+        // Vérifier si déjà présent
+        const existingOrder = await prisma.order.findUnique({
+            where: { stripeSessionId: session.id }
+        });
+
+        if (existingOrder) {
+            return { success: true, message: "Déjà synchronisé." };
+        }
+
+        // --- Logique dupliquée du Webhook pour assurer le crédit immédiat ---
+        const metadata = session.metadata || {};
+        const courseId = metadata.courseId;
+        const qty = parseInt(metadata.quantity || "1");
+        const hoursPerUnit = parseInt(metadata.hoursPerUnit || "0");
+
+        if (!courseId) {
+            return { success: false, error: "Informations de commande manquantes dans la session Stripe." };
+        }
+
+        const course = await prisma.course.findUnique({
+            where: { id: courseId },
+            select: { title: true, drivingHours: true }
+        });
+
+        // 1. Créer la commande
+        const order = await prisma.order.create({
+            data: {
+                userId: user.id,
+                courseId,
+                amount: (session.amount_total || 0) / 100,
+                currency: session.currency || "eur",
+                status: "PAID",
+                stripeSessionId: session.id,
+                createdAt: new Date(session.created * 1000),
+            }
+        });
+
+        // 2. Créer le OrderItem
+        await prisma.orderItem.create({
+            data: {
+                id: `item_${order.id}`,
+                orderId: order.id,
+                courseId,
+                quantity: qty,
+                unitPrice: ((session.amount_total || 0) / 100) / qty,
+            }
+        });
+
+        // 3. Créditer les heures
+        const realHoursPerUnit = hoursPerUnit || course?.drivingHours || 0;
+        let hoursCredited = 0;
+        if (realHoursPerUnit > 0) {
+            const minutesToCredit = realHoursPerUnit * qty * 60;
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { drivingBalance: { increment: minutesToCredit } }
+            });
+            hoursCredited = realHoursPerUnit * qty;
+            console.log(`[SYNC_SINGLE] ${minutesToCredit} min créditées.`);
+        }
+
+        revalidatePath("/dashboard/paiement");
+
+        return { 
+            success: true, 
+            message: hoursCredited > 0 
+                ? `Paiement validé ! ${hoursCredited}h ont été ajoutées à votre compte.`
+                : "Paiement validé ! Votre historique est à jour."
+        };
+
+    } catch (error: any) {
+        console.error("[SYNC_SINGLE_ERROR]", error);
+        return { success: false, error: "Erreur lors de la validation du paiement." };
     }
 }
