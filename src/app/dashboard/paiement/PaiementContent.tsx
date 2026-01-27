@@ -94,8 +94,9 @@ export default function PaiementContent({
         toast.error(result.error || "Une erreur est survenue");
         setBuyingId(null);
       }
-    } catch (e) {
-      toast.error("Erreur de connexion");
+    } catch (e: any) {
+      console.error("Checkout error:", e);
+      toast.error("Erreur : " + (e.message || "Problème de connexion au serveur"));
       setBuyingId(null);
     }
   }

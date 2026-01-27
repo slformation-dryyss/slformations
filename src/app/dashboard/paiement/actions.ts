@@ -5,38 +5,23 @@ import { prisma } from "@/lib/prisma";
 import { createCheckoutSession } from "@/lib/checkout-store";
 import { revalidatePath } from "next/cache";
 
-export default async function PaiementPage() {
-    const user = await requireUser();
-
-    // Fetch pending payment links
-    const paymentLinks = await prisma.paymentLink.findMany({
-        where: {
-            userId: user.id,
-            status: "PENDING",
-            expiresAt: {
-                gte: new Date() // Only show non-expired links
-            }
-        },
-        include: {
-            course: true
-        },
-        orderBy: {
-            createdAt: "desc"
-        }
-    });
-
-    return { paymentLinks };
-}
-
 export async function createCheckoutAction(courseId: string, quantity: number = 1) {
-    const user = await requireUser();
-
     try {
+        const user = await requireUser();
         const session = await createCheckoutSession(user as any, courseId, quantity);
         return { success: true, url: session.url };
     } catch (error: any) {
         console.error("Stripe Checkout Error:", error);
-        return { success: false, error: error.message || "Erreur lors de la création de la session de paiement" };
+        
+        // Handle Next.js redirect "error" (it's not actually an error but a signal)
+        if (error.digest?.startsWith('NEXT_REDIRECT')) {
+            throw error;
+        }
+
+        return { 
+            success: false, 
+            error: error.message || "Une erreur est survenue lors de la préparation du paiement." 
+        };
     }
 }
 
