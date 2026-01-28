@@ -398,7 +398,7 @@ export default function DrivingLessonsPage() {
                             <h2 className="text-xl font-bold text-slate-900">Prochains créneaux disponibles</h2>
                             <div className="flex items-center gap-2 text-xs font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
                                 <Calendar className="w-3 h-3" />
-                                14 PROCHAINS JOURS
+                                30 PROCHAINS JOURS
                             </div>
                         </div>
 

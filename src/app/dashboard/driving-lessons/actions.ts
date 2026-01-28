@@ -22,7 +22,7 @@ export async function getAvailableSlots(courseType: string = "PERMIS_B") {
     const startDate = new Date();
     startDate.setHours(0, 0, 0, 0);
     const endDate = new Date();
-    endDate.setDate(startDate.getDate() + 14);
+    endDate.setDate(startDate.getDate() + 30);
 
     const availabilities = await prisma.instructorAvailability.findMany({
         where: {
