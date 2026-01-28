@@ -640,6 +640,9 @@ model DrivingLesson {
   reminderSent         Boolean                 @default(false)
   instructorNotes      String?
   studentNotes         String?
+  studentProgress      String?
+  areasToImprove       String?
+  completedAt          DateTime?
   createdAt            DateTime                @default(now())
   updatedAt            DateTime                @updatedAt
   vehicleId            String?

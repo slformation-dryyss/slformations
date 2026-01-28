@@ -9,6 +9,8 @@ import {
     confirmLesson,
     rejectLesson,
 } from "./actions";
+import { completeLesson } from "../../driving-lessons/actions";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { WeeklyCalendar } from "@/components/dashboard/instructor/WeeklyCalendar";
 import { List, LayoutGrid } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -60,6 +62,16 @@ export default function AvailabilityPage() {
     const [breakEndTime, setBreakEndTime] = useState("13:00");
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Dialog state
+    const [confirmDialog, setConfirmDialog] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        variant?: "danger" | "warning" | "info";
+    }>({ isOpen: false, title: "", message: "", onConfirm: () => { } });
+    const [errorDialog, setErrorDialog] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: "" });
 
     useEffect(() => {
         loadAvailabilities();
@@ -116,28 +128,47 @@ export default function AvailabilityPage() {
     }
 
     async function handleDelete(slot: Availability) {
-        let deleteAllInGroup = false;
-
         if (slot.recurrenceGroupId) {
-            const choice = confirm(
-                "Ce créneau fait partie d'une série récurrente.\n\n" +
-                "Voulez-vous supprimer toute la série (OK) ou juste ce créneau (Annuler) ?"
-            );
-            if (choice) {
-                if (!confirm("Êtes-vous sûr de vouloir supprimer TOUTE la série ?")) return;
-                deleteAllInGroup = true;
-            } else {
-                if (!confirm("Voulez-vous supprimer ce créneau unique ?")) return;
-            }
+            // First dialog: Ask if user wants to delete entire series or just one slot
+            setConfirmDialog({
+                isOpen: true,
+                title: "Série récurrente détectée",
+                message: "Ce créneau fait partie d'une série récurrente. Voulez-vous supprimer toute la série ?",
+                variant: "warning",
+                onConfirm: () => {
+                    // Second dialog: Confirm deletion of entire series
+                    setConfirmDialog({
+                        isOpen: true,
+                        title: "Supprimer toute la série",
+                        message: "Êtes-vous sûr de vouloir supprimer TOUTE la série de créneaux récurrents ? Cette action est irréversible.",
+                        variant: "danger",
+                        onConfirm: async () => {
+                            const result = await deleteAvailabilitySlot(slot.id, true);
+                            if (result.success) {
+                                loadAvailabilities();
+                            } else {
+                                setErrorDialog({ isOpen: true, message: result.error || "Erreur lors de la suppression" });
+                            }
+                        }
+                    });
+                }
+            });
         } else {
-            if (!confirm("Êtes-vous sûr de vouloir supprimer ce créneau ?")) return;
-        }
-
-        const result = await deleteAvailabilitySlot(slot.id, deleteAllInGroup);
-        if (result.success) {
-            loadAvailabilities();
-        } else {
-            alert(result.error);
+            // Simple confirmation for non-recurring slots
+            setConfirmDialog({
+                isOpen: true,
+                title: "Supprimer ce créneau",
+                message: "Êtes-vous sûr de vouloir supprimer ce créneau ?",
+                variant: "danger",
+                onConfirm: async () => {
+                    const result = await deleteAvailabilitySlot(slot.id, false);
+                    if (result.success) {
+                        loadAvailabilities();
+                    } else {
+                        setErrorDialog({ isOpen: true, message: result.error || "Erreur lors de la suppression" });
+                    }
+                }
+            });
         }
     }
 
@@ -164,7 +195,7 @@ export default function AvailabilityPage() {
         if (result.success) {
             loadAvailabilities();
         } else {
-            alert(result.error);
+            setErrorDialog({ isOpen: true, message: result.error || "Erreur lors de la confirmation" });
         }
     }
 
@@ -173,7 +204,16 @@ export default function AvailabilityPage() {
         if (result.success) {
             loadAvailabilities();
         } else {
-            alert(result.error);
+            setErrorDialog({ isOpen: true, message: result.error || "Erreur lors du refus" });
+        }
+    }
+
+    async function handleCompleteLesson(lessonId: string, data: any) {
+        const result = await completeLesson(lessonId, data);
+        if (result.success) {
+            loadAvailabilities();
+        } else {
+            setErrorDialog({ isOpen: true, message: result.error || "Erreur lors de la validation du cours" });
         }
     }
 
@@ -316,7 +356,7 @@ export default function AvailabilityPage() {
                                 />
                                 <span className="text-sm font-bold text-slate-700">Inclure une pause (déjeuner, etc.)</span>
                             </label>
-                            
+
                             {hasBreak && (
                                 <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-1 duration-200">
                                     <div>
@@ -477,6 +517,7 @@ export default function AvailabilityPage() {
                         onDelete={handleDelete}
                         onConfirmLesson={handleConfirmLesson}
                         onRejectLesson={handleRejectLesson}
+                        onCompleteLesson={handleCompleteLesson}
                     />
                 ) : (
                     <div className="space-y-4">
@@ -538,6 +579,28 @@ export default function AvailabilityPage() {
                     </div>
                 )
             }
+
+            {/* Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                onClose={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+                onConfirm={confirmDialog.onConfirm}
+                title={confirmDialog.title}
+                message={confirmDialog.message}
+                variant={confirmDialog.variant || "danger"}
+            />
+
+            {/* Error Dialog */}
+            <ConfirmDialog
+                isOpen={errorDialog.isOpen}
+                onClose={() => setErrorDialog({ ...errorDialog, isOpen: false })}
+                onConfirm={() => setErrorDialog({ ...errorDialog, isOpen: false })}
+                title="Erreur"
+                message={errorDialog.message}
+                variant="danger"
+                confirmText="OK"
+                showCancel={false}
+            />
         </div >
     );
 }

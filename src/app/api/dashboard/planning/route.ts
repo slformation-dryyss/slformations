@@ -14,7 +14,7 @@ export async function GET() {
       include: {
         sessionBookings: {
           where: {
-             status: { not: 'CANCELLED' }
+            status: { not: 'CANCELLED' }
           },
           include: {
             session: {
@@ -30,14 +30,14 @@ export async function GET() {
           }
         },
         teachingSlots: { // For instructors
-             include: {
-                 module: true,
-                 session: {
-                     include: {
-                         course: true
-                     }
-                 }
-             }
+          include: {
+            module: true,
+            session: {
+              include: {
+                course: true
+              }
+            }
+          }
         }
       }
     });
@@ -48,126 +48,170 @@ export async function GET() {
 
     // Combine bookings and teaching slots based on role (though user usually has one role)
     // If student, use sessionBookings. If instructor, use teachingSlots (or both if hybrid?)
-    
+
     let events = [];
 
     // 1. Collect Learning Events (All roles can be students)
     const legacyLearningEvents = user.sessionBookings.map(booking => {
-        const session = booking.session;
-        return {
-            id: booking.id,
-            title: session.course.title,
-            start: session.startsAt.toISOString(),
-            end: session.endsAt.toISOString(),
-            location: session.location,
-            type: "LEARNING",
-            courseType: session.course.type,
-            source: 'LEGACY'
-        };
+      const session = booking.session;
+      return {
+        id: booking.id,
+        title: session.course.title,
+        start: session.startsAt.toISOString(),
+        end: session.endsAt.toISOString(),
+        location: session.location,
+        type: "LEARNING",
+        courseType: session.course.type,
+        source: 'LEGACY'
+      };
     });
 
     const modernBookings = await prisma.courseSessionBooking.findMany({
-        where: { 
-            userId: user.id,
-            status: { not: 'CANCELLED' }
-        },
-        include: {
-            courseSession: {
-                include: {
-                    course: true,
-                    slots: {
-                        include: {
-                            module: true
-                        },
-                        orderBy: {
-                            start: 'asc'
-                        }
-                    }
-                }
+      where: {
+        userId: user.id,
+        status: { not: 'CANCELLED' }
+      },
+      include: {
+        courseSession: {
+          include: {
+            course: true,
+            slots: {
+              include: {
+                module: true
+              },
+              orderBy: {
+                start: 'asc'
+              }
             }
+          }
         }
+      }
     });
 
     const modernLearningEvents = modernBookings.map(booking => {
-        const session = booking.courseSession as any;
-        return {
-            id: booking.id,
-            title: session.course.title,
-            start: session.startDate.toISOString(),
-            end: session.endDate.toISOString(),
-            location: session.location,
-            meetingUrl: session.meetingUrl,
-            format: session.format,
-            type: "LEARNING",
-            courseType: session.course.type,
-            source: 'MODERN',
-            slots: session.slots.map((s: any) => ({
-                id: s.id,
-                title: s.module?.title || "Module",
-                start: s.start.toISOString(),
-                end: s.end.toISOString(),
-                location: s.location,
-                meetingUrl: s.meetingUrl,
-                dayNumber: s.module?.dayNumber,
-                duration: s.module?.duration
-            }))
-        };
+      const session = booking.courseSession as any;
+      return {
+        id: booking.id,
+        title: session.course.title,
+        start: session.startDate.toISOString(),
+        end: session.endDate.toISOString(),
+        location: session.location,
+        meetingUrl: session.meetingUrl,
+        format: session.format,
+        type: "LEARNING",
+        courseType: session.course.type,
+        source: 'MODERN',
+        slots: session.slots.map((s: any) => ({
+          id: s.id,
+          title: s.module?.title || "Module",
+          start: s.start.toISOString(),
+          end: s.end.toISOString(),
+          location: s.location,
+          meetingUrl: s.meetingUrl,
+          dayNumber: s.module?.dayNumber,
+          duration: s.module?.duration
+        }))
+      };
     });
 
     // 2. Collect Teaching Events (For Instructors and Admins)
     let teachingEvents: any[] = [];
     if (user.role === "INSTRUCTOR" || user.role === "ADMIN") {
-        const mainSessions = await prisma.courseSession.findMany({
-            where: { mainTeacherId: user.id },
-            include: { 
-                course: true,
-                slots: {
-                    include: { module: true },
-                    orderBy: { start: 'asc' }
-                }
-            }
-        });
+      const mainSessions = await prisma.courseSession.findMany({
+        where: { mainTeacherId: user.id },
+        include: {
+          course: true,
+          slots: {
+            include: { module: true },
+            orderBy: { start: 'asc' }
+          }
+        }
+      });
 
-        const mainTeacherEvents = mainSessions.map((session: any) => ({
-            id: session.id,
-            title: `[ENSEIGNANT] ${session.course.title}`,
-            start: session.startDate.toISOString(),
-            end: session.endDate.toISOString(),
-            location: session.location,
-            meetingUrl: session.meetingUrl,
-            format: session.format,
-            type: "TEACHING",
-            courseType: session.course.type,
-            role: "MAIN_TEACHER",
-            slots: session.slots.map((s: any) => ({
-                id: s.id,
-                title: s.module?.title || "Module",
-                start: s.start.toISOString(),
-                end: s.end.toISOString(),
-                location: s.location,
-                meetingUrl: s.meetingUrl,
-                dayNumber: s.module?.dayNumber,
-                duration: s.module?.duration
-            }))
-        }));
+      const mainTeacherEvents = mainSessions.map((session: any) => ({
+        id: session.id,
+        title: `[ENSEIGNANT] ${session.course.title}`,
+        start: session.startDate.toISOString(),
+        end: session.endDate.toISOString(),
+        location: session.location,
+        meetingUrl: session.meetingUrl,
+        format: session.format,
+        type: "TEACHING",
+        courseType: session.course.type,
+        role: "MAIN_TEACHER",
+        slots: session.slots.map((s: any) => ({
+          id: s.id,
+          title: s.module?.title || "Module",
+          start: s.start.toISOString(),
+          end: s.end.toISOString(),
+          location: s.location,
+          meetingUrl: s.meetingUrl,
+          dayNumber: s.module?.dayNumber,
+          duration: s.module?.duration
+        }))
+      }));
 
-        const slotEvents = user.teachingSlots.map((slot: any) => ({
-            id: slot.id,
-            title: `[SLOT] ${slot.session.course.title} ${slot.module?.title ? `(${slot.module.title})` : ''}`,
-            start: slot.start.toISOString(),
-            end: slot.end.toISOString(),
-            location: slot.location || slot.session.location,
-            meetingUrl: slot.meetingUrl || slot.session.meetingUrl,
-            format: slot.session.format,
-            type: "TEACHING",
-            courseType: slot.session.course.type,
-            role: "INSTRUCTOR"
-        }));
+      const slotEvents = user.teachingSlots.map((slot: any) => ({
+        id: slot.id,
+        title: `[SLOT] ${slot.session.course.title} ${slot.module?.title ? `(${slot.module.title})` : ''}`,
+        start: slot.start.toISOString(),
+        end: slot.end.toISOString(),
+        location: slot.location || slot.session.location,
+        meetingUrl: slot.meetingUrl || slot.session.meetingUrl,
+        format: slot.session.format,
+        type: "TEACHING",
+        courseType: slot.session.course.type,
+        role: "INSTRUCTOR"
+      }));
 
-        teachingEvents = [...mainTeacherEvents, ...slotEvents];
+      teachingEvents = [...mainTeacherEvents, ...slotEvents];
     }
 
-    events = [...legacyLearningEvents, ...modernLearningEvents, ...teachingEvents];
+    // 3. Collect Driving Lessons (For Students)
+    const drivingLessons = await prisma.drivingLesson.findMany({
+      where: {
+        studentId: user.id,
+        status: { notIn: ['CANCELLED'] }
+      },
+      include: {
+        instructor: {
+          include: { user: true }
+        }
+      },
+      orderBy: { date: 'asc' }
+    });
+
+    const drivingEvents = drivingLessons.map(lesson => {
+      // Construire les dates ISO complètes
+      const lessonDate = new Date(lesson.date);
+      const [startH, startM] = lesson.startTime.split(':').map(Number);
+      const [endH, endM] = lesson.endTime.split(':').map(Number);
+
+      const startDateTime = new Date(lessonDate);
+      startDateTime.setHours(startH, startM, 0, 0);
+
+      const endDateTime = new Date(lessonDate);
+      endDateTime.setHours(endH, endM, 0, 0);
+
+      return {
+        id: lesson.id,
+        title: `Cours de conduite - ${lesson.instructor.user.firstName} ${lesson.instructor.user.lastName}`,
+        start: startDateTime.toISOString(),
+        end: endDateTime.toISOString(),
+        location: lesson.meetingPoint || lesson.city,
+        type: "DRIVING_LESSON",
+        courseType: "CONDUITE",
+        status: lesson.status,
+        duration: lesson.duration,
+        instructorNotes: lesson.instructorNotes,
+        // TODO: Add these fields to schema later
+        // studentProgress: lesson.studentProgress,
+        // areasToImprove: lesson.areasToImprove,
+        // completedAt: lesson.completedAt
+      };
+    });
+
+    events = [...legacyLearningEvents, ...modernLearningEvents, ...teachingEvents, ...drivingEvents];
 
     return NextResponse.json({ events });
 

@@ -22,20 +22,21 @@ import {
   Calendar as CalendarIcon,
   Video,
   Monitor,
-  Map
+  Map,
+  CheckCircle
 } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect, useMemo } from "react";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { 
-  format, 
-  startOfMonth, 
-  endOfMonth, 
-  eachDayOfInterval, 
-  isSameMonth, 
-  isSameDay, 
-  addMonths, 
-  subMonths, 
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  addMonths,
+  subMonths,
   isToday,
   addYears,
   subYears,
@@ -55,6 +56,7 @@ const CATEGORY_MAP: Record<string, { label: string; color: string; border: strin
   "RECUPERATION_POINTS": { label: "Récupération Points", color: "bg-orange-600", border: "border-orange-600", text: "text-orange-700", light: "bg-orange-50", dot: "bg-orange-600" },
   "TEST_PSYCHOTECHNIQUE": { label: "Test Psychotechnique", color: "bg-pink-500", border: "border-pink-500", text: "text-pink-600", light: "bg-pink-50", dot: "bg-pink-500" },
   "PERMIS": { label: "Permis", color: "bg-slate-900", border: "border-slate-900", text: "text-slate-900", light: "bg-slate-50", dot: "bg-slate-900" },
+  "CONDUITE": { label: "Cours de Conduite", color: "bg-indigo-600", border: "border-indigo-600", text: "text-indigo-700", light: "bg-indigo-50", dot: "bg-indigo-600" },
   "DEFAULT": { label: "Formation", color: "bg-slate-500", border: "border-slate-500", text: "text-slate-600", light: "bg-slate-50", dot: "bg-slate-500" },
 };
 
@@ -66,31 +68,31 @@ export default function DashboardPlanningPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
-      async function loadEvents() {
-          try {
-              // Vérifier le rôle pour redirection
-              const profileRes = await fetch('/api/profile');
-              if (profileRes.ok) {
-                  const profile = await profileRes.json();
-                  if (profile.role === 'INSTRUCTOR') {
-                      window.location.href = '/dashboard/planning-prof';
-                      return;
-                  }
-                  // Redirection removed for ADMIN to allow viewing personal planning
-              }
-
-              const res = await fetch('/api/dashboard/planning');
-              if (res.ok) {
-                  const data = await res.json();
-                  setEvents(data.events);
-              }
-          } catch (e) {
-              console.error("Failed to load events", e);
-          } finally {
-              setLoading(false);
+    async function loadEvents() {
+      try {
+        // Vérifier le rôle pour redirection
+        const profileRes = await fetch('/api/profile');
+        if (profileRes.ok) {
+          const profile = await profileRes.json();
+          if (profile.role === 'INSTRUCTOR') {
+            window.location.href = '/dashboard/planning-prof';
+            return;
           }
+          // Redirection removed for ADMIN to allow viewing personal planning
+        }
+
+        const res = await fetch('/api/dashboard/planning');
+        if (res.ok) {
+          const data = await res.json();
+          setEvents(data.events);
+        }
+      } catch (e) {
+        console.error("Failed to load events", e);
+      } finally {
+        setLoading(false);
       }
-      loadEvents();
+    }
+    loadEvents();
   }, []);
 
   const openModal = (event: any) => setActiveEvent(event);
@@ -119,7 +121,7 @@ export default function DashboardPlanningPage() {
           </p>
         </div>
         <div className="flex bg-slate-900 p-2 rounded-2xl shadow-xl">
-          <button 
+          <button
             onClick={handlePrevMonth}
             className="p-3 text-white hover:text-gold-500 transition-colors"
           >
@@ -130,7 +132,7 @@ export default function DashboardPlanningPage() {
               {format(currentDate, 'MMMM yyyy', { locale: fr })}
             </span>
           </div>
-          <button 
+          <button
             onClick={handleNextMonth}
             className="p-3 text-white hover:text-gold-500 transition-colors"
           >
@@ -164,13 +166,13 @@ export default function DashboardPlanningPage() {
               ))}
               {days.map(day => {
                 const dayDate = new Date(day);
-                dayDate.setHours(0,0,0,0);
+                dayDate.setHours(0, 0, 0, 0);
 
                 const dayEvents = events.filter(e => {
                   const s = new Date(e.start);
-                  s.setHours(0,0,0,0);
+                  s.setHours(0, 0, 0, 0);
                   const end = new Date(e.end);
-                  end.setHours(0,0,0,0);
+                  end.setHours(0, 0, 0, 0);
                   return dayDate >= s && dayDate <= end;
                 }).sort((a, b) => a.id.localeCompare(b.id));
 
@@ -178,19 +180,17 @@ export default function DashboardPlanningPage() {
                 const isCurrent = isToday(day);
 
                 return (
-                  <div 
-                    key={day.toString()} 
-                    className={`relative aspect-square sm:aspect-auto sm:min-h-[140px] p-2 sm:p-4 rounded-3xl border-2 transition-all group/day cursor-pointer ${
-                      hasEvents 
-                        ? "bg-white border-gold-200 shadow-lg shadow-gold-500/5 hover:border-gold-500 hover:scale-[1.02] z-10" 
-                        : "bg-white border-slate-200 hover:border-slate-300"
-                    } ${isCurrent ? 'ring-2 ring-gold-500 ring-offset-4 ring-offset-slate-50' : ''}`}
+                  <div
+                    key={day.toString()}
+                    className={`relative aspect-square sm:aspect-auto sm:min-h-[140px] p-2 sm:p-4 rounded-3xl border-2 transition-all group/day cursor-pointer ${hasEvents
+                      ? "bg-white border-gold-200 shadow-lg shadow-gold-500/5 hover:border-gold-500 hover:scale-[1.02] z-10"
+                      : "bg-white border-slate-200 hover:border-slate-300"
+                      } ${isCurrent ? 'ring-2 ring-gold-500 ring-offset-4 ring-offset-slate-50' : ''}`}
                     onClick={() => hasEvents && dayEvents.length === 1 && openModal(dayEvents[0])}
                   >
                     <div className="flex justify-between items-start mb-2 relative z-20">
-                      <span className={`text-lg sm:text-2xl font-black tabular-nums transition-colors ${
-                        isCurrent ? 'text-gold-500' : hasEvents ? 'text-slate-900' : 'text-slate-400'
-                      }`}>
+                      <span className={`text-lg sm:text-2xl font-black tabular-nums transition-colors ${isCurrent ? 'text-gold-500' : hasEvents ? 'text-slate-900' : 'text-slate-400'
+                        }`}>
                         {format(day, 'd')}
                       </span>
                     </div>
@@ -198,16 +198,16 @@ export default function DashboardPlanningPage() {
                     <div className="hidden sm:flex flex-col gap-1.5">
                       {dayEvents.slice(0, 3).map((ev, idx) => {
                         const cat = CATEGORY_MAP[ev.courseType] || CATEGORY_MAP.DEFAULT;
-                        
+
                         const s = new Date(ev.start);
-                        s.setHours(0,0,0,0);
+                        s.setHours(0, 0, 0, 0);
                         const end = new Date(ev.end);
-                        end.setHours(0,0,0,0);
-                        
+                        end.setHours(0, 0, 0, 0);
+
                         const isStart = isSameDay(dayDate, s);
                         const isEnd = isSameDay(dayDate, end);
                         const isMultiDay = !isSameDay(s, end);
-                        
+
                         const dayOfWeek = day.getDay(); // 0 is Sun, 1 is Mon
                         const isWeekStart = dayOfWeek === 1;
                         const isWeekEnd = dayOfWeek === 0;
@@ -216,7 +216,7 @@ export default function DashboardPlanningPage() {
                         const roundedRight = isEnd || isWeekEnd;
 
                         return (
-                          <button 
+                          <button
                             key={ev.id}
                             onClick={(e) => { e.stopPropagation(); openModal(ev); }}
                             className={`block w-full text-left p-2 rounded-xl transition-all relative z-10 border-l-4 ${cat.border} ${cat.light} group-hover/day:shadow-sm`}
@@ -248,7 +248,7 @@ export default function DashboardPlanningPage() {
             <div className="absolute top-0 right-0 p-12 opacity-10">
               <CalendarDays className="w-64 h-64 text-white" />
             </div>
-            
+
             <div className="relative z-10 mb-10">
               <h3 className="text-2xl font-black uppercase tracking-tighter mb-1">
                 Vision Annuelle <span className="text-gold-500">{getYear(currentDate)}</span>
@@ -262,12 +262,11 @@ export default function DashboardPlanningPage() {
                 const isSelected = isSameMonth(month, currentDate);
 
                 return (
-                  <button 
+                  <button
                     key={month.toString()}
                     onClick={() => setCurrentDate(month)}
-                    className={`flex flex-col items-center p-5 rounded-3xl border-2 transition-all ${
-                      isSelected ? "border-gold-500 bg-white/10 shadow-lg shadow-gold-500/20" : "border-white/5 bg-white/5 hover:bg-white/10"
-                    }`}
+                    className={`flex flex-col items-center p-5 rounded-3xl border-2 transition-all ${isSelected ? "border-gold-500 bg-white/10 shadow-lg shadow-gold-500/20" : "border-white/5 bg-white/5 hover:bg-white/10"
+                      }`}
                   >
                     <span className={`text-[10px] font-black uppercase tracking-widest mb-4 ${isSelected ? 'text-gold-500' : 'text-slate-400'}`}>
                       {format(month, 'MMM', { locale: fr })}
@@ -288,23 +287,23 @@ export default function DashboardPlanningPage() {
           {/* Tips / Legend Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-               <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-3">
-                 <Info className="w-4 h-4 text-gold-500" />
-                 Légende des catégories
-               </h4>
-               <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-                 {Object.entries(CATEGORY_MAP).filter(([k]) => k !== 'DEFAULT').map(([key, config]) => (
-                   <div key={key} className="flex items-center gap-3">
-                     <div className={`w-3 h-3 rounded-full ${config.color}`} />
-                     <span className="text-[10px] font-black text-slate-600 uppercase tracking-tight">{config.label}</span>
-                   </div>
-                 ))}
-               </div>
+              <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-3">
+                <Info className="w-4 h-4 text-gold-500" />
+                Légende des catégories
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                {Object.entries(CATEGORY_MAP).filter(([k]) => k !== 'DEFAULT').map(([key, config]) => (
+                  <div key={key} className="flex items-center gap-3">
+                    <div className={`w-3 h-3 rounded-full ${config.color}`} />
+                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-tight">{config.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="bg-gold-500 p-8 rounded-[2.5rem] shadow-xl shadow-gold-500/20 text-slate-900">
-               <p className="text-sm font-bold leading-relaxed">
-                 Vous pouvez cliquer sur chaque événement pour voir les détails de la session, incluant le lieu et les horaires précis.
-               </p>
+              <p className="text-sm font-bold leading-relaxed">
+                Vous pouvez cliquer sur chaque événement pour voir les détails de la session, incluant le lieu et les horaires précis.
+              </p>
             </div>
           </div>
         </div>
@@ -312,11 +311,11 @@ export default function DashboardPlanningPage() {
 
       {/* Modal Tooltip Refined */}
       {activeEvent && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
           onClick={closeModal}
         >
-          <div 
+          <div
             className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden border border-slate-100 animate-in fade-in zoom-in duration-200"
             onClick={e => e.stopPropagation()}
           >
@@ -324,9 +323,9 @@ export default function DashboardPlanningPage() {
             <div className="p-10">
               <div className="flex justify-between items-start mb-8">
                 <div>
-                   <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border-2 ${CATEGORY_MAP[activeEvent.courseType]?.border} ${CATEGORY_MAP[activeEvent.courseType]?.text} ${CATEGORY_MAP[activeEvent.courseType]?.light}`}>
-                      {CATEGORY_MAP[activeEvent.courseType]?.label || "Formation"}
-                   </span>
+                  <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border-2 ${CATEGORY_MAP[activeEvent.courseType]?.border} ${CATEGORY_MAP[activeEvent.courseType]?.text} ${CATEGORY_MAP[activeEvent.courseType]?.light}`}>
+                    {CATEGORY_MAP[activeEvent.courseType]?.label || "Formation"}
+                  </span>
                 </div>
                 <button onClick={closeModal} className="p-2 hover:bg-slate-100 rounded-2xl transition-all">
                   <X className="w-6 h-6 text-slate-400" />
@@ -339,46 +338,87 @@ export default function DashboardPlanningPage() {
 
               <div className="space-y-6 mb-10">
                 <div className="flex items-center gap-5">
-                   <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center shrink-0">
-                      <CalendarDays className="w-6 h-6 text-slate-900" />
-                   </div>
-                   <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Date de la session</p>
-                      <p className="text-lg font-black text-slate-900">{format(new Date(activeEvent.start), 'eeee d MMMM yyyy', { locale: fr })}</p>
-                   </div>
+                  <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center shrink-0">
+                    <CalendarDays className="w-6 h-6 text-slate-900" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Date de la session</p>
+                    <p className="text-lg font-black text-slate-900">{format(new Date(activeEvent.start), 'eeee d MMMM yyyy', { locale: fr })}</p>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-5">
-                   <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center shrink-0">
-                      <Clock className="w-6 h-6 text-slate-900" />
-                   </div>
-                   <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Horaires</p>
-                      <p className="text-lg font-black text-slate-900">
-                        {format(new Date(activeEvent.start), 'HH:mm')} - {format(new Date(activeEvent.end), 'HH:mm')}
-                      </p>
-                   </div>
+                  <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center shrink-0">
+                    <Clock className="w-6 h-6 text-slate-900" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Horaires</p>
+                    <p className="text-lg font-black text-slate-900">
+                      {format(new Date(activeEvent.start), 'HH:mm')} - {format(new Date(activeEvent.end), 'HH:mm')}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-5">
-                   <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center shrink-0">
-                      {activeEvent.format === 'VIDEO' ? <Video className="w-6 h-6 text-slate-900" /> : 
-                       activeEvent.format === 'REMOTE' ? <Monitor className="w-6 h-6 text-slate-900" /> : 
-                       <MapPin className="w-6 h-6 text-slate-900" />}
-                   </div>
-                   <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">
-                        {activeEvent.format === 'VIDEO' ? 'Format' : 
-                         activeEvent.format === 'REMOTE' ? 'Plateforme' : 'Lieu / Salle'}
-                      </p>
-                      <p className="text-lg font-black text-slate-900">
-                        {activeEvent.format === 'VIDEO' ? 'E-learning (Vidéo)' : 
-                         activeEvent.format === 'REMOTE' ? 'Visioconférence' : 
-                         (activeEvent.location || "Pontault-Combault")}
-                      </p>
-                   </div>
+                  <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center shrink-0">
+                    {activeEvent.format === 'VIDEO' ? <Video className="w-6 h-6 text-slate-900" /> :
+                      activeEvent.format === 'REMOTE' ? <Monitor className="w-6 h-6 text-slate-900" /> :
+                        <MapPin className="w-6 h-6 text-slate-900" />}
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">
+                      {activeEvent.format === 'VIDEO' ? 'Format' :
+                        activeEvent.format === 'REMOTE' ? 'Plateforme' : 'Lieu / Salle'}
+                    </p>
+                    <p className="text-lg font-black text-slate-900">
+                      {activeEvent.format === 'VIDEO' ? 'E-learning (Vidéo)' :
+                        activeEvent.format === 'REMOTE' ? 'Visioconférence' :
+                          (activeEvent.location || "Pontault-Combault")}
+                    </p>
+                  </div>
                 </div>
               </div>
+
+              {/* Driving Lesson Specific Info */}
+              {activeEvent.type === 'DRIVING_LESSON' && (
+                <>
+                  <div className="flex items-center gap-5 mt-6">
+                    <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center shrink-0">
+                      <CheckCircle className="w-6 h-6 text-slate-900" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Statut du cours</p>
+                      <p className="text-lg font-black text-slate-900">
+                        {activeEvent.status === 'COMPLETED' ? '✓ Terminé' :
+                          activeEvent.status === 'CONFIRMED' ? 'Confirmé' :
+                            'En attente de confirmation'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {activeEvent.instructorNotes && (
+                    <div className="p-6 bg-indigo-50 rounded-2xl border border-indigo-100 mt-6">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-indigo-600 mb-3 flex items-center gap-2">
+                        <Info className="w-4 h-4" />
+                        Notes du moniteur
+                      </p>
+                      <p className="text-sm text-slate-700 leading-relaxed">{activeEvent.instructorNotes}</p>
+                    </div>
+                  )}
+
+                  {activeEvent.duration && (
+                    <div className="flex items-center gap-5 mt-6">
+                      <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center shrink-0">
+                        <Clock className="w-6 h-6 text-slate-900" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Durée</p>
+                        <p className="text-lg font-black text-slate-900">{activeEvent.duration} heure{activeEvent.duration > 1 ? 's' : ''}</p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
 
               {activeEvent.slots && activeEvent.slots.length > 0 && (
                 <div className="mb-10">
@@ -413,18 +453,18 @@ export default function DashboardPlanningPage() {
               )}
 
               {activeEvent.meetingUrl && (
-                <a 
+                <a
                   href={activeEvent.meetingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-5 bg-slate-900 text-white rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-gold-500 hover:text-slate-900 transition-all shadow-xl mb-4"
                 >
-                   <MessageSquare className="w-5 h-5" />
-                   Rejoindre la visio
+                  <MessageSquare className="w-5 h-5" />
+                  Rejoindre la visio
                 </a>
               )}
 
-              <button 
+              <button
                 onClick={closeModal}
                 className="w-full py-5 bg-slate-100 text-slate-600 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all"
               >

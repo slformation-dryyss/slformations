@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Calendar, Clock, CheckCircle, XCircle, User, MapPin, RefreshCw } from "lucide-react";
+import { Calendar, Clock, CheckCircle, XCircle, User, MapPin, RefreshCw, Search, CheckCircle2 } from "lucide-react";
 import { getMyLessons, confirmLesson, rejectLesson } from "../availability/actions";
+import { completeLesson } from "../../driving-lessons/actions";
+import { LessonRecapModal } from "@/components/instructor/LessonRecapModal";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 type Lesson = {
     id: string;
@@ -22,6 +26,7 @@ type Lesson = {
         lastName: string | null;
         email: string;
         phone: string | null;
+        nationalIdNumber?: string | null;
     };
 };
 
@@ -30,6 +35,9 @@ export default function InstructorLessonsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [filter, setFilter] = useState<string>("ALL");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [showRecapModal, setShowRecapModal] = useState(false);
+    const [lessonToComplete, setLessonToComplete] = useState<any>(null);
 
     useEffect(() => {
         loadLessons();
@@ -70,9 +78,27 @@ export default function InstructorLessonsPage() {
         }
     }
 
-    const pendingLessons = lessons.filter((l) => l.status === "PENDING");
-    const confirmedLessons = lessons.filter((l) => l.status === "CONFIRMED");
-    const completedLessons = lessons.filter((l) => l.status === "COMPLETED");
+    async function handleComplete(lessonId: string, data: any) {
+        const result = await completeLesson(lessonId, data);
+        if (result.success) {
+            loadLessons();
+        } else {
+            alert(result.error);
+        }
+    }
+
+    const filteredLessons = lessons.filter((l) => {
+        if (searchQuery.trim() === "") return true;
+        const query = searchQuery.toLowerCase();
+        const fullName = `${l.student.firstName} ${l.student.lastName}`.toLowerCase();
+        const email = l.student.email.toLowerCase();
+        const neph = (l.student.nationalIdNumber || "").toLowerCase();
+        return fullName.includes(query) || email.includes(query) || neph.includes(query);
+    });
+
+    const pendingLessonsCount = lessons.filter((l) => l.status === "PENDING").length;
+    const confirmedLessonsCount = lessons.filter((l) => l.status === "CONFIRMED").length;
+    const completedLessonsCount = lessons.filter((l) => l.status === "COMPLETED").length;
 
     return (
         <div className="max-w-6xl mx-auto p-6">
@@ -93,11 +119,25 @@ export default function InstructorLessonsPage() {
                             }`}
                     >
                         {status === "ALL" && "Tous"}
-                        {status === "PENDING" && `En attente (${pendingLessons.length})`}
-                        {status === "CONFIRMED" && `Confirmés (${confirmedLessons.length})`}
-                        {status === "COMPLETED" && `Terminés (${completedLessons.length})`}
+                        {status === "PENDING" && `En attente (${pendingLessonsCount})`}
+                        {status === "CONFIRMED" && `Confirmés (${confirmedLessonsCount})`}
+                        {status === "COMPLETED" && `Terminés (${completedLessonsCount})`}
                     </button>
                 ))}
+            </div>
+
+            {/* Barre de recherche */}
+            <div className="relative mb-6">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-slate-400" />
+                </div>
+                <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Filtrer par élève (Nom, Mail, NEPH)..."
+                    className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-gold-500 sm:text-sm transition-all shadow-sm"
+                />
             </div>
 
             {error && (
@@ -112,7 +152,7 @@ export default function InstructorLessonsPage() {
                     <RefreshCw className="w-8 h-8 animate-spin text-gold-500 mx-auto mb-4" />
                     <p className="text-slate-500">Chargement...</p>
                 </div>
-            ) : lessons.length === 0 ? (
+            ) : filteredLessons.length === 0 ? (
                 <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
                     <Calendar className="w-16 h-16 text-slate-300 mx-auto mb-4" />
                     <h3 className="text-lg font-bold text-slate-900 mb-2">Aucun cours</h3>
@@ -128,7 +168,7 @@ export default function InstructorLessonsPage() {
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {lessons.map((lesson) => {
+                    {filteredLessons.map((lesson) => {
                         const lessonDate = new Date(lesson.date);
                         const isPast = lessonDate < new Date();
 
@@ -165,6 +205,12 @@ export default function InstructorLessonsPage() {
                                             </span>
                                             <span className="text-slate-400">•</span>
                                             <span>{lesson.student.email}</span>
+                                            {lesson.student.nationalIdNumber && (
+                                                <>
+                                                    <span className="text-slate-400">•</span>
+                                                    <span className="font-bold text-slate-800">NEPH: {lesson.student.nationalIdNumber}</span>
+                                                </>
+                                            )}
                                             {lesson.student.phone && (
                                                 <>
                                                     <span className="text-slate-400">•</span>
@@ -252,10 +298,45 @@ export default function InstructorLessonsPage() {
                                         </button>
                                     </div>
                                 )}
+
+                                {/* Completion button for confirmed lessons */}
+                                {lesson.status === "CONFIRMED" && (
+                                    <button
+                                        onClick={() => {
+                                            setLessonToComplete({
+                                                id: lesson.id,
+                                                studentName: `${lesson.student.firstName} ${lesson.student.lastName}`,
+                                                date: format(new Date(lesson.date), "EEEE d MMMM", { locale: fr }),
+                                                startTime: lesson.startTime,
+                                                endTime: lesson.endTime,
+                                                duration: lesson.duration
+                                            });
+                                            setShowRecapModal(true);
+                                        }}
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-100 mt-2"
+                                    >
+                                        <CheckCircle2 className="w-5 h-5" />
+                                        Terminer le cours (Saisir récap)
+                                    </button>
+                                )}
                             </div>
                         );
                     })}
                 </div>
+            )}
+
+            {lessonToComplete && (
+                <LessonRecapModal
+                    isOpen={showRecapModal}
+                    onClose={() => {
+                        setShowRecapModal(false);
+                        setLessonToComplete(null);
+                    }}
+                    lesson={lessonToComplete}
+                    onSubmit={async (data) => {
+                        await handleComplete(lessonToComplete.id, data);
+                    }}
+                />
             )}
         </div>
     );

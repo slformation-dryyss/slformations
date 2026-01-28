@@ -230,7 +230,12 @@ export async function getMyAvailabilities() {
                                 id: true,
                                 status: true,
                                 student: {
-                                    select: { firstName: true, lastName: true },
+                                    select: {
+                                        firstName: true,
+                                        lastName: true,
+                                        email: true,
+                                        nationalIdNumber: true
+                                    },
                                 },
                             },
                         },
@@ -340,6 +345,7 @@ export async function getMyLessons(status?: string) {
                         lastName: true,
                         email: true,
                         phone: true,
+                        nationalIdNumber: true
                     },
                 },
             },

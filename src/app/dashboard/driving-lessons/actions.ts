@@ -446,3 +446,66 @@ export async function getMyDrivingBalance() {
         }
     };
 }
+
+/**
+ * Marquer un cours comme terminé (moniteur)
+ */
+export async function completeLesson(lessonId: string, data: {
+    instructorNotes?: string;
+    studentProgress?: string;
+    areasToImprove?: string;
+}) {
+    const user = await getOrCreateUser();
+    if (!user) return { success: false, error: "AUTH_REQUIRED" };
+
+    try {
+        // Vérifier que l'utilisateur est moniteur
+        const instructor = await prisma.instructorProfile.findUnique({
+            where: { userId: user.id }
+        });
+
+        if (!instructor) {
+            return { success: false, error: "Accès refusé : vous devez être moniteur" };
+        }
+
+        // Vérifier que le cours existe et appartient bien à ce moniteur
+        const lesson = await prisma.drivingLesson.findFirst({
+            where: {
+                id: lessonId,
+                instructorId: instructor.id
+            }
+        });
+
+        if (!lesson) {
+            return { success: false, error: "Cours introuvable" };
+        }
+
+        if (lesson.status === "CANCELLED") {
+            return { success: false, error: "Impossible de marquer un cours annulé comme terminé" };
+        }
+
+        if (lesson.status === "COMPLETED") {
+            return { success: false, error: "Ce cours est déjà marqué comme terminé" };
+        }
+
+        // Mettre à jour le cours
+        const updated = await prisma.drivingLesson.update({
+            where: { id: lessonId },
+            data: {
+                status: "COMPLETED",
+                completedAt: new Date(),
+                instructorNotes: data.instructorNotes,
+                studentProgress: data.studentProgress,
+                areasToImprove: data.areasToImprove
+            }
+        });
+
+        revalidatePath("/dashboard/instructor/availability");
+        revalidatePath("/dashboard/planning");
+
+        return { success: true, data: updated };
+    } catch (error: any) {
+        console.error("Error completing lesson:", error);
+        return { success: false, error: error.message || "Erreur lors de la validation du cours" };
+    }
+}
