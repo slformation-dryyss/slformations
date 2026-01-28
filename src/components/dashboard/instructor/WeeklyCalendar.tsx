@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
     format,
     startOfWeek,
@@ -9,7 +10,8 @@ import {
     isSameDay,
     addWeeks,
     subWeeks,
-    parseISO
+    parseISO,
+    formatISO
 } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
@@ -24,7 +26,8 @@ import {
     Phone,
     Mail,
     AlertCircle,
-    X
+    X,
+    ExternalLink
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
@@ -64,6 +67,7 @@ export function WeeklyCalendar({
     onConfirmLesson,
     onRejectLesson
 }: WeeklyCalendarProps) {
+    const router = useRouter();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedSlot, setSelectedSlot] = useState<Availability | null>(null);
     const [isActionLoading, setIsActionLoading] = useState(false);
@@ -189,13 +193,24 @@ export function WeeklyCalendar({
                                     <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
                                         {format(day, "eee", { locale: fr })}
                                     </div>
-                                    <div className={cn(
-                                        "text-lg font-black w-10 h-10 flex items-center justify-center mx-auto rounded-full transition-colors",
-                                        isSameDay(day, new Date())
-                                            ? "bg-gold-500 text-slate-900 shadow-md"
-                                            : "text-slate-700 hover:bg-slate-100"
-                                    )}>
+                                    <div
+                                        onClick={() => router.push(`/dashboard/instructor/planning?date=${formatISO(day, { representation: 'date' })}`)}
+                                        className={cn(
+                                            "text-lg font-black w-10 h-10 flex items-center justify-center mx-auto rounded-full transition-all cursor-pointer hover:scale-110",
+                                            isSameDay(day, new Date())
+                                                ? "bg-gold-500 text-slate-900 shadow-md"
+                                                : "text-slate-700 bg-white border border-slate-100 hover:bg-gold-100 hover:border-gold-300 shadow-sm"
+                                        )}>
                                         {format(day, "d")}
+                                    </div>
+                                    <div className="mt-2 flex justify-center">
+                                        <button
+                                            onClick={() => router.push(`/dashboard/instructor/planning?date=${formatISO(day, { representation: 'date' })}`)}
+                                            className="text-[10px] text-slate-400 font-bold hover:text-gold-600 transition-colors flex items-center gap-1"
+                                        >
+                                            <ExternalLink className="w-2.5 h-2.5" />
+                                            Planning
+                                        </button>
                                     </div>
                                 </div>
                             ))}
@@ -237,12 +252,14 @@ export function WeeklyCalendar({
                                         <div
                                             key={slot.id}
                                             className={cn(
-                                                "absolute left-1 right-1 rounded-lg p-2 text-xs overflow-hidden border shadow-sm group transition-all hover:z-10 hover:shadow-md hover:scale-[1.02]",
+                                                "absolute left-1 right-1 rounded-lg p-2 text-xs overflow-hidden border shadow-sm group transition-all hover:z-10 hover:shadow-md hover:scale-[1.02] cursor-pointer",
                                                 slot.isBooked
-                                                    ? "bg-green-50 border-green-200 text-green-800"
+                                                    ? (slot.lessons[0]?.status === "CONFIRMED"
+                                                        ? "bg-green-50 border-green-200 text-green-800"
+                                                        : "bg-orange-50 border-orange-200 text-orange-800")
                                                     : slot.isRecurring
                                                         ? "bg-blue-50 border-blue-200 text-blue-800"
-                                                        : "bg-gold-50 border-gold-200 text-gold-900"
+                                                        : "bg-sky-50 border-sky-100 text-sky-700"
                                             )}
                                             style={getSlotStyle(slot.startTime, slot.endTime)}
                                             onClick={() => slot.isBooked && setSelectedSlot(slot)}
@@ -293,16 +310,20 @@ export function WeeklyCalendar({
                 {/* Legend */}
                 <div className="p-4 bg-slate-50 border-t border-slate-100 flex flex-wrap gap-4 text-xs font-semibold text-slate-500">
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded bg-gold-100 border border-gold-300"></div>
+                        <div className="w-3 h-3 rounded bg-sky-50 border border-sky-200"></div>
                         <span>Disponible</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded bg-blue-100 border border-blue-300"></div>
+                        <div className="w-3 h-3 rounded bg-blue-50 border border-blue-300"></div>
                         <span>Récurrent</span>
                     </div>
                     <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded bg-orange-100 border border-orange-300"></div>
+                        <span>En attente (élève)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded bg-green-100 border border-green-300"></div>
-                        <span>Réservé / Cours</span>
+                        <span>Validé / Confirmé</span>
                     </div>
                 </div>
             </div>

@@ -219,11 +219,18 @@ export default function DrivingLessonsPage() {
         }
     }
 
+    const isLessonUpcoming = (lesson: Lesson) => {
+        const lessonDateTime = new Date(lesson.date);
+        const [hours, minutes] = lesson.startTime.split(':').map(Number);
+        lessonDateTime.setHours(hours, minutes);
+        return lessonDateTime >= new Date();
+    };
+
     const upcomingLessons = lessons.filter(
-        (l) => new Date(l.date) >= new Date() && l.status !== "CANCELLED"
+        (l) => isLessonUpcoming(l) && l.status !== "CANCELLED"
     );
     const pastLessons = lessons.filter(
-        (l) => new Date(l.date) < new Date() || l.status === "CANCELLED"
+        (l) => !isLessonUpcoming(l) || l.status === "CANCELLED"
     );
 
     return (
@@ -652,10 +659,20 @@ export default function DrivingLessonsPage() {
                                             <span
                                                 className={`px-2 py-1 rounded text-xs font-bold ${lesson.status === "COMPLETED"
                                                     ? "bg-blue-100 text-blue-700"
-                                                    : "bg-red-100 text-red-700"
+                                                    : lesson.status === "PENDING"
+                                                        ? "bg-orange-100 text-orange-700"
+                                                        : lesson.status === "CONFIRMED"
+                                                            ? "bg-green-100 text-green-700"
+                                                            : "bg-red-100 text-red-700"
                                                     }`}
                                             >
-                                                {lesson.status === "COMPLETED" ? "Terminé" : "Annulé"}
+                                                {lesson.status === "COMPLETED"
+                                                    ? "Terminé"
+                                                    : lesson.status === "PENDING"
+                                                        ? "En attente"
+                                                        : lesson.status === "CONFIRMED"
+                                                            ? "Confirmé"
+                                                            : "Annulé"}
                                             </span>
                                         </div>
                                     </div>

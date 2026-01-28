@@ -94,7 +94,7 @@ export async function createAvailabilitySlot(formData: {
 
             // Préparer les données pour createMany
             const slotsData: any[] = [];
-            
+
             dates.forEach((date) => {
                 if (formData.breakStartTime && formData.breakEndTime) {
                     // Créneau matin
@@ -151,7 +151,7 @@ export async function createAvailabilitySlot(formData: {
             }
 
             console.log("💾 [CREATE_SLOT] Creating one-time slot(s) in DB...");
-            
+
             let createdData;
             if (formData.breakStartTime && formData.breakEndTime) {
                 createdData = await prisma.$transaction([
@@ -412,6 +412,7 @@ export async function confirmLesson(lessonId: string) {
         }
 
         revalidatePath("/dashboard/instructor/lessons");
+        revalidatePath("/dashboard/driving-lessons");
         return { success: true, data: updated };
     } catch (error: any) {
         console.error("Error confirming lesson:", error);
@@ -459,6 +460,12 @@ export async function rejectLesson(lessonId: string, reason?: string) {
             },
         });
 
+        // Re-créditer le solde de l'élève (le moniteur refuse, donc l'élève ne perd pas ses heures)
+        await prisma.user.update({
+            where: { id: lesson.studentId },
+            data: { drivingBalance: { increment: lesson.duration * 60 } }
+        });
+
         // Notification à l'élève
         const student = await prisma.user.findUnique({
             where: { id: lesson.studentId },
@@ -490,12 +497,14 @@ export async function rejectLesson(lessonId: string, reason?: string) {
         }
 
         revalidatePath("/dashboard/instructor/lessons");
+        revalidatePath("/dashboard/driving-lessons");
         return { success: true, data: updated };
     } catch (error: any) {
         console.error("Error rejecting lesson:", error);
         return { success: false, error: error.message || "Erreur lors du refus" };
     }
 }
+
 
 /**
  * Récupérer les élèves attribués à l'instructeur

@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { sendQuizResult } from "@/lib/email/transactional";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ quizId: string }> }
@@ -42,10 +44,10 @@ export async function POST(
     quiz.questions.forEach((question) => {
       const userSelected = answers[question.id] || [];
       const correctOptions = question.options.filter(o => o.isCorrect).map(o => o.id);
-      
-      const isCorrect = userSelected.length === correctOptions.length && 
-                        userSelected.every((id: string) => correctOptions.includes(id));
-      
+
+      const isCorrect = userSelected.length === correctOptions.length &&
+        userSelected.every((id: string) => correctOptions.includes(id));
+
       if (isCorrect) correctCount++;
     });
 
@@ -67,17 +69,17 @@ export async function POST(
 
     // NOUVEAU: Envoyer le résultat par mail à l'étudiant
     try {
-        await sendQuizResult({
-            userName: session.user.name || session.user.email || "Étudiant",
-            userEmail: session.user.email!,
-            quizTitle: quiz.title,
-            score,
-            isPassed,
-            passingScore: quiz.passingScore,
-            courseSlug: "" // On pourrait récupérer le slug du cours lié si besoin
-        });
+      await sendQuizResult({
+        userName: session.user.name || session.user.email || "Étudiant",
+        userEmail: session.user.email!,
+        quizTitle: quiz.title,
+        score,
+        isPassed,
+        passingScore: quiz.passingScore,
+        courseSlug: "" // On pourrait récupérer le slug du cours lié si besoin
+      });
     } catch (emailError) {
-        console.error("Failed to send quiz result email:", emailError);
+      console.error("Failed to send quiz result email:", emailError);
     }
 
     return NextResponse.json({ score, isPassed });
