@@ -725,3 +725,4 @@ model VehicleMaintenance {
 
   @@index([vehicleId, performedAt])
 }
+

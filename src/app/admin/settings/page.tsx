@@ -1,7 +1,7 @@
 import { requireOwner } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { updateSystemSettingsAction } from "./actions";
-import { MapPin, Save, Phone, Mail, Globe, Lock } from "lucide-react";
+import { MapPin, Save, Phone, Mail, Globe, Lock, Clock } from "lucide-react";
 
 export default async function AdminSettingsPage() {
    await requireOwner();
@@ -138,6 +138,35 @@ export default async function AdminSettingsPage() {
                         />
                      </div>
                   ))}
+               </div>
+            </div>
+
+            {/* --- BOOKING RULES --- */}
+            <div className="bg-white shadow rounded-lg border border-slate-200 p-6">
+               <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-gold-500" />
+                  Délais et Réservations
+               </h2>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                     <label htmlFor="BOOKING_MIN_ADVANCE_HOURS" className="block text-sm font-medium text-slate-700 mb-1">
+                        Délai minimum pour réserver/créer (Heures)
+                     </label>
+                     <div className="relative">
+                        <Clock className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
+                        <input
+                           type="number"
+                           name="BOOKING_MIN_ADVANCE_HOURS"
+                           id="BOOKING_MIN_ADVANCE_HOURS"
+                           defaultValue={settings["BOOKING_MIN_ADVANCE_HOURS"] || "48"}
+                           min="0"
+                           className="block w-full rounded-md border-slate-300 pl-10 focus:border-gold-500 focus:ring-gold-500 sm:text-sm p-2 border"
+                        />
+                     </div>
+                     <p className="mt-2 text-xs text-slate-500">
+                        S&apos;applique aux réservations élèves et à la création de créneaux ponctuels moniteur.
+                     </p>
+                  </div>
                </div>
             </div>
 

@@ -19,7 +19,8 @@ export async function updateSystemSettingsAction(formData: FormData) {
         "SOCIAL_LINKEDIN",
         "SOCIAL_SNAPCHAT",
         "SOCIAL_TIKTOK",
-        "MAINTENANCE_MODE"
+        "MAINTENANCE_MODE",
+        "BOOKING_MIN_ADVANCE_HOURS"
     ];
 
     for (const key of settingsToUpdate) {

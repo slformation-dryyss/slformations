@@ -9,6 +9,8 @@ import {
     type RecurrencePattern,
 } from "@/lib/lessons/recurrence";
 import { notifyLessonConfirmed, notifyLessonCancelled } from "@/lib/lessons/notifications";
+import { canCreateSlot } from "@/lib/lessons/validation";
+import { getSystemSettingNumber, SETTINGS, SETTING_DEFAULTS } from "@/lib/settings";
 
 /**
  * Créer un créneau de disponibilité (ponctuel ou récurrent)
@@ -150,6 +152,15 @@ export async function createAvailabilitySlot(formData: {
                 return { success: false, error: "Format de date invalide" };
             }
 
+            // Récupérer le délai dynamique
+            const advanceHours = await getSystemSettingNumber(SETTINGS.BOOKING_MIN_ADVANCE_HOURS, SETTING_DEFAULTS[SETTINGS.BOOKING_MIN_ADVANCE_HOURS]);
+
+            // Vérifier la règle des heures d'avance pour les créneaux ponctuels
+            const creationCheck = canCreateSlot(slotDate, formData.startTime, advanceHours);
+            if (!creationCheck.canCreate) {
+                return { success: false, error: creationCheck.reason };
+            }
+
             console.log("💾 [CREATE_SLOT] Creating one-time slot(s) in DB...");
 
             let createdData;
@@ -248,7 +259,10 @@ export async function getMyAvailabilities() {
             return { success: false, error: "Profil instructeur introuvable" };
         }
 
-        return { success: true, data: instructorProfile.availabilities || [] };
+        // Récupérer le délai dynamique pour l'UI
+        const advanceHours = await getSystemSettingNumber(SETTINGS.BOOKING_MIN_ADVANCE_HOURS, SETTING_DEFAULTS[SETTINGS.BOOKING_MIN_ADVANCE_HOURS]);
+
+        return { success: true, data: instructorProfile.availabilities || [], advanceHours };
     } catch (error: any) {
         console.error("Error fetching instructor availabilities:", error);
         return { success: false, error: error.message || "Erreur lors de la récupération des disponibilités" };

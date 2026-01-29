@@ -3,9 +3,10 @@
 import { prisma } from "@/lib/prisma";
 import { getOrCreateUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { canCancelLesson, shouldDeductHour, isSlotAvailable } from "@/lib/lessons/validation";
+import { canCancelLesson, shouldDeductHour, isSlotAvailable, canBookLesson } from "@/lib/lessons/validation";
 import { getStudentInstructor } from "@/lib/lessons/assignment";
 import { notifyLessonBooked, notifyLessonCancelled, notifyChangeRequest } from "@/lib/lessons/notifications";
+import { getSystemSettingNumber, SETTINGS, SETTING_DEFAULTS } from "@/lib/settings";
 
 /**
  * Récupérer les créneaux disponibles de l'instructeur attitré (étendu sur 14 jours)
@@ -34,11 +35,22 @@ export async function getAvailableSlots(courseType: string = "PERMIS_B") {
         orderBy: [{ date: "asc" }, { startTime: "asc" }],
     });
 
+    // Récupérer le délai dynamique
+    const advanceHours = await getSystemSettingNumber(SETTINGS.BOOKING_MIN_ADVANCE_HOURS, SETTING_DEFAULTS[SETTINGS.BOOKING_MIN_ADVANCE_HOURS]);
+
+    // Filtrer pour respecter la règle des heures d'avance
+    const filteredAvailabilities = availabilities.filter(slot => {
+        if (!slot.date) return false;
+        const check = canBookLesson(slot.date, slot.startTime, advanceHours);
+        return check.canBook;
+    });
+
     return {
         success: true,
         data: {
             instructor: assignment.instructor,
-            availabilities,
+            availabilities: filteredAvailabilities,
+            advanceHours, // Retourner le délai à l'UI
         },
     };
 }
@@ -89,6 +101,16 @@ export async function bookLesson(data: {
 
         if (availability.isBooked) {
             return { success: false, error: "Ce créneau est déjà réservé" };
+        }
+
+        // Récupérer le délai dynamique
+        const advanceHours = await getSystemSettingNumber(SETTINGS.BOOKING_MIN_ADVANCE_HOURS, SETTING_DEFAULTS[SETTINGS.BOOKING_MIN_ADVANCE_HOURS]);
+
+        // Vérifier la règle des heures d'avance (Sécurité au cas où)
+        const bookingDateObj = new Date(data.date);
+        const bookingCheck = canBookLesson(bookingDateObj, data.startTime, advanceHours);
+        if (!bookingCheck.canBook) {
+            return { success: false, error: bookingCheck.reason };
         }
 
         // Vérifier les chevauchements

@@ -85,6 +85,7 @@ export default function DrivingLessonsPage() {
     const [balance, setBalance] = useState<{ minutes: number; hours: number } | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [advanceHours, setAdvanceHours] = useState(48);
 
     // Modal state for instructor change
     const [showChangeModal, setShowChangeModal] = useState(false);
@@ -103,6 +104,9 @@ export default function DrivingLessonsPage() {
         if (slotsResult.success && slotsResult.data) {
             setInstructor(slotsResult.data.instructor as any);
             setAvailabilities(slotsResult.data.availabilities as any);
+            if ((slotsResult.data as any).advanceHours) {
+                setAdvanceHours((slotsResult.data as any).advanceHours);
+            }
         }
 
         // Charger les cours de l'élève
@@ -237,7 +241,7 @@ export default function DrivingLessonsPage() {
         <div className="max-w-6xl mx-auto p-6">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-slate-900">Mes Cours de Conduite</h1>
-                <p className="text-slate-500 mt-1">Réservez vos heures avec votre instructeur</p>
+                <p className="text-slate-500 mt-1">Réservez vos heures au moins {advanceHours}h à l'avance</p>
             </div>
 
             {loading ? (
@@ -481,7 +485,7 @@ export default function DrivingLessonsPage() {
                                             value={bookingDate}
                                             onChange={(e) => setBookingDate(e.target.value)}
                                             required
-                                            min={new Date().toISOString().split("T")[0]}
+                                            min={new Date(Date.now() + advanceHours * 60 * 60 * 1000).toISOString().split("T")[0]}
                                             className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500"
                                         />
                                     </div>
@@ -551,7 +555,7 @@ export default function DrivingLessonsPage() {
                                                 </svg>
                                             </div>
                                             <span className="text-xs text-slate-500 leading-snug group-hover:text-slate-700 transition-colors">
-                                                J'accepte que toute demande de report ou d'annulation doit avoir lieu <span className="font-bold text-red-500">48h avant</span> le début du cours. En cas d'annulation tardive ou d'absence, l'heure sera décomptée et non remboursée.
+                                                J'accepte que toute demande de report ou d'annulation doit avoir lieu <span className="font-bold text-red-500">{advanceHours}h avant</span> le début du cours. En cas d'annulation tardive ou d'absence, l'heure sera décomptée et non remboursée.
                                             </span>
                                         </label>
                                     </div>

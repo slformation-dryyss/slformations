@@ -3,7 +3,7 @@ import { differenceInHours, isBefore, addHours } from "date-fns";
 /**
  * Vérifie si une annulation peut être effectuée (règle des 48h)
  */
-export function canCancelLesson(lessonDate: Date, lessonStartTime: string): {
+export function canCancelLesson(lessonDate: Date, lessonStartTime: string, advanceHours: number = 48): {
     canCancel: boolean;
     reason?: string;
     hoursUntilLesson?: number;
@@ -25,11 +25,11 @@ export function canCancelLesson(lessonDate: Date, lessonStartTime: string): {
         };
     }
 
-    // Vérifier la règle des 48h
-    if (hoursUntilLesson < 48) {
+    // Vérifier la règle des heures d'avance (défaut 48h)
+    if (hoursUntilLesson < advanceHours) {
         return {
             canCancel: false,
-            reason: "Annulation tardive (moins de 48h). L'heure sera décomptée sauf urgence justifiée.",
+            reason: `Annulation tardive (moins de ${advanceHours}h). L'heure sera décomptée sauf urgence justifiée.`,
             hoursUntilLesson,
         };
     }
@@ -41,15 +41,96 @@ export function canCancelLesson(lessonDate: Date, lessonStartTime: string): {
 }
 
 /**
+ * Vérifie si un cours peut être réservé (délai paramétrable)
+ */
+export function canBookLesson(lessonDate: Date, lessonStartTime: string, advanceHours: number = 48): {
+    canBook: boolean;
+    reason?: string;
+    hoursUntilLesson?: number;
+} {
+    // Construire la date/heure complète du cours
+    const [hours, minutes] = lessonStartTime.split(":").map(Number);
+    const lessonDateTime = new Date(lessonDate);
+    lessonDateTime.setHours(hours, minutes, 0, 0);
+
+    const now = new Date();
+    const hoursUntilLesson = differenceInHours(lessonDateTime, now);
+
+    // Vérifier si le cours est dans le passé
+    if (isBefore(lessonDateTime, now)) {
+        return {
+            canBook: false,
+            reason: "Impossible de réserver un cours passé",
+            hoursUntilLesson,
+        };
+    }
+
+    // Vérifier la règle du délai d'avance
+    if (hoursUntilLesson < advanceHours) {
+        return {
+            canBook: false,
+            reason: `Délai trop court. Les cours doivent être réservés au moins ${advanceHours} heures à l'avance.`,
+            hoursUntilLesson,
+        };
+    }
+
+    return {
+        canBook: true,
+        hoursUntilLesson,
+    };
+}
+
+/**
+ * Vérifie si un créneau peut être créé par un moniteur (délai paramétrable)
+ */
+export function canCreateSlot(slotDate: Date, slotStartTime: string, advanceHours: number = 48): {
+    canCreate: boolean;
+    reason?: string;
+    hoursUntilSlot?: number;
+} {
+    // Construire la date/heure complète du créneau
+    const [hours, minutes] = slotStartTime.split(":").map(Number);
+    const slotDateTime = new Date(slotDate);
+    slotDateTime.setHours(hours, minutes, 0, 0);
+
+    const now = new Date();
+    const hoursUntilSlot = differenceInHours(slotDateTime, now);
+
+    // Vérifier si le créneau est dans le passé
+    if (isBefore(slotDateTime, now)) {
+        return {
+            canCreate: false,
+            reason: "Impossible de créer un créneau dans le passé",
+            hoursUntilSlot,
+        };
+    }
+
+    // Vérifier la règle du délai d'avance
+    if (hoursUntilSlot < advanceHours) {
+        return {
+            canCreate: false,
+            reason: `Délai trop court. Les créneaux ponctuels doivent être créés au moins ${advanceHours} heures à l'avance.`,
+            hoursUntilSlot,
+        };
+    }
+
+    return {
+        canCreate: true,
+        hoursUntilSlot,
+    };
+}
+
+/**
  * Détermine si une annulation doit décompter une heure
  */
 export function shouldDeductHour(
     lessonDate: Date,
     lessonStartTime: string,
     isUrgent: boolean,
-    urgencyValidated: boolean
+    urgencyValidated: boolean,
+    advanceHours?: number
 ): boolean {
-    const cancellationCheck = canCancelLesson(lessonDate, lessonStartTime);
+    const cancellationCheck = canCancelLesson(lessonDate, lessonStartTime, advanceHours);
 
     // Si annulation dans les délais, pas de décompte
     if (cancellationCheck.canCancel) {

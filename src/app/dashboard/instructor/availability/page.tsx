@@ -62,6 +62,7 @@ export default function AvailabilityPage() {
     const [breakEndTime, setBreakEndTime] = useState("13:00");
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [advanceHours, setAdvanceHours] = useState(48);
 
     // Dialog state
     const [confirmDialog, setConfirmDialog] = useState<{
@@ -84,6 +85,9 @@ export default function AvailabilityPage() {
             const result = await getMyAvailabilities();
             if (result.success && result.data) {
                 setAvailabilities(result.data as any);
+                if ((result as any).advanceHours) {
+                    setAdvanceHours((result as any).advanceHours);
+                }
             } else {
                 setError(result.error || "Une erreur est survenue lors du chargement");
             }
@@ -312,6 +316,7 @@ export default function AvailabilityPage() {
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
                                     required
+                                    min={new Date(Date.now() + advanceHours * 60 * 60 * 1000).toISOString().split("T")[0]}
                                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500"
                                 />
                             </div>

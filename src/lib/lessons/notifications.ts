@@ -5,31 +5,31 @@ import { prisma } from "@/lib/prisma";
 import { addDays, startOfHour, endOfHour } from "date-fns";
 
 interface LessonInfo {
-    date: Date;
-    startTime: string;
-    endTime: string;
-    studentName: string;
-    instructorName: string;
-    location?: string;
-    meetingPoint?: string;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  studentName: string;
+  instructorName: string;
+  location?: string;
+  meetingPoint?: string;
 }
 
 /**
  * Notifier l'élève et l'instructeur d'une nouvelle réservation
  */
 export async function notifyLessonBooked(
-    studentEmail: string,
-    instructorEmail: string,
-    lesson: LessonInfo
+  studentEmail: string,
+  instructorEmail: string,
+  lesson: LessonInfo
 ) {
-    const dateStr = format(lesson.date, "EEEE d MMMM yyyy", { locale: fr });
-    const timeStr = `${lesson.startTime} - ${lesson.endTime}`;
+  const dateStr = format(lesson.date, "EEEE d MMMM yyyy", { locale: fr });
+  const timeStr = `${lesson.startTime} - ${lesson.endTime}`;
 
-    // Email à l'élève
-    await sendEmail({
-        to: studentEmail,
-        subject: "Confirmation de réservation : Cours de conduite",
-        html: `
+  // Email à l'élève
+  await sendEmail({
+    to: studentEmail,
+    subject: "Confirmation de réservation : Cours de conduite",
+    html: `
       <div style="font-family: sans-serif; color: #334155;">
         <h2>Votre cours de conduite est réservé !</h2>
         <p>Bonjour ${lesson.studentName},</p>
@@ -44,13 +44,13 @@ export async function notifyLessonBooked(
         <p>Cordialement,<br/>L'équipe SL Formations</p>
       </div>
     `,
-    });
+  });
 
-    // Email à l'instructeur
-    await sendEmail({
-        to: instructorEmail,
-        subject: "Nouvelle demande de cours : " + lesson.studentName,
-        html: `
+  // Email à l'instructeur
+  await sendEmail({
+    to: instructorEmail,
+    subject: "Nouvelle demande de cours : " + lesson.studentName,
+    html: `
       <div style="font-family: sans-serif; color: #334155;">
         <h2>Nouvelle demande de cours reçue</h2>
         <p>Bonjour ${lesson.instructorName},</p>
@@ -64,19 +64,19 @@ export async function notifyLessonBooked(
         <p>Cordialement,<br/>L'équipe SL Formations</p>
       </div>
     `,
-    });
+  });
 }
 
 /**
  * Notifier de la confirmation d'un cours par l'instructeur
  */
 export async function notifyLessonConfirmed(studentEmail: string, lesson: LessonInfo) {
-    const dateStr = format(lesson.date, "EEEE d MMMM yyyy", { locale: fr });
+  const dateStr = format(lesson.date, "EEEE d MMMM yyyy", { locale: fr });
 
-    await sendEmail({
-        to: studentEmail,
-        subject: "Cours de conduite confirmé !",
-        html: `
+  await sendEmail({
+    to: studentEmail,
+    subject: "Cours de conduite confirmé !",
+    html: `
       <div style="font-family: sans-serif; color: #334155;">
         <h2>Bonne nouvelle ! Votre cours est confirmé</h2>
         <p>Bonjour ${lesson.studentName},</p>
@@ -85,25 +85,25 @@ export async function notifyLessonConfirmed(studentEmail: string, lesson: Lesson
         <p>Bonne séance !<br/>L'équipe SL Formations</p>
       </div>
     `,
-    });
+  });
 }
 
 /**
  * Notifier de l'annulation d'un cours
  */
 export async function notifyLessonCancelled(
-    toEmail: string,
-    recipientName: string,
-    lesson: LessonInfo,
-    cancelledByName: string,
-    reason?: string
+  toEmail: string,
+  recipientName: string,
+  lesson: LessonInfo,
+  cancelledByName: string,
+  reason?: string
 ) {
-    const dateStr = format(lesson.date, "EEEE d MMMM yyyy", { locale: fr });
+  const dateStr = format(lesson.date, "EEEE d MMMM yyyy", { locale: fr });
 
-    await sendEmail({
-        to: toEmail,
-        subject: "Annulation de votre cours de conduite",
-        html: `
+  await sendEmail({
+    to: toEmail,
+    subject: "Annulation de votre cours de conduite",
+    html: `
       <div style="font-family: sans-serif; color: #334155;">
         <h2>Cours de conduite annulé</h2>
         <p>Bonjour ${recipientName},</p>
@@ -113,21 +113,21 @@ export async function notifyLessonCancelled(
         <p>Cordialement,<br/>L'équipe SL Formations</p>
       </div>
     `,
-    });
+  });
 }
 
 /**
  * Notifier d'une demande de changement d'instructeur (à l'admin)
  */
 export async function notifyChangeRequest(
-    adminEmail: string,
-    studentName: string,
-    reason: string
+  adminEmail: string,
+  studentName: string,
+  reason: string
 ) {
-    await sendEmail({
-        to: adminEmail,
-        subject: "Nouvelle demande de changement d'instructeur",
-        html: `
+  await sendEmail({
+    to: adminEmail,
+    subject: "Nouvelle demande de changement d'instructeur",
+    html: `
       <div style="font-family: sans-serif; color: #334155;">
         <h2>Demande de changement d'instructeur</h2>
         <p>Une nouvelle demande de changement d'instructeur a été soumise par l'élève <strong>${studentName}</strong>.</p>
@@ -136,21 +136,21 @@ export async function notifyChangeRequest(
         <p>Cordialement,<br/>L'équipe SL Formations</p>
       </div>
     `,
-    });
+  });
 }
 
 /**
  * Notifier l'élève que sa demande de changement a été approuvée
  */
 export async function notifyChangeRequestApproved(
-    studentEmail: string,
-    studentName: string,
-    newInstructorName: string
+  studentEmail: string,
+  studentName: string,
+  newInstructorName: string
 ) {
-    await sendEmail({
-        to: studentEmail,
-        subject: "Votre demande de changement d'instructeur a été approuvée",
-        html: `
+  await sendEmail({
+    to: studentEmail,
+    subject: "Votre demande de changement d'instructeur a été approuvée",
+    html: `
       <div style="font-family: sans-serif; color: #334155;">
         <h2>Changement d'instructeur confirmé</h2>
         <p>Bonjour ${studentName},</p>
@@ -160,21 +160,21 @@ export async function notifyChangeRequestApproved(
         <p>Cordialement,<br/>L'équipe SL Formations</p>
       </div>
     `,
-    });
+  });
 }
 
 /**
  * Notifier l'élève que sa demande de changement a été rejetée
  */
 export async function notifyChangeRequestRejected(
-    studentEmail: string,
-    studentName: string,
-    reason?: string
+  studentEmail: string,
+  studentName: string,
+  reason?: string
 ) {
-    await sendEmail({
-        to: studentEmail,
-        subject: "Information concernant votre demande de changement d'instructeur",
-        html: `
+  await sendEmail({
+    to: studentEmail,
+    subject: "Information concernant votre demande de changement d'instructeur",
+    html: `
       <div style="font-family: sans-serif; color: #334155;">
         <h2>Mise à jour de votre demande de changement</h2>
         <p>Bonjour ${studentName},</p>
@@ -184,23 +184,23 @@ export async function notifyChangeRequestRejected(
         <p>Cordialement,<br/>L'équipe SL Formations</p>
       </div>
     `,
-    });
+  });
 }
 
 /**
  * Notifier de l'approche d'un cours (Rappel 24h)
  */
 export async function notifyLessonReminder(
-    toEmail: string,
-    recipientName: string,
-    lesson: { date: Date; startTime: string; endTime: string; instructorName: string; meetingPoint?: string }
+  toEmail: string,
+  recipientName: string,
+  lesson: { date: Date; startTime: string; endTime: string; instructorName: string; meetingPoint?: string }
 ) {
-    const dateStr = format(lesson.date, "EEEE d MMMM yyyy", { locale: fr });
+  const dateStr = format(lesson.date, "EEEE d MMMM yyyy", { locale: fr });
 
-    await sendEmail({
-        to: toEmail,
-        subject: "Rappel : Votre cours de conduite demain",
-        html: `
+  await sendEmail({
+    to: toEmail,
+    subject: "Rappel : Votre cours de conduite demain",
+    html: `
       <div style="font-family: sans-serif; color: #334155;">
         <h2>Rappel de votre cours de conduite</h2>
         <p>Bonjour ${recipientName},</p>
@@ -213,72 +213,72 @@ export async function notifyLessonReminder(
         <p>Bonne séance !<br/>L'équipe SL Formations</p>
       </div>
     `,
-    });
+  });
 }
 
 /**
  * Envoyer les rappels pour tous les cours prévus dans ~24h
  */
 export async function sendLessonReminders() {
-    const tomorrow = addDays(new Date(), 1);
-    const start = startOfHour(tomorrow);
-    const end = endOfHour(tomorrow);
+  const tomorrow = addDays(new Date(), 1);
+  const start = startOfHour(tomorrow);
+  const end = endOfHour(tomorrow);
 
-    // Trouver tous les cours confirmés dans cette plage horaire
-    const lessons = await prisma.drivingLesson.findMany({
-        where: {
-            date: {
-                gte: start,
-                lte: end,
-            },
-            status: "CONFIRMED",
-            reminderSent: false,
-        },
-        include: {
-            student: { select: { email: true, firstName: true, lastName: true } },
-            instructor: { include: { user: { select: { email: true, firstName: true, lastName: true } } } },
-        },
-    });
+  // Trouver tous les cours confirmés dans cette plage horaire
+  const lessons = await prisma.drivingLesson.findMany({
+    where: {
+      date: {
+        gte: start,
+        lte: end,
+      },
+      status: "CONFIRMED",
+      reminderSent: false,
+    },
+    include: {
+      student: { select: { email: true, firstName: true, lastName: true } },
+      instructor: { include: { user: { select: { email: true, firstName: true, lastName: true } } } },
+    },
+  });
 
-    console.log(`[Reminders] Found ${lessons.length} lessons to notify`);
+  console.log(`[Reminders] Found ${lessons.length} lessons to notify`);
 
-    for (const lesson of lessons) {
-        try {
-            // Rappel à l'élève
-            await notifyLessonReminder(
-                lesson.student.email!,
-                `${lesson.student.firstName} ${lesson.student.lastName}`,
-                {
-                    date: lesson.date,
-                    startTime: lesson.startTime,
-                    endTime: lesson.endTime,
-                    instructorName: `${lesson.instructor.user.firstName} ${lesson.instructor.user.lastName}`,
-                    meetingPoint: lesson.meetingPoint || "",
-                }
-            );
-
-            // Rappel à l'instructeur
-            await notifyLessonReminder(
-                lesson.instructor.user.email,
-                `${lesson.instructor.user.firstName} ${lesson.instructor.user.lastName}`,
-                {
-                    date: lesson.date,
-                    startTime: lesson.startTime,
-                    endTime: lesson.endTime,
-                    instructorName: `${lesson.instructor.user.firstName} ${lesson.instructor.user.lastName}`,
-                    meetingPoint: lesson.meetingPoint || "",
-                }
-            );
-
-            // Marquer comme envoyé
-            await prisma.drivingLesson.update({
-                where: { id: lesson.id },
-                data: { reminderSent: true },
-            });
-        } catch (err) {
-            console.error(`[Reminders] Failed for lesson ${lesson.id}:`, err);
+  for (const lesson of lessons) {
+    try {
+      // Rappel à l'élève
+      await notifyLessonReminder(
+        lesson.student.email!,
+        `${lesson.student.firstName} ${lesson.student.lastName}`,
+        {
+          date: lesson.date,
+          startTime: lesson.startTime,
+          endTime: lesson.endTime,
+          instructorName: `${lesson.instructor.user.firstName} ${lesson.instructor.user.lastName}`,
+          meetingPoint: lesson.meetingPoint || "",
         }
-    }
+      );
 
-    return lessons.length;
+      // Rappel à l'instructeur
+      await notifyLessonReminder(
+        lesson.instructor.user.email,
+        `${lesson.instructor.user.firstName} ${lesson.instructor.user.lastName}`,
+        {
+          date: lesson.date,
+          startTime: lesson.startTime,
+          endTime: lesson.endTime,
+          instructorName: `${lesson.instructor.user.firstName} ${lesson.instructor.user.lastName}`,
+          meetingPoint: lesson.meetingPoint || "",
+        }
+      );
+
+      // Marquer comme envoyé
+      await prisma.drivingLesson.update({
+        where: { id: lesson.id },
+        data: { reminderSent: true },
+      });
+    } catch (err) {
+      console.error(`[Reminders] Failed for lesson ${lesson.id}:`, err);
+    }
+  }
+
+  return lessons.length;
 }
