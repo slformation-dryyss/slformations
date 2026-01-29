@@ -11,6 +11,7 @@ interface DownloadCertificateButtonProps {
   endDate: string;
   duration: number;
   score?: number;
+  variant?: "primary" | "outline";
 }
 
 export function DownloadCertificateButton({
@@ -20,6 +21,7 @@ export function DownloadCertificateButton({
   endDate,
   duration,
   score,
+  variant = "primary",
 }: DownloadCertificateButtonProps) {
   const [loading, setLoading] = useState(false);
 
@@ -42,18 +44,22 @@ export function DownloadCertificateButton({
     }
   };
 
+  const buttonStyles = variant === "primary"
+    ? "bg-gold-500 text-navy-900 hover:bg-gold-600 shadow-lg shadow-gold-500/20"
+    : "border-2 border-slate-200 text-slate-700 hover:border-gold-500 hover:text-gold-600 bg-white";
+
   return (
     <button
       onClick={handleDownload}
       disabled={loading}
-      className="flex items-center gap-2 px-6 py-3 bg-gold-500 text-navy-900 rounded-xl font-bold hover:bg-gold-600 transition shadow-lg shadow-gold-500/20"
+      className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition ${buttonStyles} disabled:opacity-50 disabled:cursor-not-allowed`}
     >
       {loading ? (
         <Loader2 className="w-5 h-5 animate-spin" />
       ) : (
         <FileDown className="w-5 h-5" />
       )}
-      <span>Télécharger mon attestation</span>
+      <span>{loading ? "Génération..." : "Attestation"}</span>
     </button>
   );
 }

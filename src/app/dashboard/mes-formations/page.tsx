@@ -15,6 +15,7 @@ import {
   Play,
   ArrowRight
 } from "lucide-react";
+import { DownloadCertificateButton } from "@/components/courses/DownloadCertificateButton";
 
 type Enrollment = {
   id: string;
@@ -30,6 +31,7 @@ type Enrollment = {
   lastLessonId?: string | null;
   status: string;
   lastAccessedAt: string;
+  enrollmentCreatedAt: string;
   totalModules: number;
 };
 
@@ -41,6 +43,7 @@ type Stats = {
 
 export default function DashboardMesFormationsPage() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [user, setUser] = useState<{ firstName: string; lastName: string } | null>(null);
   const [stats, setStats] = useState<Stats>({ activeCourses: 0, completedHours: 0, totalHours: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -52,6 +55,7 @@ export default function DashboardMesFormationsPage() {
           const data = await res.json();
           setEnrollments(data.enrollments);
           setStats(data.stats);
+          setUser(data.user);
         }
       } catch (e) {
         console.error("Failed to load enrollments", e);
@@ -194,13 +198,25 @@ export default function DashboardMesFormationsPage() {
                           {enrollment.totalModules} modules
                         </span>
                         {/* Lien vers le player ou page détail */}
-                        <Link
-                          href={`/learn/${enrollment.slug || enrollment.courseId}${enrollment.lastLessonId ? `/${enrollment.lastLessonId}` : ""}`}
-                          className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 transition"
-                        >
-                          <Play className="w-3 h-3 fill-current" />
-                          {enrollment.lastLessonId ? "Reprendre" : "Continuer"}
-                        </Link>
+                        <div className="flex items-center gap-2">
+                          {enrollment.progress === 100 && user && (
+                            <DownloadCertificateButton
+                              userName={`${user.firstName} ${user.lastName}`}
+                              courseTitle={enrollment.title}
+                              startDate={new Date(enrollment.enrollmentCreatedAt).toLocaleDateString()}
+                              endDate={new Date(enrollment.lastAccessedAt).toLocaleDateString()}
+                              duration={35}
+                              variant="outline"
+                            />
+                          )}
+                          <Link
+                            href={`/learn/${enrollment.slug || enrollment.courseId}${enrollment.lastLessonId ? `/${enrollment.lastLessonId}` : ""}`}
+                            className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 transition"
+                          >
+                            <Play className="w-3 h-3 fill-current" />
+                            {enrollment.lastLessonId ? "Reprendre" : "Continuer"}
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>

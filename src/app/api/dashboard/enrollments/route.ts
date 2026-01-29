@@ -96,6 +96,7 @@ export async function GET() {
         lastLessonId: enrollment.lastLessonId,
         status: enrollment.status,
         lastAccessedAt: enrollment.updatedAt,
+        enrollmentCreatedAt: enrollment.createdAt,
         totalModules: enrollment.course._count.modules || 0
       };
     }));
@@ -105,6 +106,10 @@ export async function GET() {
 
     return NextResponse.json({
       enrollments,
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
       stats: {
         activeCourses: activeCoursesCount,
         completedHours: 0,
