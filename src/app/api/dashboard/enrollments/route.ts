@@ -92,6 +92,8 @@ export async function GET() {
         sessionProgress,
         hasDistance: totalDistanceLessons > 0,
         hasSessions: totalSessions > 0,
+        // @ts-ignore
+        lastLessonId: enrollment.lastLessonId,
         status: enrollment.status,
         lastAccessedAt: enrollment.updatedAt,
         totalModules: enrollment.course._count.modules || 0

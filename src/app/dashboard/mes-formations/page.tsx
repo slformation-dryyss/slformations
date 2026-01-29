@@ -27,6 +27,7 @@ type Enrollment = {
   sessionProgress?: number;
   hasDistance?: boolean;
   hasSessions?: boolean;
+  lastLessonId?: string | null;
   status: string;
   lastAccessedAt: string;
   totalModules: number;
@@ -194,11 +195,11 @@ export default function DashboardMesFormationsPage() {
                         </span>
                         {/* Lien vers le player ou page détail */}
                         <Link
-                          href={`/learn/${enrollment.slug || enrollment.courseId}`}
+                          href={`/learn/${enrollment.slug || enrollment.courseId}${enrollment.lastLessonId ? `/${enrollment.lastLessonId}` : ""}`}
                           className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 transition"
                         >
                           <Play className="w-3 h-3 fill-current" />
-                          Continuer
+                          {enrollment.lastLessonId ? "Reprendre" : "Continuer"}
                         </Link>
                       </div>
                     </div>

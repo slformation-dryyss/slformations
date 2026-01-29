@@ -36,6 +36,16 @@ export default async function LearnPage({
     redirect(`/formations/${course.slug ?? ""}`);
   }
 
+  // Update last accessed lesson for enrollment
+  // @ts-ignore
+  if (enrollment && enrollment.lastLessonId !== currentLesson.id) {
+    await prisma.enrollment.update({
+      where: { id: enrollment.id },
+      // @ts-ignore
+      data: { lastLessonId: currentLesson.id },
+    });
+  }
+
   // Fetch all completed lessons for this user in this course
   const completedProgress = await prisma.lessonProgress.findMany({
     where: {
@@ -50,6 +60,13 @@ export default async function LearnPage({
 
   const completedLessonIds = new Set(completedProgress.map(p => p.lessonId));
 
+  // Fetch resources for current lesson
+  // @ts-ignore
+  const resources = await prisma.lessonResource.findMany({
+    where: { lessonId: currentLesson.id },
+    orderBy: { createdAt: "asc" }
+  });
+
   return (
     <div className="min-h-screen text-slate-900 font-sans">
       <Header />
@@ -63,6 +80,7 @@ export default async function LearnPage({
               videoUrl={currentLesson.videoUrl}
               title={currentLesson.title}
               isCompleted={completedLessonIds.has(currentLesson.id)}
+              resources={resources}
             />
 
             {/* Lesson Content */}
@@ -109,10 +127,10 @@ export default async function LearnPage({
           {/* Sidebar curriculum */}
           <aside className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-               <h2 className="text-lg font-bold text-slate-900">Programme</h2>
-               <span className="text-xs font-bold px-2 py-1 bg-gold-500/10 text-gold-600 rounded-full">
-                  {completedLessonIds.size} / {course.modules.flatMap(m => m.lessons).length} terminés
-               </span>
+              <h2 className="text-lg font-bold text-slate-900">Programme</h2>
+              <span className="text-xs font-bold px-2 py-1 bg-gold-500/10 text-gold-600 rounded-full">
+                {completedLessonIds.size} / {course.modules.flatMap(m => m.lessons).length} terminés
+              </span>
             </div>
             <div className="space-y-3 max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar">
               {course.modules.map((module) => (
@@ -125,14 +143,13 @@ export default async function LearnPage({
                       const isCurrent = lesson.id === currentLesson.id;
                       const isCompleted = completedLessonIds.has(lesson.id);
                       const isLocked = !lesson.isFree && !enrollment;
-                      
+
                       return (
                         <Link
                           key={lesson.id}
                           href={isLocked ? "#" : `/learn/${course.slug}/${lesson.id}`}
-                          className={`flex items-center gap-3 px-4 py-3.5 text-sm hover:bg-slate-50 transition group ${
-                            isCurrent ? "bg-gold-500/5 text-gold-600 font-semibold border-l-4 border-gold-500" : "text-slate-600"
-                          } ${isLocked ? "cursor-not-allowed opacity-60 text-slate-400" : ""}`}
+                          className={`flex items-center gap-3 px-4 py-3.5 text-sm hover:bg-slate-50 transition group ${isCurrent ? "bg-gold-500/5 text-gold-600 font-semibold border-l-4 border-gold-500" : "text-slate-600"
+                            } ${isLocked ? "cursor-not-allowed opacity-60 text-slate-400" : ""}`}
                         >
                           <div className="shrink-0">
                             {isCompleted ? (
@@ -147,7 +164,7 @@ export default async function LearnPage({
                           </div>
                           <span className="flex-1 truncate leading-tight">{lesson.title}</span>
                           {lesson.isFree && !enrollment && (
-                             <span className="text-[10px] font-bold px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100 italic">Offert</span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100 italic">Offert</span>
                           )}
                         </Link>
                       );
@@ -159,14 +176,14 @@ export default async function LearnPage({
                         href={`/learn/${course.slug}/quiz/${module.quiz.id}`}
                         className="flex items-center gap-3 px-4 py-4 text-sm bg-slate-50 hover:bg-gold-50 transition border-t border-slate-100"
                       >
-                         <div className="shrink-0 w-5 h-5 bg-gold-500 rounded-full flex items-center justify-center">
-                            <Trophy className="w-3 h-3 text-navy-900" />
-                         </div>
-                         <div className="flex-1">
-                            <span className="block font-bold text-slate-900">Évaluation : {module.quiz.title}</span>
-                            <span className="block text-[10px] text-slate-500 text-xs">Vérifiez vos acquis pour ce module</span>
-                         </div>
-                         <ChevronRight className="w-4 h-4 text-slate-400" />
+                        <div className="shrink-0 w-5 h-5 bg-gold-500 rounded-full flex items-center justify-center">
+                          <Trophy className="w-3 h-3 text-navy-900" />
+                        </div>
+                        <div className="flex-1">
+                          <span className="block font-bold text-slate-900">Évaluation : {module.quiz.title}</span>
+                          <span className="block text-[10px] text-slate-500 text-xs">Vérifiez vos acquis pour ce module</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-slate-400" />
                       </Link>
                     )}
                   </div>

@@ -32,6 +32,26 @@ export async function updateLessonProgress(userId: string, lessonId: string, isC
     throw new Error("Accès non autorisé à cette leçon");
   }
 
+  // Get current progress to check timeSpent
+  const lessonProgress = await prisma.lessonProgress.findUnique({
+    where: {
+      userId_lessonId: {
+        userId,
+        lessonId,
+      },
+    },
+  });
+
+  // Validation: 90% of duration must be spent to mark as completed
+  if (isCompleted && lesson.duration > 0) {
+    const timeSpent = lessonProgress?.timeSpent || 0;
+    const requiredTime = lesson.duration * 0.9; // 90% of duration (in seconds)
+
+    if (timeSpent < requiredTime) {
+      throw new Error(`Vous devez visionner au moins 90% de la vidéo pour valider cette leçon. (${Math.round(timeSpent / 60)} / ${Math.round(requiredTime / 60)} min)`);
+    }
+  }
+
   // Upsert progress
   const progress = await prisma.lessonProgress.upsert({
     where: {

@@ -9,9 +9,10 @@ interface LessonPlayerClientProps {
   videoUrl?: string | null;
   title: string;
   isCompleted?: boolean;
+  resources?: { id: string; title: string; url: string; type: string }[];
 }
 
-export function LessonPlayerClient({ lessonId, videoUrl, title, isCompleted }: LessonPlayerClientProps) {
+export function LessonPlayerClient({ lessonId, videoUrl, title, isCompleted, resources = [] }: LessonPlayerClientProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(isCompleted ?? false);
@@ -114,6 +115,41 @@ export function LessonPlayerClient({ lessonId, videoUrl, title, isCompleted }: L
           )}
         </button>
       </div>
+
+      {/* Resources Section */}
+      {resources.length > 0 && (
+        <div className="mt-8 border-t border-slate-100 pt-6">
+          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Ressources & Documents</h3>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {resources.map((resource) => (
+              <a
+                key={resource.id}
+                href={resource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-gold-500 hover:bg-gold-50/30 transition group"
+              >
+                <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-gold-500 transition">
+                  {resource.type === "PDF" ? (
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.172 13.828a4 4 0 015.656 0l4 4a4 4 0 11-5.656 5.656l-1.102-1.101" />
+                    </svg>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">{resource.title}</p>
+                  <p className="text-[10px] text-slate-500 uppercase">{resource.type}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

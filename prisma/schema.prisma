@@ -165,8 +165,23 @@ model Lesson {
   updatedAt   DateTime         @updatedAt
   module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   progress    LessonProgress[]
+  resources   LessonResource[]
+  lastAccessedEnrollments Enrollment[] @relation("LastAccessedLesson")
 
   @@index([moduleId, position])
+}
+
+model LessonResource {
+  id        String   @id @default(cuid())
+  title     String
+  url       String
+  type      String   @default("PDF") // PDF, LINK, IMAGE, etc.
+  lessonId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
 }
 
 model CourseSession {
@@ -269,15 +284,17 @@ model LessonProgress {
 }
 
 model Enrollment {
-  id        String   @id @default(cuid())
-  userId    String
-  courseId  String
-  status    String   @default("ACTIVE")
-  progress  Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  userId       String
+  courseId     String
+  status       String   @default("ACTIVE")
+  progress     Int      @default(0)
+  lastLessonId String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastLesson   Lesson?  @relation("LastAccessedLesson", fields: [lastLessonId], references: [id])
 
   @@unique([userId, courseId])
   @@index([courseId])

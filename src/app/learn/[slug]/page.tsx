@@ -11,12 +11,12 @@ export default async function LearnSlugRedirectPage({
   const user = await requireUser();
 
   const course = await prisma.course.findFirst({
-    where: { 
+    where: {
       OR: [
         { slug: slugOrId },
         { id: slugOrId }
       ],
-      isPublished: true 
+      isPublished: true
     },
     include: {
       modules: {
@@ -40,14 +40,21 @@ export default async function LearnSlugRedirectPage({
     notFound();
   }
 
+  const enrollment = course.enrollments[0];
+
+  // If student has already started, redirect to last accessed lesson
+  // @ts-ignore
+  if (enrollment?.lastLessonId) {
+    // @ts-ignore
+    redirect(`/learn/${course.slug || course.id}/${enrollment.lastLessonId}`);
+  }
+
   const firstLesson = course.modules
     .filter(m => m.lessons.length > 0)[0]?.lessons[0];
 
   if (!firstLesson) {
     redirect(`/formations/${course.slug || course.id}`);
   }
-
-  const enrollment = course.enrollments[0];
 
   if (!enrollment && !firstLesson.isFree) {
     redirect(`/formations/${course.slug || course.id}`);
