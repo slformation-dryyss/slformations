@@ -1,0 +1,45 @@
+﻿--- Current Courses in DB ---
+[cml2ndski0014hmfw79as3hcp] Agent de S├╗ret├® et de S├®curit├® Priv├®e (Slug: agent-surete) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsgj0003hmfw5aylu9pl] CACES┬« R482 (Engins de chantier) (Slug: caces-r482) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsgc0002hmfwns0dpo4n] CACES┬« R486 (PEMP) (Slug: caces-r486) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsfn0001hmfw3p5jq5gd] CACES┬« R489 (Chariots ├®l├®vateurs) (Slug: caces-r489) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsj8000rhmfwa9a1ptt4] Compl├®ments SSIAP 2 (Slug: ssiap-2-complement) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2nlxib001azn7kldd78ao2] EPI ÔÇô MANIPULATION EXTINCTEURS (Slug: extincteurs) - 0Ôé¼ - 2 modules, 0 enrollments
+[cml2nlxi80019zn7kio1q3rn2] ├ëVACUATION DÔÇÖUN ├ëTABLISSEMENT (Slug: evacuation) - 0Ôé¼ - 2 modules, 0 enrollments
+[cml2ndsh40006hmfwc9prdrja] FCO Marchandises (Slug: fco-marchandises) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsgy0005hmfwbggnnx11] FIMO Marchandises (Slug: fimo-marchandises) - 0Ôé¼ - 2 modules, 0 enrollments
+[cml2ndsjz000zhmfw68wth0ek] Formation APS Titre III (Slug: aps-titre-3) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndshi000ahmfwscoqguoh] Formation Chauffeur VTC en ligne (Slug: vtc-online) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsht000ehmfws2b0pqoa] Formation Continue Taxi (Slug: taxi-continue) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndshe0009hmfwu0d83l1o] Formation Continue VTC (Slug: vtc-continue) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2nlxif001bzn7ku38eeumu] FORMATION FOSST (Slug: fosst) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndshw000fhmfwm12szvqw] Formation Mobilit├® Taxi (Slug: taxi-mobilite) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsi0000ghmfw2gjl0djh] Formation Mobilit├® Taxi Parisienne et Banlieue (Slug: taxi-mobilite-paris) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsic000ihmfwdrllsbx1] Formation Passerelle Taxi (Slug: taxi-passerelle) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsi5000hhmfwxm3n3igs] Formation Passerelle Taxi Banlieue vers Taxi Parisien (Slug: taxi-passerelle-paris) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndshm000bhmfwgghkq5u5] Formation Passerelle Taxi vers VTC (Slug: vtc-passerelle) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndshp000dhmfw2n412tfq] Formation Taxi Initiale (Slug: taxi-initiale) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndshb0008hmfw983p3ev6] Formation VTC (Slug: vtc-initiale) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsku0017hmfw29x07dar] H0/B0 (Slug: habilitation-b0) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndskz0018hmfwr4esh2v0] Habilitation ├ëlectrique BS BE Manoeuvre (Slug: habilitation-bs) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsk60011hmfwlqkkm3zd] MAC APS (Slug: mac-aps) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2nlxis001czn7kcrby8fto] MAC FORMATEUR SST (Slug: mac-formateur-sst) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndskd0013hmfw16ei8wpn] Palpation de S├®curit├® (Slug: palpation) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsik000lhmfwamlbtz24] RAN SSIAP 1 (Slug: ran-ssiap-1) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsj1000phmfw4eiidsmw] RAN SSIAP 2 (Slug: ran-ssiap-2) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsjh000thmfwptk04xgu] RAN SSIAP 3 (Slug: ran-ssiap-3) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsk80012hmfw8o3zy455] Recyclage Carte Professionnelle (Slug: recyclage-carte-pro) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsin000mhmfw2i4xpmyp] Recyclage SSIAP 1 (Slug: recyclage-ssiap-1) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsj5000qhmfwe7opx5jg] Recyclage SSIAP 2 (Slug: recyclage-ssiap-2) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsjk000uhmfw8qnocid0] Recyclage SSIAP 3 (Slug: recyclage-ssiap-3) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2nlxi30018zn7kfrkufaxv] RECYCLAGE SST (Slug: sst-mac) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsih000khmfw6pfq3hs8] SSIAP 1 (Slug: ssiap-1) - 0Ôé¼ - 3 modules, 0 enrollments
+[cml2ndsit000nhmfwdm4v4bko] SSIAP 1 Module Compl├®mentaire (Slug: ssiap-1-complement) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsiw000ohmfwytj73fhk] SSIAP 2 (Slug: ssiap-2) - 0Ôé¼ - 2 modules, 0 enrollments
+[cml2ndsjd000shmfwz8hyaggw] SSIAP 3 (Slug: ssiap-3) - 0Ôé¼ - 2 modules, 0 enrollments
+[cml2ndskp0016hmfw6ydvgt8v] SST (Sauveteur Secouriste du Travail) (Slug: sst) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2nlxhp0016zn7kmt7h22l3] SST INITIAL (Slug: sst-initial) - 0Ôé¼ - 2 modules, 0 enrollments
+[cml2ndsk20010hmfwld1scrf3] Surveillance Grands ├ëv├¿nements (Slug: surveillance-evenements) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsjn000vhmfwycxxzlnn] Technicien de maintenance et de travaux SSI (Slug: ssi-technicien) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsjv000yhmfw5ldkyn2o] TFP APS - PACK (Slug: tfp-aps-pack) - 0Ôé¼ - 1 modules, 0 enrollments
+[cml2ndsjr000xhmfw6vblhebn] TFP APS (Ex CQP) (Slug: tfp-aps) - 0Ôé¼ - 1 modules, 0 enrollments
