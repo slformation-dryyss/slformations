@@ -5,16 +5,16 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const categories = await getCategoriesWithCourses();
+    const categories = await getCategoriesWithCourses() as any[];
     
     // Flatten the response for easier consumption in the frontend
-    const formattedCategories = categories.map(cat => ({
+    const formattedCategories = categories.map((cat: any) => ({
       id: cat.id,
       name: cat.name,
       slug: cat.slug,
-      courses: cat.courses
-        .map(cc => cc.course)
-        .filter(c => c !== null) // Safety check
+      courses: (cat.courses || [])
+        .map((cc: any) => cc.course)
+        .filter((c: any) => c !== null) // Safety check
     }));
 
     return NextResponse.json(formattedCategories);
