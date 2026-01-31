@@ -93,6 +93,7 @@ async function main() {
         { title: 'ÉVACUATION D’UN ÉTABLISSEMENT', slug: 'evacuation', type: 'SÉCURITÉ', description: 'Guide-file et serre-file.', price: 0 },
         { title: 'EPI – MANIPULATION EXTINCTEURS', slug: 'extincteurs', type: 'SÉCURITÉ', description: 'Usage des extincteurs.', price: 0 },
         { title: 'FORMATION FOSST', slug: 'fosst', type: 'SÉCURITÉ', description: 'Référent santé-sécurité.', price: 0 },
+        { title: 'GESTES ET POSTURES', slug: 'gestes-postures', type: 'SÉCURITÉ', description: 'Appréhender les risques dorso-lombaires et maîtriser les techniques de manutention.', price: 0 },
         { title: 'MAC FORMATEUR SST', slug: 'mac-formateur-sst', type: 'SECOURISME', description: 'Actualisation formateur SST.', price: 0 },
       ]
     },

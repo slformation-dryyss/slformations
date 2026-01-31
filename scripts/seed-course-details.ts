@@ -171,6 +171,36 @@ async function main() {
       ]
     },
     {
+      slug: 'gestes-postures',
+      objectives: "Appréhender les risques dorso-lombaires et leur prévention. Appliquer les techniques de gestes et postures de travail adaptées pour atténuer la fatigue et réduire la fréquence des accidents.",
+      targetAudience: "Tout salarié amené à manipuler des charges ou à effectuer des travaux répétitifs.",
+      prospects: "Réduction des troubles musculo-squelettiques (TMS) et amélioration des conditions de travail.",
+      durationText: "7 heures (1 jour)",
+      formatText: "Présentiel",
+      modules: [
+        { 
+          title: "Théorie et Anatomie", 
+          dayNumber: 1, 
+          duration: 3.5, 
+          description: "Comprendre le corps humain et les risques liés à la manutention.", 
+          lessons: [
+            { title: "Risques et accidents", content: "Aspects réglementaires et statistiques." },
+            { title: "Anatomie et Physiologie", content: "Notions de base et risques de lésions." }
+          ] 
+        },
+        { 
+          title: "Pratique et Évaluation", 
+          dayNumber: 1, 
+          duration: 3.5, 
+          description: "Mises en situation et exercices physiques.", 
+          lessons: [
+            { title: "Techniques de manutention", content: "Principes d'économie d'effort et serious game." },
+            { title: "Exercices pratiques", content: "Manipulation de charges, échauffements et étirements." }
+          ] 
+        }
+      ]
+    },
+    {
        slug: 'formation-vtc',
        objectives: "Réussir l'examen pour devenir chauffeur VTC professionnel.",
        targetAudience: "Chauffeurs souhaitant exercer le transport de personnes. Prérequis : Permis B > 3 ans.",
