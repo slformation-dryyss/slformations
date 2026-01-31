@@ -35,6 +35,12 @@ export async function createCourseAction(formData: FormData) {
 
   const slug = slugifyTitle(title) + "-" + Date.now().toString().slice(-4);
 
+  const objectives = formData.get("objectives") as string;
+  const targetAudience = formData.get("targetAudience") as string;
+  const prospects = formData.get("prospects") as string;
+  const durationText = formData.get("durationText") as string;
+  const formatText = formData.get("formatText") as string;
+
   const course = await prisma.course.create({
     data: {
       title,
@@ -45,6 +51,11 @@ export async function createCourseAction(formData: FormData) {
       isPublished: false, // Default draft
       imageUrl: imageUrl || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80", // Better placeholder
       drivingHours,
+      objectives: objectives || "Maîtriser les compétences fondamentales et se préparer à la certification.",
+      targetAudience: targetAudience || "Particuliers ou professionnels souhaitant se former aux métiers du transport et de la sécurité.",
+      prospects: prospects || "Insertion professionnelle immédiate dans le secteur visé.",
+      durationText: durationText || "Variable",
+      formatText: formatText || "Présentiel",
     },
   });
 
@@ -68,11 +79,31 @@ export async function updateCourseAction(formData: FormData) {
     if (isNaN(maxStudents)) maxStudents = 0;
     const drivingHours = parseInt(formData.get("drivingHours") as string) || 0;
 
+    const objectives = formData.get("objectives") as string;
+    const targetAudience = formData.get("targetAudience") as string;
+    const prospects = formData.get("prospects") as string;
+    const durationText = formData.get("durationText") as string;
+    const formatText = formData.get("formatText") as string;
+
     if (!courseId) throw new Error("Course ID is missing");
 
     await prisma.course.update({
       where: { id: courseId },
-      data: { title, description, price, type, isPublished, imageUrl, maxStudents, drivingHours },
+      data: { 
+        title, 
+        description, 
+        price, 
+        type, 
+        isPublished, 
+        imageUrl, 
+        maxStudents, 
+        drivingHours,
+        objectives,
+        targetAudience,
+        prospects,
+        durationText,
+        formatText
+      },
     });
 
     revalidatePath(`/admin/courses/${courseId}`);

@@ -330,6 +330,16 @@ export default async function CMSCoursePage({
                             </div>
 
                             <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Durée Affichée</label>
+                                <input type="text" name="durationText" defaultValue={course.durationText || ""} className="w-full text-sm border-slate-300 rounded p-2 border" placeholder="Ex: 77 heures (11 jours)" />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Format</label>
+                                <input type="text" name="formatText" defaultValue={course.formatText || ""} className="w-full text-sm border-slate-300 rounded p-2 border" placeholder="Ex: Présentiel, Distanciel..." />
+                            </div>
+
+                            <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Type</label>
                                 <select name="type" defaultValue={course.type} className="w-full text-sm border-slate-300 rounded p-2 border">
                                     <option value="PERMIS">Permis</option>
@@ -346,8 +356,23 @@ export default async function CMSCoursePage({
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                                <textarea name="description" rows={4} defaultValue={course.description} className="w-full text-sm border-slate-300 rounded p-2 border" />
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Description (Courte)</label>
+                                <textarea name="description" rows={3} defaultValue={course.description} className="w-full text-sm border-slate-300 rounded p-2 border" />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Objectifs (Pédagogiques)</label>
+                                <textarea name="objectives" rows={3} defaultValue={course.objectives || ""} className="w-full text-sm border-slate-300 rounded p-2 border" />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Public Visé</label>
+                                <textarea name="targetAudience" rows={2} defaultValue={course.targetAudience || ""} className="w-full text-sm border-slate-300 rounded p-2 border" />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Débouchés / Perspectives</label>
+                                <textarea name="prospects" rows={2} defaultValue={course.prospects || ""} className="w-full text-sm border-slate-300 rounded p-2 border" />
                             </div>
 
                             <button type="submit" className="w-full bg-gold-500 hover:bg-gold-600 text-slate-900 font-bold py-2 rounded transition-colors flex items-center justify-center gap-2">
