@@ -25,6 +25,20 @@ interface UserProfile {
   isProfileComplete: boolean;
 }
 
+interface Course {
+  id: string;
+  title: string;
+  slug: string;
+  type: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  courses: Course[];
+}
+
 export function Header() {
   const { user, isLoading: isAuthLoading } = useUser();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -32,6 +46,8 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
 
   const toggleDropdown = (name: string) => {
     setActiveDropdown(activeDropdown === name ? null : name);
@@ -58,6 +74,20 @@ export function Header() {
       setProfile(null);
     }
   }, [user]);
+
+  useEffect(() => {
+    setIsCategoriesLoading(true);
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data) => {
+        setCategories(data);
+        setIsCategoriesLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch categories:", err);
+        setIsCategoriesLoading(false);
+      });
+  }, []);
 
   const isLoading = isAuthLoading || isProfileLoading;
   // Fallback to session role (set by afterCallback) to ensure instant Admin access
@@ -178,59 +208,44 @@ export function Header() {
                   </Link>
 
                   <div className="space-y-1 mt-2">
-                    {/* VTC / TAXI */}
-                    <div className="relative group/sub">
-                      <div className="flex items-center justify-between px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 cursor-pointer transition">
-                        <span className="text-sm font-semibold">Formation VTC / Taxi</span>
-                        <ChevronDown className="w-3.5 h-3.5 -rotate-90" />
+                    {isCategoriesLoading ? (
+                      <div className="px-5 py-4 flex items-center justify-center">
+                        <Loader2 className="w-5 h-5 animate-spin text-gold-500" />
                       </div>
-                      <div className="absolute left-full top-0 w-64 ml-0 opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible group-hover/sub:translate-x-0 translate-x-2 transition-all duration-200">
-                        <div className="bg-white rounded-xl shadow-xl border border-slate-100 py-2 ml-1">
-                          <Link href="/formations/vtc" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Formation VTC</Link>
-                          <Link href="/formations/vtc" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Formation Continue VTC</Link>
-                          <Link href="/formations/vtc" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Formation Taxi</Link>
-                          <Link href="/formations/vtc" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Passerelle Taxi vers VTC</Link>
+                    ) : (
+                      categories.map((category) => (
+                        <div key={category.id} className="relative group/sub">
+                          {category.courses.length > 0 ? (
+                            <>
+                              <div className="flex items-center justify-between px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 cursor-pointer transition">
+                                <span className="text-sm font-semibold">{category.name}</span>
+                                <ChevronDown className="w-3.5 h-3.5 -rotate-90" />
+                              </div>
+                              <div className="absolute left-full top-0 w-72 ml-0 opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible group-hover/sub:translate-x-0 translate-x-2 transition-all duration-200">
+                                <div className="bg-white rounded-xl shadow-xl border border-slate-100 py-2 ml-1 max-h-[80vh] overflow-y-auto">
+                                  {category.courses.map((course) => (
+                                    <Link
+                                      key={course.id}
+                                      href={`/formations/${course.slug}`}
+                                      className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition"
+                                    >
+                                      {course.title}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <Link
+                              href={`/formations/catalogue?category=${category.slug}`}
+                              className="flex items-center space-x-3 px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
+                            >
+                              <span className="text-sm font-semibold">{category.name}</span>
+                            </Link>
+                          )}
                         </div>
-                      </div>
-                    </div>
-
-                    {/* CACES */}
-                    <Link
-                      href="/formations/caces"
-                      className="flex items-center space-x-3 px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
-                    >
-                      <span className="text-sm font-semibold">CACES®</span>
-                    </Link>
-
-                    {/* Secourisme */}
-                    <Link
-                      href="/formations/secourisme"
-                      className="flex items-center space-x-3 px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
-                    >
-                      <span className="text-sm font-semibold">Secourisme (SST)</span>
-                    </Link>
-
-                    {/* Incendie */}
-                    <div className="relative group/sub text-slate-700">
-                        <div className="flex items-center justify-between px-5 py-2 hover:bg-slate-50 hover:text-gold-600 cursor-pointer transition">
-                            <span className="text-sm font-semibold">Sécurité Incendie</span>
-                            <ChevronDown className="w-3.5 h-3.5 -rotate-90" />
-                        </div>
-                        <div className="absolute left-full top-0 w-64 ml-0 opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible group-hover/sub:translate-x-0 translate-x-2 transition-all duration-200">
-                            <div className="bg-white rounded-xl shadow-xl border border-slate-100 py-2 ml-1">
-                                <Link href="/formations/incendie" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Manipulation Extincteurs</Link>
-                                <Link href="/formations/incendie" className="block px-4 py-2 text-sm text-slate-600 hover:text-gold-600 hover:bg-slate-50 transition">Équipier de Première Intervention</Link>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Habilitation */}
-                    <Link
-                      href="/formations/habilitation-electrique"
-                      className="flex items-center space-x-3 px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
-                    >
-                      <span className="text-sm font-semibold">Habilitation Élec.</span>
-                    </Link>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
@@ -435,23 +450,36 @@ export function Header() {
               </Link>
               
               <div className="ml-4 border-l border-slate-100 mt-2 space-y-2">
-                <div className="py-1">
-                    <p className="px-3 text-[10px] font-black uppercase text-slate-400">VTC / Taxi</p>
-                    <Link href="/formations/vtc" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>Formation VTC</Link>
-                    <Link href="/formations/vtc" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>Formation Continue VTC</Link>
-                </div>
-                
-                <div className="py-1">
-                    <p className="px-3 text-[10px] font-black uppercase text-slate-400">CACES</p>
-                    <Link href="/formations/caces" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>CACES®</Link>
-                </div>
-
-                <div className="py-1">
-                    <p className="px-3 text-[10px] font-black uppercase text-slate-400">Sécurité</p>
-                    <Link href="/formations/secourisme" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>Secourisme (SST)</Link>
-                    <Link href="/formations/incendie" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>Sécurité Incendie</Link>
-                    <Link href="/formations/habilitation-electrique" className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition" onClick={() => setIsMobileMenuOpen(false)}>Habilitation Élec.</Link>
-                </div>
+                {isCategoriesLoading ? (
+                  <div className="px-3 py-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-gold-500" />
+                  </div>
+                ) : (
+                  categories.map((category) => (
+                    <div key={category.id} className="py-1">
+                      <p className="px-3 text-[10px] font-black uppercase text-slate-400">{category.name}</p>
+                      {category.courses.map((course) => (
+                        <Link
+                          key={course.id}
+                          href={`/formations/${course.slug}`}
+                          className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {course.title}
+                        </Link>
+                      ))}
+                      {category.courses.length === 0 && (
+                        <Link
+                          href={`/formations/catalogue?category=${category.slug}`}
+                          className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          Voir tout
+                        </Link>
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
