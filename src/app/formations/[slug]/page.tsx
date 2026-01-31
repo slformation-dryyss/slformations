@@ -29,16 +29,8 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
   ) || [];
 
   // Déterminer la durée et le format selon le type
-  const getDurationInfo = () => {
-    if (course.type === "CACES") return { duration: "2 à 5 jours", format: "Présentiel" };
-    if (course.type === "Incendie") return { duration: "1 à 10 jours", format: "Présentiel" };
-    if (course.type === "Secourisme") return { duration: "2 jours", format: "Présentiel" };
-    if (course.type === "Habilitation Électrique") return { duration: "1 à 3 jours", format: "Présentiel" };
-    if (course.type === "VTC") return { duration: "50 heures", format: "Présentiel" };
-    return { duration: "Variable", format: "Présentiel" };
-  };
-
-  const { duration, format } = getDurationInfo();
+  const duration = course.durationText || "Variable";
+  const format = course.formatText || "Présentiel";
 
   return (
     <div className="min-h-screen text-slate-900 font-sans flex flex-col">
@@ -86,7 +78,7 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
             </h1>
 
             <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl leading-relaxed font-medium">
-              {course.description?.split('\n')[0] || "Formation professionnelle certifiante pour monter en compétences et obtenir votre diplôme d'État."}
+              {course.description}
             </p>
 
             <div className="flex flex-wrap items-center gap-8 text-sm text-white/90 mb-12">
@@ -96,7 +88,7 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
               </div>
               <div className="flex items-center space-x-3 bg-white/5 backdrop-blur-xl px-5 py-3 rounded-2xl border border-white/10">
                 <Users className="w-5 h-5 text-gold-500" />
-                <span className="font-bold uppercase tracking-tight">12 pers. max</span>
+                <span className="font-bold uppercase tracking-tight">{course.maxStudents || 12} pers. max</span>
               </div>
               <div className="flex items-center space-x-3 bg-white/5 backdrop-blur-xl px-5 py-3 rounded-2xl border border-white/10">
                 <BadgeCheck className="w-5 h-5 text-gold-500" />
@@ -141,7 +133,7 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
               </div>
               <h3 className="text-xl font-black mb-3 text-slate-900 uppercase tracking-tight">Objectif clé</h3>
               <p className="text-slate-500 leading-relaxed font-medium">
-                Maîtrisez les compétences fondamentales et préparez-vous sereinement à l'obtention de votre certification officielle.
+                {course.objectives || "Maîtrisez les compétences fondamentales et préparez-vous sereinement à l'obtention de votre certification officielle."}
               </p>
             </div>
 
@@ -151,7 +143,7 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
               </div>
               <h3 className="text-xl font-black mb-3 text-slate-900 uppercase tracking-tight">Public visé</h3>
               <p className="text-slate-500 leading-relaxed font-medium">
-                Professionnels en quête de spécialisation ou particuliers souhaitant acquérir une expertise reconnue par l'État.
+                {course.targetAudience || "Professionnels en quête de spécialisation ou particuliers souhaitant acquérir une expertise reconnue par l'État."}
               </p>
             </div>
 
@@ -161,7 +153,7 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
               </div>
               <h3 className="text-xl font-black mb-3 text-slate-900 uppercase tracking-tight">Certification</h3>
               <p className="text-slate-500 leading-relaxed font-medium">
-                Titre certifié RNCP/RS, reconnu au niveau national pour faciliter votre insertion professionnelle durable.
+                {course.prospects || "Titre certifié RNCP/RS, reconnu au niveau national pour faciliter votre insertion professionnelle durable."}
               </p>
             </div>
           </div>

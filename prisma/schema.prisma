@@ -46,6 +46,7 @@ model User {
   primaryRole            String                 @default("STUDENT")
   mustChangePassword     Boolean                @default(false)
   passwordChangedAt      DateTime?
+  drivingBalance         Int                    @default(0)
   addresses              Address[]
   bookings               Booking[]
   studentChangeRequests  ChangeRequest[]        @relation("StudentChangeRequests")
@@ -66,7 +67,6 @@ model User {
   teachingSlots          SessionSlot[]
   teacherProfile         TeacherProfile?
   documents              UserDocument[]
-  drivingBalance         Int                    @default(0)
 }
 
 model TeacherProfile {
@@ -94,6 +94,12 @@ model Course {
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   maxStudents    Int?               @default(0)
+  drivingHours   Int?               @default(0)
+  objectives     String?            @default("Maîtriser les compétences fondamentales et se préparer à la certification.")
+  targetAudience String?            @default("Particuliers ou professionnels souhaitant se former aux métiers du transport et de la sécurité.")
+  prospects      String?            @default("Insertion professionnelle immédiate dans le secteur visé.")
+  durationText   String?            @default("Variable")
+  formatText     String?            @default("Présentiel")
   bookings       Booking[]
   categories     CourseOnCategory[]
   courseSessions CourseSession[]
@@ -104,7 +110,6 @@ model Course {
   paymentLinks   PaymentLink[]
   quizzes        Quiz[]
   sessions       Session[]
-  drivingHours   Int?               @default(0)
 
   @@index([type])
   @@index([isPublished, type])
@@ -165,23 +170,8 @@ model Lesson {
   updatedAt   DateTime         @updatedAt
   module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   progress    LessonProgress[]
-  resources   LessonResource[]
-  lastAccessedEnrollments Enrollment[] @relation("LastAccessedLesson")
 
   @@index([moduleId, position])
-}
-
-model LessonResource {
-  id        String   @id @default(cuid())
-  title     String
-  url       String
-  type      String   @default("PDF") // PDF, LINK, IMAGE, etc.
-  lessonId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
-  @@index([lessonId])
 }
 
 model CourseSession {
@@ -284,17 +274,15 @@ model LessonProgress {
 }
 
 model Enrollment {
-  id           String   @id @default(cuid())
-  userId       String
-  courseId     String
-  status       String   @default("ACTIVE")
-  progress     Int      @default(0)
-  lastLessonId String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lastLesson   Lesson?  @relation("LastAccessedLesson", fields: [lastLessonId], references: [id])
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  status    String   @default("ACTIVE")
+  progress  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
   @@index([courseId])
@@ -601,11 +589,11 @@ model InstructorAvailability {
   startTime         String
   endTime           String
   isRecurring       Boolean           @default(false)
-  recurrenceGroupId String?
   isBooked          Boolean           @default(false)
-  licenseTypes      String[]          @default(["B"])
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
+  recurrenceGroupId String?
+  licenseTypes      String[]          @default(["B"])
   lessons           DrivingLesson[]
   instructor        InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade)
 
@@ -657,12 +645,12 @@ model DrivingLesson {
   reminderSent         Boolean                 @default(false)
   instructorNotes      String?
   studentNotes         String?
-  studentProgress      String?
-  areasToImprove       String?
-  completedAt          DateTime?
   createdAt            DateTime                @default(now())
   updatedAt            DateTime                @updatedAt
   vehicleId            String?
+  studentProgress      String?
+  areasToImprove       String?
+  completedAt          DateTime?               @db.Timestamp(6)
   availability         InstructorAvailability? @relation(fields: [availabilityId], references: [id])
   instructor           InstructorProfile       @relation(fields: [instructorId], references: [id], onDelete: Cascade)
   student              User                    @relation("StudentLessons", fields: [studentId], references: [id], onDelete: Cascade)
@@ -681,13 +669,13 @@ model ChangeRequest {
   reason                String
   details               String?
   preferredGender       String?
-  courseType            String             @default("PERMIS_B")
   status                String             @default("PENDING")
   reviewedBy            String?
   reviewedAt            DateTime?
   reviewNotes           String?
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
+  courseType            String             @default("PERMIS_B")
   currentInstructor     InstructorProfile  @relation("CurrentInstructor", fields: [currentInstructorId], references: [id], onDelete: Cascade)
   requestedInstructor   InstructorProfile? @relation("RequestedInstructor", fields: [requestedInstructorId], references: [id])
   student               User               @relation("StudentChangeRequests", fields: [studentId], references: [id], onDelete: Cascade)
@@ -742,4 +730,3 @@ model VehicleMaintenance {
 
   @@index([vehicleId, performedAt])
 }
-
