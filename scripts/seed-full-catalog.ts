@@ -81,9 +81,13 @@ async function main() {
       name: 'LA SANTÉ ET LA SÉCURITÉ AU TRAVAIL',
       slug: 'sante-securite',
       courses: [
-        { title: 'SST (Sauveteur Secouriste du Travail)', slug: 'sst', type: 'SECOURISME', description: 'Formation aux premiers secours en milieu professionnel.' },
-        { title: 'Habilitation Électrique B0 H0 H0V', slug: 'habilitation-b0', type: 'HABILITATION', description: 'Personnel non électricien travaillant à proximité.' },
-        { title: 'Habilitation Électrique BS BE Manoeuvre', slug: 'habilitation-bs', type: 'HABILITATION', description: 'Interventions simples sur circuits basse tension.' },
+        { title: 'SST INITIAL', slug: 'sst-initial', type: 'SECOURISME', description: 'Sauvetage Secourisme du Travail - Formation initiale.' },
+        { title: 'H0/B0', slug: 'habilitation-b0', type: 'HABILITATION', description: 'Habilitation électrique pour personnel non électricien.' },
+        { title: 'RECYCLAGE SST', slug: 'sst-mac', type: 'SECOURISME', description: 'Maintien et Actualisation des Compétences du Sauveteur Secouriste du Travail.' },
+        { title: 'ÉVACUATION D’UN ÉTABLISSEMENT', slug: 'evacuation', type: 'SÉCURITÉ', description: 'Formation guide-file et serre-file pour l\'évacuation incendie.' },
+        { title: 'EPI – MANIPULATION EXTINCTEURS', slug: 'extincteurs', type: 'SÉCURITÉ', description: 'Équipier de Première Intervention : manipuler un extincteur sur un début d\'incendie.' },
+        { title: 'FORMATION FOSST', slug: 'fosst', type: 'SÉCURITÉ', description: 'Formation à l\'Organisation des Secours et à la Santé au Travail.' },
+        { title: 'MAC FORMATEUR SST', slug: 'mac-formateur-sst', type: 'SECOURISME', description: 'Maintien et Actualisation des Compétences pour les formateurs SST.' },
       ]
     }
   ];

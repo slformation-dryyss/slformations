@@ -102,15 +102,72 @@ async function main() {
       ]
     },
     {
-      slug: 'sst-sauveteur-secouriste-du-travail',
-      objectives: "Devenir le premier maillon de la chaîne des secours en entreprise et participer à la prévention des risques.",
-      targetAudience: "Tout salarié souhaitant être formé aux premiers secours.",
-      prospects: "Maintien des compétences obligatoire tous les 2 ans.",
+      slug: 'sst-initial',
+      objectives: "Devenir le premier maillon de la chaîne des secours en entreprise et participer à la prévention des risques professionnels.",
+      targetAudience: "Tout salarié souhaitant être formé aux premiers secours. Aucun prérequis nécessaire.",
+      prospects: "Maintien des compétences obligatoire tous les 2 ans (MAC).",
       durationText: "14 heures (2 jours)",
       formatText: "Présentiel",
       modules: [
-        { title: "Protéger et Alerter", dayNumber: 1, duration: 7, description: "Intervention initiale.", lessons: [{ title: "L'alerte", content: "Informer les secours." }] },
-        { title: "Secourir", dayNumber: 2, duration: 7, description: "Gestes de secours adaptés.", lessons: [{ title: "Réanimation", content: "Massage et défibrillateur." }] }
+        { title: "Le cadre juridique et la prévention", dayNumber: 1, duration: 7, description: "Rôle du SST et cadre d'intervention.", lessons: [{ title: "Rôle du SST", content: "Protéger, de l'alerte à l'intervention." }, { title: "Prévention", content: "Repérer les dangers dans l'entreprise." }] },
+        { title: "Secourir et Alerter", dayNumber: 2, duration: 7, description: "Gestes de secours adaptés à chaque situation.", lessons: [{ title: "L'alerte", content: "Organiser et transmettre l'alerte." }, { title: "La réanimation", content: "Usage du défibrillateur (DAE)." }] }
+      ]
+    },
+    {
+      slug: 'sst-mac',
+      objectives: "Maintenir et actualiser les compétences du Sauveteur Secouriste du Travail (renouvellement obligatoire tous les 24 mois).",
+      targetAudience: "Titulaires du certificat SST en cours de validité.",
+      prospects: "Renouvellement du certificat SST.",
+      durationText: "7 heures (1 jour)",
+      formatText: "Présentiel",
+      modules: [
+        { title: "Retour d'expérience et actualisation", dayNumber: 1, duration: 7, description: "Échanges sur les pratiques et mise à jour des techniques.", lessons: [{ title: "Évolution du guide technique", content: "Dernières directives de l'INRS." }, { title: "Mise en situation", content: "Cas concrets de sauvetage." }] }
+      ]
+    },
+    {
+      slug: 'evacuation',
+      objectives: "Former le personnel aux procédures d'évacuation, au rôle de guide-file et serre-file, et à la gestion du rassemblement.",
+      targetAudience: "Tout personnel désigné pour encadrer l'évacuation en cas d'incendie.",
+      prospects: "Mise en conformité du registre de sécurité.",
+      durationText: "3 h 30 (Demi-journée)",
+      formatText: "Présentiel",
+      modules: [
+        { title: "Théorie de l'évacuation", dayNumber: 1, duration: 2, description: "Comprendre les signaux et les cheminements.", lessons: [{ title: "Signal d'alarme", content: "Reconnaître l'alerte sonore." }, { title: "Rôles", content: "Missions des guide-files et serre-files." }] },
+        { title: "Exercice pratique", dayNumber: 1, duration: 1.5, description: "Mise en situation réelle dans l'établissement.", lessons: [{ title: "Reconnaissance", content: "Identifier les sorties de secours." }] }
+      ]
+    },
+    {
+      slug: 'extincteurs',
+      objectives: "Maîtriser l'utilisation des différents types d'extincteurs et savoir intervenir efficacement on un début d'incendie.",
+      targetAudience: "L'ensemble du personnel de l'entreprise (recommandation Code du Travail).",
+      prospects: "Sécurité incendie renforcée au travail.",
+      durationText: "2 à 3 heures",
+      formatText: "Présentiel (Atelier)",
+      modules: [
+        { title: "Théorie du feu", dayNumber: 1, duration: 1, description: "Le triangle du feu et les agents extincteurs.", lessons: [{ title: "Classes de feux", content: "A, B, C, D et F." }] },
+        { title: "Pratique sur bac à feu", dayNumber: 1, duration: 2, description: "Manipulation réelle d'extincteurs Eau/CO2.", lessons: [{ title: "Attaque du feu", content: "Positionnement et distance de sécurité." }] }
+      ]
+    },
+    {
+      slug: 'fosst',
+      objectives: "Former des référents capables d'organiser les secours et de piloter la santé au travail dans l'entreprise.",
+      targetAudience: "Dirigeants, managers, responsables RH ou sécurité.",
+      prospects: "Gestionnaire de la santé-sécurité.",
+      durationText: "21 heures (3 jours)",
+      formatText: "Présentiel",
+      modules: [
+        { title: "Organisation des secours", dayNumber: 1, duration: 7, description: "Mise en place des protocoles d'urgence.", lessons: [{ title: "Audit interne", content: "Évaluer les besoins en matériels." }] }
+      ]
+    },
+    {
+      slug: 'mac-formateur-sst',
+      objectives: "Maintenir et actualiser les compétences pédagogiques et techniques des formateurs SST.",
+      targetAudience: "Formateurs SST certifiés (renouvellement tous les 3 ans).",
+      prospects: "Maintien de l'habilitation formateur SST.",
+      durationText: "21 heures (3 jours)",
+      formatText: "Présentiel",
+      modules: [
+        { title: "Ingénierie pédagogique", dayNumber: 1, duration: 7, description: "Conception de modules de formation.", lessons: [{ title: "Évaluation", content: "Critères de certification des stagiaires." }] }
       ]
     },
     {
