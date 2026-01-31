@@ -14,36 +14,79 @@ async function main() {
       durationText: "77 heures (11 jours)",
       formatText: "Présentiel",
       modules: [
-        {
-          title: "Le feu et ses conséquences",
-          dayNumber: 1,
-          duration: 7,
-          description: "Comprendre les mécanismes de la combustion et la propagation du feu.",
-          lessons: [
-            { title: "Le triangle du feu", content: "Les 3 éléments nécessaires à la combustion." },
-            { title: "Classes de feux", content: "Classification A, B, C, D, F et agents extincteurs associés." }
-          ]
-        },
-        {
-          title: "Sécurité incendie",
-          dayNumber: 2,
-          duration: 7,
-          description: "Principes de classement des ERP et principes fondamentaux de sécurité.",
-          lessons: [
-            { title: "Cloisonnement", content: "Isolement des risques et barrages au feu." },
-            { title: "Évacuation", content: "Principes de mise en sécurité des occupants." }
-          ]
-        },
-        {
-          title: "Installations techniques",
-          dayNumber: 3,
-          duration: 7,
-          description: "Découverte des circuits électriques, colonnes sèches et éclairage de sécurité.",
-          lessons: [
-            { title: "Installations électriques", content: "Risques et sectionnement." },
-            { title: "Système de Sécurité Incendie (SSI)", content: "Détection, mise en sécurité et alarme." }
-          ]
-        }
+        { title: "Le feu et ses conséquences", dayNumber: 1, duration: 7, description: "Comprendre les mécanismes de la combustion.", lessons: [{ title: "Triangle du feu", content: "Les 3 éléments de la combustion." }, { title: "Classes de feux", content: "A, B, C, D, F." }] },
+        { title: "Sécurité incendie", dayNumber: 2, duration: 7, description: "Principes de classement des ERP.", lessons: [{ title: "Évacuation", content: "Mise en sécurité des occupants." }] },
+        { title: "Installations techniques", dayNumber: 3, duration: 7, description: "Électricité et systèmes de secours.", lessons: [{ title: "Système de Sécurité Incendie", content: "Détection et alarme." }] }
+      ]
+    },
+    {
+      slug: 'ssiap-2',
+      objectives: "Encadrer une équipe de sécurité incendie, diriger le poste de sécurité lors de sinistres et gérer les opérations d'entretien.",
+      targetAudience: "Titulaires du SSIAP 1 avec 1607h d'expérience. Prérequis : SST/PSC1 valide.",
+      prospects: "Chef d'équipe de sécurité incendie.",
+      durationText: "70 heures (10 jours)",
+      formatText: "Présentiel",
+      modules: [
+        { title: "Rôles et missions du chef d'équipe", dayNumber: 1, duration: 7, description: "Management et organisation du service.", lessons: [{ title: "Gestion de l'équipe", content: "Encadrement et évaluation." }] },
+        { title: "Manipulation des systèmes", dayNumber: 2, duration: 7, description: "Gestion du Poste Central de Sécurité.", lessons: [{ title: "PCS", content: "Conduite à tenir en situation de crise." }] }
+      ]
+    },
+    {
+      slug: 'ssiap-3',
+      objectives: "Assurer les fonctions de chef de service de sécurité : conseil au chef d'établissement, gestion des budgets et suivi de la réglementation.",
+      targetAudience: "Diplômé SSIAP 2 (3 ans d'exp) ou diplôme de niveau 4. Prérequis : SST/PSC1.",
+      prospects: "Chef de service de sécurité incendie.",
+      durationText: "216 heures (30 jours)",
+      formatText: "Présentiel",
+      modules: [
+        { title: "Réglementation incendie", dayNumber: 1, duration: 7, description: "Maîtrise du cadre législatif complexe.", lessons: [{ title: "Analyses de plans", content: "Outils CLICDVCREM." }] },
+        { title: "Gestion et Management", dayNumber: 2, duration: 7, description: "Budget et ressources humaines.", lessons: [{ title: "Budget du service", content: "Maintenance et achats." }] }
+      ]
+    },
+    {
+      slug: 'caces-r489-categorie-1a-1b-3-5',
+      objectives: "Conduire et manipuler des chariots de manutention en toute sécurité selon la recommandation R489 de la CNAM.",
+      targetAudience: "Caristes, préparateurs de commandes, magasiniers.",
+      prospects: "Logistique, entreposage, industrie.",
+      durationText: "2 à 5 jours selon expérience",
+      formatText: "Mixte (Théorie & Pratique)",
+      modules: [
+        { title: "Théorie Cariste", dayNumber: 1, duration: 7, description: "Règles de sécurité et technologie des engins.", lessons: [{ title: "Stabilité", content: "Notions de physique et centre de gravité." }] },
+        { title: "Pratique Conduite", dayNumber: 2, duration: 7, description: "Évolutions et manutention de charges.", lessons: [{ title: "Gerbage", content: "Prise et dépose en hauteur." }] }
+      ]
+    },
+    {
+      slug: 'fimo-marchandises',
+      objectives: "Obtenir la qualification nécessaire pour conduire des véhicules de plus de 3,5 tonnes de PTAC à titre professionnel.",
+      targetAudience: "Conducteurs débutant dans le transport de marchandises. Prérequis : Permis C ou CE.",
+      prospects: "Conducteur routier national ou international.",
+      durationText: "140 heures (4 semaines)",
+      formatText: "Présentiel",
+      modules: [
+        { title: "Perfectionnement à la conduite", dayNumber: 1, duration: 7, description: "Conduite rationnelle et sécurité routière.", lessons: [{ title: "Éco-conduite", content: "Optimisation de la consommation." }] },
+        { title: "Réglementation Sociale", dayNumber: 2, duration: 7, description: "Temps de conduite et de repos.", lessons: [{ title: "Le Chronotachygraphe", content: "Utilisation des cartes conducteur." }] }
+      ]
+    },
+    {
+      slug: 'fco-marchandises',
+      objectives: "Mettre à jour ses connaissances professionnelles et renouveler sa carte de qualification (obligatoire tous les 5 ans).",
+      targetAudience: "Conducteurs routiers en activité. Prérequis : FIMO validée.",
+      prospects: "Maintien du titre professionnel.",
+      durationText: "35 heures (5 jours)",
+      formatText: "Présentiel",
+      modules: [
+        { title: "Actualisation sécurité", dayNumber: 1, duration: 7, description: "Révision des acquis et nouveautés réglementaires.", lessons: [{ title: "Risques routiers", content: "Actualisation des dangers." }] }
+      ]
+    },
+    {
+      slug: 'habitation-electrique-b0-h0-h0v',
+      objectives: "Réaliser des opérations non électriques dans des zones présentant des risques électriques en toute sécurité.",
+      targetAudience: "Personnel non-électricien : agents d'entretien, peintres, maçons.",
+      prospects: "Accès autorisé aux locaux électriques.",
+      durationText: "1 jour",
+      formatText: "Présentiel",
+      modules: [
+        { title: "Notions élémentaires", dayNumber: 1, duration: 7, description: "Dangers de l'électricité et mesures de protection.", lessons: [{ title: "Le courant électrique", content: "Effets sur le corps humain." }] }
       ]
     },
     {
@@ -54,86 +97,32 @@ async function main() {
       durationText: "175 heures (5 semaines)",
       formatText: "Présentiel",
       modules: [
-        {
-          title: "Socle de base : Juridique",
-          dayNumber: 1,
-          duration: 7,
-          description: "Cadre légal de la sécurité privée en France.",
-          lessons: [
-            { title: "Livre VI du CSI", content: "Réglementation de la profession." },
-            { title: "Code de Déontologie", content: "Éthique et comportement professionnel." }
-          ]
-        },
-        {
-          title: "Gestion des conflits",
-          dayNumber: 2,
-          duration: 7,
-          description: "Désamorcer les situations tendues et gérer l'agressivité.",
-          lessons: [
-            { title: "Communication verbale", content: "Techniques d'écoute et de dialogue." },
-            { title: "Maîtrise de soi", content: "Gérer le stress en situation de crise." }
-          ]
-        }
+        { title: "Socle de base : Juridique", dayNumber: 1, duration: 7, description: "Cadre légal de la sécurité privée.", lessons: [{ title: "Livre VI du CSI", content: "Réglementation de la profession." }] },
+        { title: "Gestion des conflits", dayNumber: 2, duration: 7, description: "Désamorcer les situations tendues.", lessons: [{ title: "Communication verbale", content: "Techniques d'écoute." }] }
       ]
     },
     {
       slug: 'sst-sauveteur-secouriste-du-travail',
       objectives: "Devenir le premier maillon de la chaîne des secours en entreprise et participer à la prévention des risques.",
       targetAudience: "Tout salarié souhaitant être formé aux premiers secours.",
-      prospects: "Maintien des compétences obligatoire tous les 2 ans (MAC SST).",
+      prospects: "Maintien des compétences obligatoire tous les 2 ans.",
       durationText: "14 heures (2 jours)",
       formatText: "Présentiel",
       modules: [
-        {
-          title: "Protéger et Alerter",
-          dayNumber: 1,
-          duration: 7,
-          description: "Maîtriser les premières étapes de l'intervention.",
-          lessons: [
-            { title: "Recherche des dangers", content: "Supprimer ou isoler le danger." },
-            { title: "L'alerte", content: "Transmettre les informations aux secours spécialisés." }
-          ]
-        },
-        {
-          title: "Secourir",
-          dayNumber: 2,
-          duration: 7,
-          description: "Pratiquer les gestes de secours adaptés à la victime.",
-          lessons: [
-            { title: "La victime s'étouffe", content: "Claquages dans le dos et compressions." },
-            { title: "La victime saigne abondamment", content: "Compression directe et pansement compressif." }
-          ]
-        }
+        { title: "Protéger et Alerter", dayNumber: 1, duration: 7, description: "Intervention initiale.", lessons: [{ title: "L'alerte", content: "Informer les secours." }] },
+        { title: "Secourir", dayNumber: 2, duration: 7, description: "Gestes de secours adaptés.", lessons: [{ title: "Réanimation", content: "Massage et défibrillateur." }] }
       ]
     },
     {
        slug: 'formation-vtc',
-       objectives: "Réussir l'examen théorique et pratique pour devenir chauffeur VTC professionnel.",
-       targetAudience: "Chauffeurs souhaitant exercer le transport de personnes à titre onéreux. Prérequis : Permis B > 3 ans.",
-       prospects: "Chauffeur indépendant, auto-entrepreneur ou salarié.",
+       objectives: "Réussir l'examen pour devenir chauffeur VTC professionnel.",
+       targetAudience: "Chauffeurs souhaitant exercer le transport de personnes. Prérequis : Permis B > 3 ans.",
+       prospects: "Chauffeur indépendant ou salarié.",
        durationText: "50 heures (7 jours)",
-       formatText: "Mixte (Théorie & Pratique)",
+       formatText: "Mixte",
        modules: [
-         {
-           title: "Réglementation du transport",
-           dayNumber: 1,
-           duration: 7,
-           description: "Connaissance des lois encadrant le transport de personnes.",
-           lessons: [
-             { title: "Droit du transport", content: "Loi Grandguillaume et code des transports." },
-             { title: "Sécurité Routière", content: "Règles spécifiques au VTC." }
-           ]
-         },
-         {
-           title: "Gestion et Développement",
-           dayNumber: 2,
-           duration: 7,
-           description: "Apprendre à gérer son entreprise de VTC.",
-           lessons: [
-             { title: "Statuts juridiques", content: "Choisir entre SASU, EURL, Auto-entrepreneur." },
-             { title: "Relation Client", content: "Qualité de service et accueil." }
-           ]
-         }
+         { title: "Réglementation", dayNumber: 1, duration: 7, description: "Lois encadrant le transport.", lessons: [{ title: "Droit du transport", content: "Loi Grandguillaume." }] },
+         { title: "Gestion", dayNumber: 2, duration: 7, description: "Gérer son entreprise.", lessons: [{ title: "Statuts", content: "EURL, SASU, Auto-entrepreneur." }] }
        ]
     }
   ];
