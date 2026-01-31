@@ -101,7 +101,9 @@ async function getAdminStats() {
   const recentEnrollments = await prisma.enrollment.findMany({
     take: 5,
     orderBy: { createdAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      createdAt: true,
       user: {
         select: { email: true, name: true },
       },
@@ -456,12 +458,12 @@ export default async function AdminDashboardPage() {
           <div className="bg-slate-900 text-red-400 p-4 rounded-lg text-xs font-mono overflow-auto mb-6 max-h-40">
             {error instanceof Error ? error.message : String(error)}
           </div>
-          <button
-            onClick={() => window.location.reload()}
+          <Link
+            href="/admin"
             className="block w-full text-center py-2.5 px-4 bg-slate-900 text-white font-medium rounded-lg hover:bg-slate-800 transition"
           >
             Actualiser la page
-          </button>
+          </Link>
         </div>
       </div>
     );
