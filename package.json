@@ -50,6 +50,6 @@
     "eslint-config-next": "15.1.9"
   },
   "prisma": {
-    "seed": "npx tsx scripts/seed-full-catalog.ts"
+    "seed": "npx tsx scripts/seed-full-catalog.ts && npx tsx scripts/seed-course-details.ts"
   }
 }
