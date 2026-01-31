@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Plus, Edit, Eye, Trash } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { CourseFilters } from "@/components/admin/CourseFilters";
 import { DeleteCourseButton } from "@/components/admin/courses/DeleteCourseButton";
 

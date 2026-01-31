@@ -4,6 +4,9 @@ import { SessionsManager } from "@/components/admin/SessionsManager";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getSessions() {
   return await prisma.courseSession.findMany({
     include: {
@@ -16,7 +19,12 @@ async function getSessions() {
   });
 }
 
-export default async function AdminSessionsPage() {
+export default async function AdminSessionsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<any>;
+}) {
+  await searchParams; // Await searchParams for Next.js 15 consistency
   await requireAdmin();
   const sessions = await getSessions();
 
