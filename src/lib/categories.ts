@@ -9,11 +9,13 @@ export async function getCategoriesWithCourses() {
   return prisma.courseCategory.findMany({
     include: {
       courses: {
+        where: {
+          course: {
+            isPublished: true
+          }
+        },
         include: {
           course: {
-            where: {
-              isPublished: true,
-            },
             select: {
               id: true,
               title: true,
