@@ -24,7 +24,7 @@ export default async function HistoryPage({
         ];
     }
 
-    const [links, totalCount] = await Promise.all([
+    const [links, totalCount, users, courses] = await Promise.all([
         prisma.paymentLink.findMany({
             where: whereClause,
             orderBy: { createdAt: "desc" },
@@ -35,7 +35,9 @@ export default async function HistoryPage({
                 course: { select: { title: true } }
             }
         }),
-        prisma.paymentLink.count({ where: whereClause })
+        prisma.paymentLink.count({ where: whereClause }),
+        prisma.user.findMany({ select: { id: true, email: true, firstName: true, lastName: true }, orderBy: { lastName: 'asc' } }),
+        prisma.course.findMany({ select: { id: true, title: true }, where: { isPublished: true } })
     ]);
 
     const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -47,6 +49,8 @@ export default async function HistoryPage({
                 totalCount={totalCount}
                 currentPage={page}
                 totalPages={totalPages}
+                users={users}
+                courses={courses}
             />
         </div>
     );

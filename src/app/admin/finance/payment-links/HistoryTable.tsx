@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Search, FileDown, RefreshCcw, Loader2, Copy } from "lucide-react";
 import { syncPaymentLinkStatusAction } from "../actions";
+import { ManualPaymentModal } from "./ManualPaymentModal";
 
 interface PaymentLink {
     id: string;
@@ -20,9 +21,11 @@ interface HistoryTableProps {
     totalCount: number;
     currentPage: number;
     totalPages: number;
+    users: { id: string; email: string; firstName: string | null; lastName: string | null }[];
+    courses: { id: string; title: string }[];
 }
 
-export default function HistoryTable({ links, totalCount, currentPage, totalPages }: HistoryTableProps) {
+export default function HistoryTable({ links, totalCount, currentPage, totalPages, users, courses }: HistoryTableProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -118,6 +121,7 @@ export default function HistoryTable({ links, totalCount, currentPage, totalPage
                     >
                         <FileDown className="w-4 h-4" />
                     </button>
+                    <ManualPaymentModal users={users} courses={courses} />
                     <div className="relative w-full md:w-64">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <input
@@ -210,27 +214,29 @@ export default function HistoryTable({ links, totalCount, currentPage, totalPage
             </div>
 
             {/* Pagination Controls */}
-            {totalPages > 1 && (
-                <div className="flex items-center justify-between pt-4">
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Précédent
-                    </button>
-                    <span className="text-sm text-slate-600">
-                        Page {currentPage} sur {totalPages}
-                    </span>
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Suivant
-                    </button>
-                </div>
-            )}
+            {
+                totalPages > 1 && (
+                    <div className="flex items-center justify-between pt-4">
+                        <button
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Précédent
+                        </button>
+                        <span className="text-sm text-slate-600">
+                            Page {currentPage} sur {totalPages}
+                        </span>
+                        <button
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Suivant
+                        </button>
+                    </div>
+                )
+            }
         </div>
     );
 }
