@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Modal } from "@/components/ui/Modal";
 import { Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { createManualPayment } from "./actions";
+import { createManualPayment } from "../actions";
 
 interface ManualPaymentModalProps {
     users: { id: string; email: string; firstName: string | null; lastName: string | null }[];
@@ -22,11 +21,6 @@ export function ManualPaymentModal({ users, courses }: ManualPaymentModalProps) 
     const [amount, setAmount] = useState("");
     const [paymentMethod, setPaymentMethod] = useState("Virement");
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-
-    const findCoursePrice = (id: string) => {
-        // Ideally we would pass prices, but for manual override we let user type amount
-        // Could be enhanced to auto-fill.
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -68,23 +62,21 @@ export function ManualPaymentModal({ users, courses }: ManualPaymentModalProps) 
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button className="bg-slate-900 text-white hover:bg-slate-800 gap-2">
-                    <Plus className="w-4 h-4" />
-                    Saisir un paiement
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                    <DialogTitle>Nouveau Paiement Manuel</DialogTitle>
-                </DialogHeader>
+        <>
+            <button
+                onClick={() => setOpen(true)}
+                className="inline-flex items-center gap-2 bg-slate-900 text-white hover:bg-slate-800 px-4 py-2 rounded-md font-medium text-sm transition-colors shadow-sm"
+            >
+                <Plus className="w-4 h-4" />
+                Saisir un paiement
+            </button>
 
-                <form onSubmit={handleSubmit} className="space-y-4 py-4">
+            <Modal isOpen={open} onClose={() => setOpen(false)} title="Nouveau Paiement Manuel" maxWidth="md">
+                <form onSubmit={handleSubmit} className="space-y-4 py-2">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Élève</label>
+                        <label className="text-sm font-medium text-slate-700">Élève</label>
                         <select
-                            className="w-full rounded-md border border-slate-300 p-2 text-sm"
+                            className="w-full rounded-md border border-slate-300 p-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                             value={userId}
                             onChange={(e) => setUserId(e.target.value)}
                             required
@@ -99,9 +91,9 @@ export function ManualPaymentModal({ users, courses }: ManualPaymentModalProps) 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Formation / Produit</label>
+                        <label className="text-sm font-medium text-slate-700">Formation / Produit</label>
                         <select
-                            className="w-full rounded-md border border-slate-300 p-2 text-sm"
+                            className="w-full rounded-md border border-slate-300 p-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                             value={courseId}
                             onChange={(e) => setCourseId(e.target.value)}
                             required
@@ -117,11 +109,11 @@ export function ManualPaymentModal({ users, courses }: ManualPaymentModalProps) 
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Montant (€ TTC)</label>
+                            <label className="text-sm font-medium text-slate-700">Montant (€ TTC)</label>
                             <input
                                 type="number"
                                 step="0.01"
-                                className="w-full rounded-md border border-slate-300 p-2 text-sm"
+                                className="w-full rounded-md border border-slate-300 p-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                                 placeholder="0.00"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
@@ -130,10 +122,10 @@ export function ManualPaymentModal({ users, courses }: ManualPaymentModalProps) 
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Date</label>
+                            <label className="text-sm font-medium text-slate-700">Date</label>
                             <input
                                 type="date"
-                                className="w-full rounded-md border border-slate-300 p-2 text-sm"
+                                className="w-full rounded-md border border-slate-300 p-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
                                 required
@@ -142,9 +134,9 @@ export function ManualPaymentModal({ users, courses }: ManualPaymentModalProps) 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Moyen de paiement</label>
+                        <label className="text-sm font-medium text-slate-700">Moyen de paiement</label>
                         <select
-                            className="w-full rounded-md border border-slate-300 p-2 text-sm"
+                            className="w-full rounded-md border border-slate-300 p-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                             value={paymentMethod}
                             onChange={(e) => setPaymentMethod(e.target.value)}
                             required
@@ -157,16 +149,24 @@ export function ManualPaymentModal({ users, courses }: ManualPaymentModalProps) 
                     </div>
 
                     <div className="flex justify-end gap-2 pt-4">
-                        <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                        <button
+                            type="button"
+                            onClick={() => setOpen(false)}
+                            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
+                        >
                             Annuler
-                        </Button>
-                        <Button type="submit" className="bg-gold-500 text-slate-900 hover:bg-gold-400" disabled={loading}>
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="inline-flex items-center px-4 py-2 text-sm font-bold text-slate-900 bg-gold-500 rounded-md hover:bg-gold-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
                             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             Enregistrer
-                        </Button>
+                        </button>
                     </div>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </Modal>
+        </>
     );
 }
