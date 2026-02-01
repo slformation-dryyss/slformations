@@ -98,7 +98,7 @@ async function main() {
       ]
     },
     {
-      name: 'PERMIS_B',
+      name: 'PERMIS B',
       slug: 'permis-b',
       courses: [
         { title: 'Permis B (Auto) - Formule Classique', slug: 'permis-b-auto-classique', type: 'PERMIS_B', description: 'Formule 13h Boîte Auto.', price: 980, drivingHours: 13 },
@@ -125,6 +125,11 @@ async function main() {
         { title: 'Stage Récupération de Points', slug: 'stage-points', type: 'P_POINTS', description: 'Stage de 2 jours (4 points récupérés).', price: 250 },
       ]
     },
+    {
+      name: 'SECOURISME',
+      slug: 'secourisme',
+      courses: []
+    }
   ];
 
   for (const cat of categoriesData) {
