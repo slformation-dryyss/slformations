@@ -98,6 +98,12 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
                 <MapPin className="w-5 h-5 text-gold-500" />
                 <span className="font-bold uppercase tracking-tight">{format}</span>
               </div>
+              <div className="flex items-center space-x-3 bg-gold-500 text-slate-900 px-5 py-3 rounded-2xl shadow-[0_0_20px_rgba(234,179,8,0.3)]">
+                <Wallet className="w-5 h-5" />
+                <span className="font-black">
+                  {course.price && course.price > 0 ? `${course.price}€ TTC` : "SUR DEVIS"}
+                </span>
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-5">
@@ -119,8 +125,8 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
           </div>
         </section>
 
-        {/* Pricing Section - Only for non-Permis courses */}
-        {course.price && !['PERMIS', 'Permis B', 'Permis Moto', 'Permis AAC'].includes(course.type) && (
+        {/* Pricing Section */}
+        {course.price !== undefined && (
           <CoursePricing price={course.price} title={course.title} />
         )}
 

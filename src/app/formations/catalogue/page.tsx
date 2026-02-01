@@ -240,15 +240,19 @@ export default async function CatalogueFormationsPage({
                             </div>
                           </div>
 
-                          <div className="mt-auto">
+                          <div className="mt-auto flex items-center justify-between gap-4">
                             {course.slug && (
                               <Link
                                 href={`/formations/${course.slug}`}
-                                className="block w-full py-3 px-4 bg-slate-900 text-white rounded-lg font-semibold text-sm text-center hover:bg-gold-500 hover:text-slate-900 hover:shadow-lg transition-all duration-300"
+                                className="flex-1 py-3 px-4 bg-slate-900 text-white rounded-lg font-semibold text-sm text-center hover:bg-gold-500 hover:text-slate-900 hover:shadow-lg transition-all duration-300"
                               >
-                                Découvrir le programme
+                                Découvrir
                               </Link>
                             )}
+                            <div className="text-right">
+                                <div className="text-[10px] font-black text-slate-400 uppercase leading-none">Prix</div>
+                                <div className="text-lg font-black text-slate-900">{course.price > 0 ? `${course.price}€` : "Devis"}</div>
+                            </div>
                           </div>
                         </div>
                       </article>

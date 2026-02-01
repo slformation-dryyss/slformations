@@ -457,9 +457,15 @@ export default async function FormationVTCPage() {
                       <div className="p-6">
                         <h4 className="font-bold text-slate-900 text-xl mb-3 group-hover:text-gold-600 transition">{course.title}</h4>
                         <p className="text-slate-600 text-sm line-clamp-2 mb-5">{course.description}</p>
-                        <Link href={`/formations/${course.slug}`} className="block w-full text-center bg-slate-900 text-white font-semibold py-3 rounded-lg hover:bg-gold-600 transition-all shadow-sm hover:shadow-md">
-                          Découvrir le programme
-                        </Link>
+                        <div className="flex items-center justify-between mb-5">
+                          <Link href={`/formations/${course.slug}`} className="flex-1 text-center bg-slate-900 text-white font-semibold py-3 rounded-lg hover:bg-gold-600 transition-all shadow-sm hover:shadow-md text-sm">
+                            Découvrir le programme
+                          </Link>
+                          <div className="ml-4 text-right">
+                             <div className="text-[10px] font-black text-slate-400 uppercase leading-none mb-1">Prix</div>
+                             <div className="text-xl font-black text-slate-900">{course.price > 0 ? `${course.price}€` : "Devis"}</div>
+                          </div>
+                        </div>
                         {/* @ts-ignore */}
                         {course.courseSessions && course.courseSessions.length > 0 && (
                           <div className="mt-4 pt-4 border-t border-slate-100 flex items-center text-sm text-slate-500">

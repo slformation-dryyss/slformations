@@ -41,10 +41,18 @@ export function CoursePricing({ price, title, pricePersonal, priceCPF, priceComp
             
             <div className="mb-6">
               <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-4xl font-black text-slate-900">{personalPrice}€</span>
-                <span className="text-slate-500 text-sm">TTC</span>
+                {personalPrice > 0 ? (
+                  <>
+                    <span className="text-4xl font-black text-slate-900">{personalPrice}€</span>
+                    <span className="text-slate-500 text-sm">TTC</span>
+                  </>
+                ) : (
+                  <span className="text-2xl font-black text-slate-900 uppercase">Sur Devis</span>
+                )}
               </div>
-              <p className="text-xs text-slate-400">Paiement en 1 à 4 fois sans frais</p>
+              <p className="text-xs text-slate-400">
+                {personalPrice > 0 ? "Paiement en 1 à 4 fois sans frais" : "Contactez-nous pour un tarif personnalisé"}
+              </p>
             </div>
 
             <ul className="space-y-3 mb-8">
@@ -66,7 +74,7 @@ export function CoursePricing({ price, title, pricePersonal, priceCPF, priceComp
               href={`/contact?subject=${encodeURIComponent(`Inscription Personnel - ${title}`)}`}
               className="block w-full text-center bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition-colors"
             >
-              S'inscrire
+              {personalPrice > 0 ? "S'inscrire" : "Demander un devis"}
             </a>
           </div>
 
@@ -83,8 +91,14 @@ export function CoursePricing({ price, title, pricePersonal, priceCPF, priceComp
             
             <div className="mb-6">
               <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-4xl font-black text-white">{cpfPrice}€</span>
-                <span className="text-gold-100 text-sm">TTC</span>
+                {cpfPrice > 0 ? (
+                  <>
+                    <span className="text-4xl font-black text-white">{cpfPrice}€</span>
+                    <span className="text-gold-100 text-sm">TTC</span>
+                  </>
+                ) : (
+                  <span className="text-2xl font-black text-white uppercase">Sur Devis</span>
+                )}
               </div>
               <p className="text-xs text-gold-100">Pris en charge par votre CPF</p>
             </div>
@@ -108,7 +122,7 @@ export function CoursePricing({ price, title, pricePersonal, priceCPF, priceComp
               href={`/contact?subject=${encodeURIComponent(`Inscription CPF - ${title}`)}`}
               className="block w-full text-center bg-white text-gold-600 font-bold py-3 rounded-xl hover:bg-gold-50 transition-colors"
             >
-              Utiliser mon CPF
+              {cpfPrice > 0 ? "Utiliser mon CPF" : "Consulter mon solde CPF"}
             </a>
           </div>
 
@@ -122,8 +136,14 @@ export function CoursePricing({ price, title, pricePersonal, priceCPF, priceComp
             
             <div className="mb-6">
               <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-4xl font-black text-slate-900">{companyPrice}€</span>
-                <span className="text-slate-500 text-sm">HT</span>
+                {companyPrice > 0 ? (
+                  <>
+                    <span className="text-4xl font-black text-slate-900">{companyPrice}€</span>
+                    <span className="text-slate-500 text-sm">HT</span>
+                  </>
+                ) : (
+                  <span className="text-2xl font-black text-slate-900 uppercase">Sur Devis</span>
+                )}
               </div>
               <p className="text-xs text-slate-400">Prise en charge OPCO possible</p>
             </div>

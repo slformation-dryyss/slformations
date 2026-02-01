@@ -139,9 +139,15 @@ export default async function IncendiePage() {
                                 <div className="p-5">
                                     <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-orange-600 transition">{course.title}</h4>
                                     <p className="text-slate-500 text-sm line-clamp-2 mb-4">{course.description}</p>
-                                    <Link href={`/formations/${course.slug}`} className="block w-full text-center bg-orange-600 text-white font-medium py-2 rounded-lg hover:bg-orange-700 transition">
-                                        Voir le programme
-                                    </Link>
+                                    <div className="mt-auto pt-4 flex items-center justify-between gap-4">
+                                        <Link href={`/formations/${course.slug}`} className="flex-1 text-center bg-orange-600 text-white font-medium py-2 rounded-lg hover:bg-orange-700 transition">
+                                            Voir le programme
+                                        </Link>
+                                        <div className="text-right">
+                                            <div className="text-[10px] font-black text-slate-400 uppercase leading-none">Prix</div>
+                                            <div className="text-lg font-black text-slate-900">{course.price > 0 ? `${course.price}€` : "Devis"}</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}

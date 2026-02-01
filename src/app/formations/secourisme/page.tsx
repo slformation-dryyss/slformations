@@ -151,12 +151,18 @@ export default async function SecourismePage() {
                                 </div>
                             )}
 
-                            <Link
-                                href={`/formations/${course.slug}`}
-                                className="block w-full text-center bg-red-600 text-white font-medium py-2 rounded-lg hover:bg-red-700 transition bottom-0 mt-auto"
-                            >
-                                Voir le programme
-                            </Link>
+                            <div className="mt-auto pt-4 flex items-center justify-between gap-4">
+                                <Link
+                                    href={`/formations/${course.slug}`}
+                                    className="flex-1 text-center bg-red-600 text-white font-medium py-2 rounded-lg hover:bg-red-700 transition"
+                                >
+                                    Voir le programme
+                                </Link>
+                                <div className="text-right">
+                                    <div className="text-[10px] font-black text-slate-400 uppercase leading-none">Prix</div>
+                                    <div className="text-lg font-black text-slate-900">{course.price > 0 ? `${course.price}€` : "Devis"}</div>
+                                </div>
+                            </div>
 
                         </div>
                         </div>
