@@ -7,7 +7,7 @@ async function main() {
 
   const categoriesData = [
     {
-      name: 'FORMATION CACES',
+      name: 'Formation CACES',
       slug: 'caces',
       courses: [
         { title: 'CACES® R489 (Chariots élévateurs)', slug: 'caces-r489', type: 'CACES', description: 'Conduite de chariots de manutention à conducteur porté.', price: 0 },
@@ -16,7 +16,7 @@ async function main() {
       ]
     },
     {
-      name: 'FORMATION TRANSPORT',
+      name: 'Formation Transport',
       slug: 'transport',
       courses: [
         { title: 'FIMO Marchandises', slug: 'fimo-marchandises', type: 'TRANSPORT', description: 'Formation Initiale Minimale Obligatoire.', price: 0 },
@@ -24,7 +24,7 @@ async function main() {
       ]
     },
     {
-      name: 'FORMATION VTC',
+      name: 'Formation VTC',
       slug: 'vtc',
       courses: [
         { title: 'Formation VTC', slug: 'vtc-initiale', type: 'VTC', description: 'Préparation complète à l\'examen VTC.', price: 0 },
@@ -38,7 +38,7 @@ async function main() {
       ]
     },
     {
-      name: 'FORMATION TAXI',
+      name: 'Formation Taxi',
       slug: 'taxi',
       courses: [
         { title: 'Formation Taxi Initiale', slug: 'taxi-initiale', type: 'TAXI', description: 'Préparation au certificat pro Taxi.', price: 0 },
@@ -50,7 +50,7 @@ async function main() {
       ]
     },
     {
-      name: 'LA SÉCURITÉ INCENDIE',
+      name: 'La sécurité incendie',
       slug: 'incendie',
       courses: [
         { title: 'SSIAP 1 - Agent de Service de Sécurité Incendie', slug: 'ssiap-1', type: 'INCENDIE', description: 'Formation initiale Agent de Sécurité Incendie.', price: 700 },
@@ -69,7 +69,7 @@ async function main() {
       ]
     },
     {
-      name: 'LA PRÉVENTION ET LA SÉCURITÉ',
+      name: 'La prévention et la sécurité',
       slug: 'prevention',
       courses: [
         { title: 'TFP APS (Ex CQP)', slug: 'tfp-aps', type: 'SURVEILLANCE', description: 'Formation Agent de Prévention et de Sécurité.', price: 0 },
@@ -83,7 +83,7 @@ async function main() {
       ]
     },
     {
-      name: 'LA SANTÉ ET LA SÉCURITÉ AU TRAVAIL',
+      name: 'La santé et la sécurité au travail',
       slug: 'sante-securite',
       courses: [
         { title: 'Sauveteur Secouriste du Travail (SST) - Initial', slug: 'sst-initial', type: 'SECOURISME', description: 'Devenir secouriste en entreprise.', price: 250 },
@@ -98,7 +98,7 @@ async function main() {
       ]
     },
     {
-      name: 'PERMIS B',
+      name: 'Permis B',
       slug: 'permis-b',
       courses: [
         { title: 'Permis B (Auto) - Formule Classique', slug: 'permis-b-auto-classique', type: 'PERMIS_B', description: 'Formule 13h Boîte Auto.', price: 980, drivingHours: 13 },
@@ -110,7 +110,7 @@ async function main() {
       ]
     },
     {
-      name: 'MOTO',
+      name: 'Moto',
       slug: 'moto',
       courses: [
         { title: 'Permis Moto A2 - Formule Essentielle', slug: 'moto-a2-essentielle', type: 'MOTO', description: '20h de formation.', price: 695, drivingHours: 20 },
@@ -119,14 +119,14 @@ async function main() {
       ]
     },
     {
-      name: 'RÉCUPÉRATION DE POINTS',
+      name: 'Récupération de points',
       slug: 'p-points',
       courses: [
         { title: 'Stage Récupération de Points', slug: 'stage-points', type: 'P_POINTS', description: 'Stage de 2 jours (4 points récupérés).', price: 250 },
       ]
     },
     {
-      name: 'SECOURISME',
+      name: 'Secourisme',
       slug: 'secourisme',
       courses: []
     }

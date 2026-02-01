@@ -457,7 +457,7 @@ export function Header() {
                 ) : (
                   categories.map((category) => (
                     <div key={category.id} className="py-1">
-                      <p className="px-3 text-[10px] font-black uppercase text-slate-400">{category.name}</p>
+                      <p className="px-3 text-[10px] font-black text-slate-400">{category.name}</p>
                       {category.courses.map((course) => (
                         <Link
                           key={course.id}
