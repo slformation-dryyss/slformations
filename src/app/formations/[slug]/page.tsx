@@ -5,9 +5,9 @@ import { Footer } from "@/components/layout/Footer";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import SessionCalendar from "@/components/formations/SessionCalendar";
 import Link from "next/link";
-import { 
-  Clock, Users, BadgeCheck, Shield, CheckCircle2, 
-  BookOpen, Target, Award, GraduationCap, Wallet, 
+import {
+  Clock, Users, BadgeCheck, Shield, CheckCircle2,
+  BookOpen, Target, Award, GraduationCap, Wallet,
   ArrowRight, Calendar, MapPin
 } from "lucide-react";
 import { CoursePricing } from "@/components/formations/CoursePricing";
@@ -77,9 +77,7 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
               {course.title}
             </h1>
 
-            <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl leading-relaxed font-medium">
-              {course.description}
-            </p>
+
 
             <div className="flex flex-wrap items-center gap-8 text-sm text-white/90 mb-12">
               <div className="flex items-center space-x-3 bg-white/5 backdrop-blur-xl px-5 py-3 rounded-2xl border border-white/10">
@@ -164,33 +162,41 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
             </div>
           </div>
 
+          {/* Presentation Section */}
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl font-black text-slate-900 mb-6">Présentation de la formation</h2>
+            <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-medium">
+              {course.description}
+            </p>
+          </div>
+
           {/* Programme Section */}
           {course.modules && course.modules.length > 0 && (
             <section id="programme" className="scroll-mt-32">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                 <div>
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 bg-gold-500/10 rounded-2xl flex items-center justify-center">
-                            <BookOpen className="w-6 h-6 text-gold-500" />
-                        </div>
-                        <h2 className="text-3xl md:text-4xl font-black text-slate-900 uppercase tracking-tight">
-                        Programme détaillé
-                        </h2>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-gold-500/10 rounded-2xl flex items-center justify-center">
+                      <BookOpen className="w-6 h-6 text-gold-500" />
                     </div>
-                    <p className="text-slate-500 text-lg max-w-2xl font-medium">
-                        Une approche pédagogique structurée pour garantir votre réussite et une assimilation optimale des compétences.
-                    </p>
+                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 uppercase tracking-tight">
+                      Programme détaillé
+                    </h2>
+                  </div>
+                  <p className="text-slate-500 text-lg max-w-2xl font-medium">
+                    Une approche pédagogique structurée pour garantir votre réussite et une assimilation optimale des compétences.
+                  </p>
                 </div>
                 <div className="flex items-center gap-4 bg-slate-50 px-6 py-3 rounded-2xl border border-slate-100">
-                    <div className="text-right">
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Total</p>
-                        <p className="text-slate-900 font-black">{course.modules.length} Modules</p>
-                    </div>
-                    <div className="w-px h-8 bg-slate-200" />
-                    <div className="text-right">
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Format</p>
-                        <p className="text-slate-900 font-black">Présentiel</p>
-                    </div>
+                  <div className="text-right">
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Total</p>
+                    <p className="text-slate-900 font-black">{course.modules.length} Modules</p>
+                  </div>
+                  <div className="w-px h-8 bg-slate-200" />
+                  <div className="text-right">
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Format</p>
+                    <p className="text-slate-900 font-black">Présentiel</p>
+                  </div>
                 </div>
               </div>
 
@@ -250,15 +256,15 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
                               </div>
                             ))}
                             {module.quiz && (
-                                <div className="flex items-center gap-4 p-4 rounded-2xl border-2 border-dashed border-gold-200 bg-gold-50/20">
-                                    <div className="w-10 h-10 rounded-xl bg-gold-500 flex items-center justify-center text-slate-900 shadow-lg shadow-gold-500/20">
-                                        <Award className="w-5 h-5" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h4 className="font-black text-slate-900 uppercase text-xs tracking-widest">Évaluation des connaissances</h4>
-                                        <p className="text-sm text-slate-600 font-medium">Quiz de validation du module</p>
-                                    </div>
+                              <div className="flex items-center gap-4 p-4 rounded-2xl border-2 border-dashed border-gold-200 bg-gold-50/20">
+                                <div className="w-10 h-10 rounded-xl bg-gold-500 flex items-center justify-center text-slate-900 shadow-lg shadow-gold-500/20">
+                                  <Award className="w-5 h-5" />
                                 </div>
+                                <div className="flex-1">
+                                  <h4 className="font-black text-slate-900 uppercase text-xs tracking-widest">Évaluation des connaissances</h4>
+                                  <p className="text-sm text-slate-600 font-medium">Quiz de validation du module</p>
+                                </div>
+                              </div>
                             )}
                           </div>
                         </AccordionContent>
