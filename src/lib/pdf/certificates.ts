@@ -101,17 +101,74 @@ export const generateAttestation = (data: CertificateData) => {
 
 export const generateCertificatRealisation = (data: CertificateData) => {
   const doc = new jsPDF();
-
+  const primaryColor = [15, 23, 42]; // Navy 900
+  
+  // Header
   doc.setFontSize(22);
-  doc.setTextColor(30, 41, 59);
-  doc.text("CERTIFICAT DE RÉALISATION", 105, 40, { align: "center" });
-  doc.text("(Modèle officiel CPF / OPCO)", 105, 50, { align: "center" });
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  doc.setFont("helvetica", "bold");
+  doc.text("CERTIFICAT DE RÉALISATION", 105, 30, { align: "center" });
+  
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "italic");
+  doc.text("(Articles L. 6313-1 du Code du travail)", 105, 37, { align: "center" });
 
+  // Divider
+  doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  doc.setLineWidth(0.5);
+  doc.line(20, 45, 190, 45);
+
+  // Dispensateur (OF)
+  doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("Dispense de formation effectuée conformément à l'article L. 6331-21 du Code du travail", 105, 65, { align: "center" });
+  doc.text("L'ORGANISME DE FORMATION (DISPENSATEUR) :", 20, 55);
+  
+  doc.setFont("helvetica", "normal");
+  doc.text("SL FORMATIONS", 25, 62);
+  doc.text("123 Avenue de Paris, 75001 Paris", 25, 68);
+  doc.text("Numéro de déclaration d'activité : 11 75 XXXXX 75", 25, 74);
+  doc.text("SIRET : 123 456 789 00012", 25, 80);
 
-  // Add more formal fields as required by the official Cerfa-like structure
-  // ...
+  // Bénéficiaire
+  doc.setFont("helvetica", "bold");
+  doc.text("LE BÉNÉFICIAIRE :", 20, 95);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Prénom et NOM : ${data.userName}`, 25, 102);
+  if (data.companyName) {
+    doc.text(`Entreprise : ${data.companyName}`, 25, 108);
+  }
+
+  // Action de formation
+  doc.setFont("helvetica", "bold");
+  doc.text("L'ACTION DE FORMATION :", 20, 120);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Intitulé : ${data.courseTitle}`, 25, 127);
+  doc.text(`Dates de réalisation : du ${data.startDate} au ${data.endDate}`, 25, 133);
+  doc.text(`Durée totale réalisée : ${data.duration} heures`, 25, 139);
+
+  // Certification
+  doc.setFont("helvetica", "bold");
+  doc.text("ATTESTE QUE LA FORMATION A ÉTÉ RÉALISÉE", 105, 160, { align: "center" });
+  
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  const legalText = "Le présent certificat est établi sur la base des éléments de suivi et d'assiduité de l'apprenant (relevés de connexion, feuilles d'émargement, travaux réalisés).";
+  const splitLegal = doc.splitTextToSize(legalText, 170);
+  doc.text(splitLegal, 20, 170);
+
+  // Footer / Signatures
+  doc.setFontSize(10);
+  doc.text(`Fait à Paris, le ${new Date().toLocaleDateString('fr-FR')}`, 20, 210);
+
+  // Signatures
+  doc.setFont("helvetica", "bold");
+  doc.text("Signature du dispensateur", 40, 225, { align: "center" });
+  doc.text("(Cachet de l'organisme)", 40, 230, { align: "center" });
+  doc.setDrawColor(200);
+  doc.rect(20, 235, 60, 30); // Placeholder for signature
+
+  doc.text("Signature du bénéficiaire", 150, 225, { align: "center" });
+  doc.rect(130, 235, 60, 30); // Placeholder for signature
 
   return doc;
 };

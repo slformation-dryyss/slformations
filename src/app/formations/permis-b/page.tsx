@@ -88,7 +88,6 @@ export default function PermisBPage() {
                     features={[
                       "Frais d'inscription inclus",
                       "Démarches administratives ANTS",
-                      "Évaluation de départ",
                       "20h de conduite",
                       "Kit pédagogique numérique",
                       "Accompagnement à l'examen"
@@ -137,7 +136,6 @@ export default function PermisBPage() {
                     features={[
                       "Frais d'inscription inclus",
                       "Démarches administratives ANTS",
-                      "Évaluation de départ",
                       "13h de conduite (Minimum légal)",
                       "Apprentissage facilité",
                       "Accompagnement à l'examen"
@@ -163,6 +161,43 @@ export default function PermisBPage() {
                     buttonText="Choisir cette formule"
                     link="/contact?subject=Inscription Permis B Auto Confort (20h)"
                   />
+                </div>
+              </div>
+
+              {/* Legal Notice about Evaluation */}
+              <div className="mt-12 p-8 bg-slate-900 rounded-3xl border border-white/10 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none group-hover:scale-110 transition-transform duration-500">
+                  <Clock className="w-32 h-32 text-gold-500" />
+                </div>
+                <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
+                  <div className="w-20 h-20 bg-gold-500 rounded-2xl flex items-center justify-center flex-shrink-0 animate-pulse">
+                    <Car className="w-10 h-10 text-navy-900" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-black text-white mb-2 uppercase tracking-tight">
+                      Étape Obligatoire : L'Auto-Évaluation de Départ
+                    </h4>
+                    <p className="text-slate-400 text-sm leading-relaxed max-w-2xl">
+                      Conformément à la réglementation en vigueur, l'heure d'évaluation de départ est <span className="text-gold-500 font-bold italic underline">indépendante</span> du forfait de formation. 
+                      Cette évaluation est indispensable pour estimer le volume d'heures nécessaire à votre apprentissage et doit être effectuée <span className="text-white font-bold">avant</span> la signature de votre contrat.
+                    </p>
+                    <div className="flex flex-wrap gap-4 mt-4">
+                      <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white text-[10px] font-bold uppercase tracking-widest">
+                        Réglementation Officielle
+                      </span>
+                      <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-gold-500 text-[10px] font-bold uppercase tracking-widest">
+                        Payable à l'unité
+                      </span>
+                    </div>
+                  </div>
+                  <div className="ml-auto flex-shrink-0">
+                    <Link 
+                      href="/contact?subject=Demande d'évaluation de départ"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-white text-navy-900 font-black rounded-xl hover:bg-gold-500 transition-all uppercase text-xs"
+                    >
+                      Réserver mon évaluation
+                    </Link>
+                  </div>
                 </div>
               </div>
             </section>

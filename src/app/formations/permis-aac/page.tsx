@@ -73,7 +73,6 @@ export default function PermisAACPage() {
                             features={[
                                 "Frais d'inscription",
                                 "Démarches ANTS",
-                                "Évaluation de départ",
                                 "13h de conduite",
                                 "Kit pédagogique numérique",
                                 "Accompagnement examen"
@@ -91,7 +90,6 @@ export default function PermisAACPage() {
                             features={[
                                 "Frais d'inscription",
                                 "Démarches ANTS",
-                                "Évaluation de départ",
                                 "20h de conduite",
                                 "Kit pédagogique numérique",
                                 "Accompagnement examen"
@@ -103,6 +101,27 @@ export default function PermisAACPage() {
                             buttonText="Choisir ce forfait"
                             link="/contact?subject=Inscription Permis AAC Forfait 20H"
                         />
+                    </div>
+
+                    {/* Legal Notice about Evaluation */}
+                    <div className="mt-12 p-8 bg-slate-900 rounded-3xl border border-white/10 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none group-hover:scale-110 transition-transform duration-500">
+                            <Clock className="w-32 h-32 text-gold-500" />
+                        </div>
+                        <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
+                            <div className="w-20 h-20 bg-gold-500 rounded-2xl flex items-center justify-center flex-shrink-0 animate-pulse">
+                                <Users className="w-10 h-10 text-navy-900" />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-black text-white mb-2 uppercase tracking-tight">
+                                    Étape Obligatoire : L'Auto-Évaluation de Départ
+                                </h4>
+                                <p className="text-slate-400 text-sm leading-relaxed max-w-2xl">
+                                    Conformément à la réglementation, l'évaluation de départ est <span className="text-gold-500 font-bold italic underline">exclue</span> des forfaits AAC. 
+                                    Elle permet de définir précisément vos besoins avant le début de la conduite effectuée <span className="text-white font-bold">avant</span> la signature de votre contrat.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </section>
 

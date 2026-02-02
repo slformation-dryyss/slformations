@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { getLessonWithCourseBySlug } from "@/lib/lessons";
 import { requireUser } from "@/lib/auth";
 import { LessonPlayerClient } from "@/components/courses/LessonPlayerClient";
+import { DownloadCertificateButton } from "@/components/courses/DownloadCertificateButton";
 import { prisma } from "@/lib/prisma";
 import { Lock, PlayCircle, ChevronLeft, ChevronRight, CheckCircle, Trophy } from "lucide-react";
 
@@ -132,6 +133,38 @@ export default async function LearnPage({
                 {completedLessonIds.size} / {course.modules.flatMap(m => m.lessons).length} terminés
               </span>
             </div>
+
+            {/* Certificate Download Section */}
+            {completedLessonIds.size === course.modules.flatMap(m => m.lessons).length && (
+              <div className="mb-6 p-6 bg-navy-900 rounded-2xl border border-navy-700 shadow-xl overflow-hidden relative">
+                <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                  <Trophy className="w-24 h-24 text-gold-500" />
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 bg-gold-500 rounded-lg flex items-center justify-center">
+                      <Trophy className="w-5 h-5 text-navy-900" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold leading-tight">Félicitations !</h3>
+                      <p className="text-gold-500/80 text-[10px] uppercase font-black tracking-widest">Formation terminée</p>
+                    </div>
+                  </div>
+                  <p className="text-slate-300 text-xs mb-6 leading-relaxed">
+                    Vous avez complété l'intégralité du programme. Vos attestations officielles sont prêtes à être téléchargées.
+                  </p>
+                  <DownloadCertificateButton
+                    userName={user.name || user.email}
+                    courseTitle={course.title}
+                    startDate={new Date(enrollment?.createdAt || Date.now()).toLocaleDateString('fr-FR')}
+                    endDate={new Date().toLocaleDateString('fr-FR')}
+                    duration={course.modules.reduce((acc, m) => acc + (m.duration || 0), 0) || 7}
+                    score={85} // Mock score for now, should ideally be from quiz
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="space-y-3 max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar">
               {course.modules.map((module) => (
                 <div key={module.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">

@@ -18,6 +18,18 @@ export async function GET() {
 
   try {
     const session = await auth0.getSession();
+    if (!session || !session.user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
+    // Only allow staff/admin to see diagnostic data
+    const roles = (session.user as any)["https://sl-formations.fr/roles"] || [];
+    const isStaff = roles.some((r: string) => ["ADMIN", "OWNER", "TEACHER", "INSTRUCTOR"].includes(r.toUpperCase()));
+    
+    if (!isStaff) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     diag.auth.hasSession = !!session;
     if (session) {
       diag.auth.user = {
