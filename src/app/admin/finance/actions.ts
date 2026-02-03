@@ -203,3 +203,61 @@ export async function syncPaymentLinkStatusAction(formData: FormData) {
     }
 }
 
+export async function createManualPayment(formData: FormData) {
+    await requireAdmin();
+
+    const userId = formData.get("userId") as string;
+    const courseId = formData.get("courseId") as string;
+    const amount = parseFloat(formData.get("amount") as string);
+    const paymentMethod = formData.get("paymentMethod") as string;
+    const date = formData.get("date") as string;
+
+    if (!userId || !courseId || isNaN(amount)) {
+        return { error: "Données invalides." };
+    }
+
+    try {
+        return await prisma.$transaction(async (tx) => {
+            // 1. Create Order
+            const order = await tx.order.create({
+                data: {
+                    userId,
+                    courseId,
+                    amount,
+                    status: "PAID",
+                    createdAt: new Date(date),
+                }
+            });
+
+            // 2. Create Payment record
+            await tx.payment.create({
+                data: {
+                    orderId: order.id,
+                    provider: paymentMethod, // Virement, Especes, etc.
+                    providerPaymentId: `MANUAL-${Date.now()}`,
+                    status: "COMPLETED",
+                    amount,
+                }
+            });
+
+            // 3. Create or Update Enrollment
+            await tx.enrollment.upsert({
+                where: {
+                    userId_courseId: { userId, courseId }
+                },
+                update: { status: "ACTIVE" },
+                create: {
+                    userId,
+                    courseId,
+                    status: "ACTIVE"
+                }
+            });
+
+            return { success: true };
+        });
+    } catch (error: any) {
+        console.error("Manual Payment Error:", error);
+        return { error: "Erreur lors de l'enregistrement du paiement." };
+    }
+}
+

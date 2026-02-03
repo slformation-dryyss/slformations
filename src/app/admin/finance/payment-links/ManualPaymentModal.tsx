@@ -40,7 +40,7 @@ export function ManualPaymentModal({ users, courses }: ManualPaymentModalProps) 
             formData.append("paymentMethod", paymentMethod);
             formData.append("date", date);
 
-            const result = await createManualPayment(formData);
+            const result = await createManualPayment(formData) as { success?: boolean; error?: string };
 
             if (result.success) {
                 toast.success("Paiement enregistré avec succès");
@@ -51,7 +51,7 @@ export function ManualPaymentModal({ users, courses }: ManualPaymentModalProps) 
                 setAmount("");
                 setPaymentMethod("Virement");
             } else {
-                toast.error(result.error as string || "Erreur lors de l'enregistrement");
+                toast.error(result.error || "Erreur lors de l'enregistrement");
             }
         } catch (error) {
             console.error(error);
