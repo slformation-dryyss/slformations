@@ -1,6 +1,6 @@
 
 import { requireAdmin } from "@/lib/auth";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminLayoutClient } from "@/components/admin/AdminLayoutClient";
 
 export const dynamic = "force-dynamic";
 
@@ -13,12 +13,9 @@ export default async function AdminLayout({
   const user = await requireAdmin();
 
   return (
-    <div className="flex h-screen bg-slate-50 font-sans">
-      <AdminSidebar role={user.role} />
-      <main className="flex-1 overflow-y-auto p-8">
-        {children}
-      </main>
-    </div>
+    <AdminLayoutClient userRole={user.role}>
+      {children}
+    </AdminLayoutClient>
   );
 }
 
