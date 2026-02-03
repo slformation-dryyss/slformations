@@ -1,5 +1,5 @@
 
-export function getCourseImage(course: { title?: string; type?: string; slug?: string; imageUrl?: string | null }): string {
+export function getCourseImage(course: { title?: string | null; type?: string | null; slug?: string | null; imageUrl?: string | null }): string {
     // If a valid URL is already present and seemingly correct (not a placeholder we want to replace), use it.
     // However, since we want to FORCE the new images for now (as the DB has old placeholders), we might prioritize local logic.
     // For safety, let's prioritize local logic if it matches our new categories, otherwise fallback to existing URL or default.

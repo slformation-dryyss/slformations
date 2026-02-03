@@ -129,7 +129,7 @@ export default function DashboardMesFormationsPage() {
                     <div className="relative h-40 bg-slate-900">
                       {enrollment.imageUrl || getCourseImage(enrollment) ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={getCourseImage(enrollment)} alt={enrollment.title} className="w-full h-full object-cover opacity-80" />
+                        <img src={enrollment.imageUrl || getCourseImage(enrollment)} alt={enrollment.title} className="w-full h-full object-cover opacity-80" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-300">
                           <BookOpen className="w-12 h-12" />
