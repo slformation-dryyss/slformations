@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Search, User as UserIcon } from "lucide-react";
 import { UserRoleSelector } from "@/components/admin/UserRoleSelector";
 import { DeleteUserButton } from "@/components/admin/DeleteUserButton";
+import { CreateUserButton } from "@/components/admin/CreateUserButton";
 
 // Helper components
 function RoleBadge({ roles, role }: { roles?: string[], role?: string }) {
@@ -115,7 +116,9 @@ export default async function AdminUsersPage({
           </form>
         </div>
 
-        <div className="w-[200px] hidden md:block" /> {/* Spacer to keep search centered visually */}
+        <div className="shrink-0">
+          <CreateUserButton />
+        </div>
       </div>
 
       {/* Tabs Navigation */}

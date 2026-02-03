@@ -40,7 +40,7 @@ export async function createPasswordChangeTicket(auth0UserId: string, resultUrl:
     const token = await getManagementApiToken();
     const rawDomain = process.env.AUTH0_ISSUER_BASE_URL;
     if (!rawDomain) throw new Error("Missing AUTH0_ISSUER_BASE_URL");
-    
+
     const domain = rawDomain.replace(/\/$/, "");
 
     const response = await fetch(`${domain}/api/v2/tickets/password-change`, {
@@ -63,4 +63,38 @@ export async function createPasswordChangeTicket(auth0UserId: string, resultUrl:
 
     const data = await response.json();
     return data.ticket;
+}
+
+export async function createAuth0User(data: { email: string; firstName: string; lastName: string; password?: string }) {
+    const token = await getManagementApiToken();
+    const rawDomain = process.env.AUTH0_ISSUER_BASE_URL;
+    if (!rawDomain) throw new Error("Missing AUTH0_ISSUER_BASE_URL");
+
+    const domain = rawDomain.replace(/\/$/, "");
+
+    const response = await fetch(`${domain}/api/v2/users`, {
+        method: "POST",
+        headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+            connection: "Username-Password-Authentication",
+            email: data.email,
+            password: data.password || Math.random().toString(36).slice(-12) + "A1!",
+            given_name: data.firstName,
+            family_name: data.lastName,
+            name: `${data.firstName} ${data.lastName}`,
+            email_verified: true,
+            verify_email: false,
+        }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        console.error("Auth0 User Creation Error:", error);
+        throw new Error(`Failed to create Auth0 user: ${error.message || error.error}`);
+    }
+
+    return await response.json();
 }

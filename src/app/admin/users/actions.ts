@@ -4,6 +4,85 @@
 import { requireOwner, requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { createAuth0User } from "@/lib/auth0-mgmt";
+import { sendEmail } from "@/lib/email";
+import { renderWelcomeEmail } from "@/emails/user-onboarding-templates";
+
+export async function createUserAction(formData: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  roles: string[];
+}) {
+  await requireAdmin();
+
+  const { email, firstName, lastName, roles } = formData;
+
+  if (!email || !firstName || !lastName || !roles || roles.length === 0) {
+    throw new Error("Tous les champs sont obligatoires");
+  }
+
+  // 1. Check if user already exists
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    throw new Error("Un utilisateur avec cet email existe déjà");
+  }
+
+  // 2. Generate temporary password
+  const tempPassword = Math.random().toString(36).slice(-10) + "A1!";
+
+  // 3. Create in Auth0
+  let auth0User;
+  try {
+    auth0User = await createAuth0User({
+      email,
+      firstName,
+      lastName,
+      password: tempPassword
+    });
+  } catch (error: any) {
+    throw new Error(`Erreur Auth0: ${error.message}`);
+  }
+
+  const auth0Id = auth0User.user_id;
+
+  // 4. Create in Prisma
+  const rolePriority = ["OWNER", "ADMIN", "SECRETARY", "TEACHER", "INSTRUCTOR", "STUDENT"];
+  const primaryRole = [...roles].sort((a, b) =>
+    rolePriority.indexOf(a) - rolePriority.indexOf(b)
+  )[0] || "STUDENT";
+
+  const user = await prisma.user.create({
+    data: {
+      email,
+      firstName,
+      lastName,
+      name: `${firstName} ${lastName}`,
+      auth0Id,
+      roles,
+      primaryRole,
+      role: primaryRole,
+      mustChangePassword: true,
+      onboardingStatus: "NEW",
+    }
+  });
+
+  // 5. Send Welcome Email
+  try {
+    await sendEmail({
+      to: email,
+      subject: "Bienvenue chez SL Formations - Vos accès",
+      html: renderWelcomeEmail({ firstName, email, password: tempPassword })
+    });
+  } catch (emailError) {
+    console.error("Failed to send welcome email:", emailError);
+    // On ne fait pas échouer l'action si seul le mail échoue, mais l'admin devra fournir le MDP manuellement
+  }
+
+  revalidatePath("/admin/users");
+  return user;
+}
+
 
 export async function updateUserRolesAction(userId: string, newRoles: string[]) {
   // STRICTLY OWNER ONLY: Promoting/Demoting users is sensitive
