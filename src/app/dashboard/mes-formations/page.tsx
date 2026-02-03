@@ -16,6 +16,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { DownloadCertificateButton } from "@/components/courses/DownloadCertificateButton";
+import { getCourseImage } from "@/lib/course-image-helper";
 
 type Enrollment = {
   id: string;
@@ -126,9 +127,9 @@ export default function DashboardMesFormationsPage() {
                 {enrollments.map(enrollment => (
                   <div key={enrollment.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition-all group">
                     <div className="relative h-40 bg-slate-900">
-                      {enrollment.imageUrl ? (
+                      {enrollment.imageUrl || getCourseImage(enrollment) ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={enrollment.imageUrl} alt={enrollment.title} className="w-full h-full object-cover opacity-80" />
+                        <img src={getCourseImage(enrollment)} alt={enrollment.title} className="w-full h-full object-cover opacity-80" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-300">
                           <BookOpen className="w-12 h-12" />

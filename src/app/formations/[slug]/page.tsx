@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getCourseBySlug } from "@/lib/courses";
+import { getCourseImage } from "@/lib/course-image-helper";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -40,10 +41,10 @@ export default async function FormationPage({ params }: { params: Promise<{ slug
         {/* Hero Formation */}
         <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden pt-32 pb-20 bg-slate-900 text-white">
           <div className="absolute inset-0 z-0">
-            {course.imageUrl && (
+            {(course.imageUrl || getCourseImage(course)) && (
               <img
                 className="w-full h-full object-cover opacity-40 scale-105"
-                src={course.imageUrl}
+                src={getCourseImage(course)}
                 alt={course.title}
               />
             )}

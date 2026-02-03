@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Filter, Search, Clock, MapPin, Laptop, Shield, Code, ArrowUpDown } from "lucide-react";
 import { getCourses } from "@/lib/courses";
 import { CatalogueSearch } from "@/components/formations/CatalogueSearch";
+import { getCourseImage } from "@/lib/course-image-helper";
 
 export const dynamic = 'force-dynamic';
 
@@ -71,7 +72,7 @@ export default async function CatalogueFormationsPage({
         // If createdAt is needed, ensure it is in the course object. Currently getCourses sorts by desc createdAt by default.
         // So we might not need to re-sort for 'newest' if we don't change the default order, but let's be explicit if possible.
         // Since getCourses() returns order desc, we trust that order.
-        return 0; 
+        return 0;
     }
   });
 
@@ -104,7 +105,7 @@ export default async function CatalogueFormationsPage({
               <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-8">
                 Découvrez l’ensemble de nos formations : Transport, Sécurité, VTC et Numérique !
               </p>
-              
+
               {/* Search Bar Integration */}
               <CatalogueSearch />
             </div>
@@ -132,11 +133,10 @@ export default async function CatalogueFormationsPage({
                         <Link
                           key={filter.value}
                           href={filter.value === 'all' ? `/formations/catalogue?q=${query || ''}` : `/formations/catalogue?category=${filter.value}&q=${query || ''}`}
-                          className={`block w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                            isActive
-                              ? 'bg-slate-900 text-white shadow-md'
-                              : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-                          }`}
+                          className={`block w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
+                            ? 'bg-slate-900 text-white shadow-md'
+                            : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                            }`}
                         >
                           {filter.name}
                         </Link>
@@ -149,12 +149,12 @@ export default async function CatalogueFormationsPage({
                   <div className="absolute top-0 right-0 w-16 h-16 bg-gold-400/10 rounded-bl-full -mr-4 -mt-4"></div>
                   <h4 className="font-bold text-slate-900 mb-2 relative z-10">Une question ?</h4>
                   <p className="text-sm text-slate-600 mb-4 relative z-10">
-                    Nos conseillers vous répondent directement au :<br/>
+                    Nos conseillers vous répondent directement au :<br />
                     <span className="font-bold text-slate-900">01 60 28 54 18</span>
                   </p>
                   <a href="/contact" className="inline-flex items-center text-sm font-bold text-gold-600 hover:text-gold-700 relative z-10">
                     Nous contacter
-                    <MapPin className="w-3 h-3 ml-1 transform rotate-[-45deg]" /> 
+                    <MapPin className="w-3 h-3 ml-1 transform rotate-[-45deg]" />
                   </a>
                 </div>
               </aside>
@@ -167,28 +167,28 @@ export default async function CatalogueFormationsPage({
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
                   <div>
                     <h2 className="text-2xl font-bold text-slate-900">Nos programmes</h2>
-                   <div className="text-sm text-slate-500 mt-1">
+                    <div className="text-sm text-slate-500 mt-1">
                       <span className="font-semibold text-slate-900">{courses.length}</span> résultats
                       {query && <span> pour &quot;<span className="text-slate-900 font-medium">{query}</span>&quot;</span>}
-                   </div>
+                    </div>
                   </div>
 
                   {/* Tri */}
                   <div className="flex items-center space-x-2 text-sm">
                     <span className="text-slate-500 hidden sm:inline">Trier par :</span>
                     <div className="flex bg-white border border-slate-200 rounded-lg p-1">
-                        <Link 
-                            href={`?${new URLSearchParams({...resolvedSearchParams, sort: 'newest'}).toString()}`}
-                            className={`px-3 py-1.5 rounded-md transition-colors ${sort === 'newest' ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-500 hover:bg-slate-50'}`}
-                        >
-                            Nouveautés
-                        </Link>
-                        <Link 
-                            href={`?${new URLSearchParams({...resolvedSearchParams, sort: 'alpha-asc'}).toString()}`}
-                            className={`px-3 py-1.5 rounded-md transition-colors ${sort === 'alpha-asc' ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-500 hover:bg-slate-50'}`}
-                        >
-                            A-Z
-                        </Link>
+                      <Link
+                        href={`?${new URLSearchParams({ ...resolvedSearchParams, sort: 'newest' }).toString()}`}
+                        className={`px-3 py-1.5 rounded-md transition-colors ${sort === 'newest' ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-500 hover:bg-slate-50'}`}
+                      >
+                        Nouveautés
+                      </Link>
+                      <Link
+                        href={`?${new URLSearchParams({ ...resolvedSearchParams, sort: 'alpha-asc' }).toString()}`}
+                        className={`px-3 py-1.5 rounded-md transition-colors ${sort === 'alpha-asc' ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-500 hover:bg-slate-50'}`}
+                      >
+                        A-Z
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -201,10 +201,10 @@ export default async function CatalogueFormationsPage({
                         className="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col"
                       >
                         <div className="h-56 overflow-hidden relative bg-slate-100">
-                          {course.imageUrl ? (
+                          {course.imageUrl || getCourseImage(course) ? (
                             <img
                               className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                              src={course.imageUrl}
+                              src={getCourseImage(course)}
                               alt={course.title}
                             />
                           ) : (
@@ -218,7 +218,7 @@ export default async function CatalogueFormationsPage({
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="p-6 flex flex-col flex-1">
                           <div className="mb-4">
                             <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-gold-600 transition-colors">
@@ -250,8 +250,8 @@ export default async function CatalogueFormationsPage({
                               </Link>
                             )}
                             <div className="text-right">
-                                <div className="text-[10px] font-black text-slate-400 uppercase leading-none">Prix</div>
-                                <div className="text-lg font-black text-slate-900">{course.price > 0 ? `${course.price}€` : "Devis"}</div>
+                              <div className="text-[10px] font-black text-slate-400 uppercase leading-none">Prix</div>
+                              <div className="text-lg font-black text-slate-900">{course.price > 0 ? `${course.price}€` : "Devis"}</div>
                             </div>
                           </div>
                         </div>
@@ -263,8 +263,8 @@ export default async function CatalogueFormationsPage({
                     <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                     <h3 className="text-lg font-bold text-slate-900 mb-2">Aucun résultat trouvé</h3>
                     <p className="text-slate-500 text-base mb-6">
-                        Nous n&apos;avons pas trouvé de formation correspondant à votre recherche. 
-                        Essayez d&apos;autres mots-clés ou consultez toutes nos formations.
+                      Nous n&apos;avons pas trouvé de formation correspondant à votre recherche.
+                      Essayez d&apos;autres mots-clés ou consultez toutes nos formations.
                     </p>
                     <Link href="/formations/catalogue" className="inline-block px-6 py-3 bg-gold-500 text-slate-900 font-bold rounded-lg hover:bg-gold-400 transition-colors">
                       Voir tout le catalogue
