@@ -10,21 +10,11 @@ export async function createCheckoutAction(courseId: string, quantity: number = 
         const user = await requireUser();
         const session = await createCheckoutSession(user as any, courseId, quantity);
 
-        // Log this session as a PaymentLink so it appears in admin history
-        if (session.id && session.url) {
-            await prisma.paymentLink.create({
-                data: {
-                    userId: user.id,
-                    courseId: courseId,
-                    stripeSessionId: session.id,
-                    stripeUrl: session.url,
-                    amount: (session.amount_total || 0) / 100,
-                    status: "PENDING",
-                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-                    justification: "Achat direct depuis le tableau de bord"
-                }
-            });
-        }
+        // REMOVED: Do not create a PaymentLink for direct dashboard purchases.
+        // This was casing confusion for users seeing "Pending Payments" for their own attempts.
+        // if (session.id && session.url) {
+        //     await prisma.paymentLink.create({ ... });
+        // }
 
         return { success: true, url: session.url };
     } catch (error: any) {

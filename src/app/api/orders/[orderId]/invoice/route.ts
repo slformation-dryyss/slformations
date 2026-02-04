@@ -52,6 +52,20 @@ export async function GET(
         const year = new Date(order.createdAt).getFullYear();
         const invoiceNumber = `FAC-${year}-${order.id.slice(-5).toUpperCase()}`;
 
+        // Read Logo
+        let logoBase64: string | undefined = undefined;
+        try {
+            const fs = await import("fs");
+            const path = await import("path");
+            const logoPath = path.join(process.cwd(), "public", "LOGO.png");
+            if (fs.existsSync(logoPath)) {
+                const logoBuffer = fs.readFileSync(logoPath);
+                logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+            }
+        } catch (e) {
+            console.error("Error loading invoice logo:", e);
+        }
+
         const invoiceData = {
             invoiceNumber,
             invoiceDate: new Date(order.createdAt).toLocaleDateString('fr-FR'),
@@ -83,7 +97,8 @@ export async function GET(
             }],
 
             paymentMethod: "Carte Bancaire (Stripe)",
-            bankDetails: ""
+            bankDetails: "",
+            logoBase64: logoBase64
         };
 
         const pdf = generateInvoice(invoiceData);

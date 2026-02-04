@@ -275,3 +275,78 @@ export async function sendInvoice(data: any, userEmail: string) {
   }
 }
 
+interface PaymentLinkEmailData {
+  userName: string;
+  userEmail: string;
+  courseTitle: string;
+  amount: number;
+  paymentUrl: string;
+}
+
+export async function sendPaymentLinkEmail(data: PaymentLinkEmailData) {
+  try {
+    const { data: emailData, error } = await resend.emails.send({
+      from: 'SL Formations <info@sl-formations.fr>',
+      to: [data.userEmail],
+      subject: `Lien de paiement - ${data.courseTitle}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+             body { font-family: Arial, sans-serif; line-height: 1.6; color: #334155; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; }
+            .button { display: inline-block; background: #eab308; color: #1e293b; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+            .footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="margin: 0;">Règlement de votre formation</h1>
+            </div>
+            <div class="content">
+              <p>Bonjour <strong>${data.userName}</strong>,</p>
+              
+              <p>Voici le lien sécurisé pour procéder au règlement de votre formation :</p>
+              
+              <h2 style="color: #eab308; margin: 20px 0;">${data.courseTitle}</h2>
+              <p><strong>Montant à régler :</strong> ${data.amount} €</p>
+              
+              <div style="text-align: center;">
+                <a href="${data.paymentUrl}" class="button">
+                  Procéder au paiement sécurisé
+                </a>
+              </div>
+              
+              <p style="font-size: 14px; color: #64748b;">Ce lien est valable 24h. En cas de problème, n'hésitez pas à nous contacter.</p>
+              
+              <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 14px; color: #64748b;">
+                <strong>SL Formations</strong><br>
+                <a href="mailto:info@sl-formations.fr">info@sl-formations.fr</a>
+              </p>
+            </div>
+            <div class="footer">
+              <p>SL FORMATIONS - Organisme de formation</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    });
+
+    if (error) {
+      console.error('Email sending error:', error);
+      return { success: false, error };
+    }
+
+    return { success: true, data: emailData };
+  } catch (error) {
+    console.error('Email sending exception:', error);
+    return { success: false, error };
+  }
+}
+

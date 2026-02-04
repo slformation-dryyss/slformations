@@ -32,15 +32,26 @@ interface InvoiceData {
   // Payment
   paymentMethod?: string;
   bankDetails?: string;
+
+  // Logo
+  logoBase64?: string;
 }
 
 export const generateInvoice = (data: InvoiceData) => {
   const doc = new jsPDF();
   
-  // Header - Company Info
+  // Header - Logo & Company Info
+  if (data.logoBase64) {
+    try {
+      doc.addImage(data.logoBase64, 'PNG', 20, 10, 30, 10); // Adjust dimensions as needed
+    } catch (e) {
+      console.error("Error adding logo to PDF:", e);
+    }
+  }
+
   doc.setFontSize(20);
   doc.setTextColor(30, 41, 59);
-  doc.text(data.companyName, 20, 20);
+  doc.text(data.companyName, 20, 25); // Shifted down a bit if needed, or keep same if logo is small/side-by-sde
   
   doc.setFontSize(9);
   doc.setTextColor(100, 116, 139);

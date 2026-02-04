@@ -3,6 +3,8 @@
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
+import { sendPaymentLinkEmail } from "@/lib/email/transactional";
+import { z } from "zod";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
@@ -10,8 +12,6 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
 const stripe = stripeSecretKey
     ? new Stripe(stripeSecretKey)
     : null;
-
-import { z } from "zod";
 
 const ManualPaymentSchema = z.object({
     userId: z.string().min(1, "ID Utilisateur requis"),
@@ -79,6 +79,9 @@ export async function createManualPaymentLinkAction(formData: FormData) {
             cancel_url: `${appUrl}/dashboard/paiement`,
         });
 
+
+
+// ... inside function
         // Save Payment Link to DB so student can see it
         await prisma.paymentLink.create({
             data: {
@@ -91,6 +94,17 @@ export async function createManualPaymentLinkAction(formData: FormData) {
                 expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h expiration
             }
         });
+
+        // Send Email to student
+        if (session.url) {
+            await sendPaymentLinkEmail({
+                userName: user.firstName || user.name || "Élève",
+                userEmail: user.email,
+                courseTitle: course.title,
+                amount: amount,
+                paymentUrl: session.url
+            });
+        }
 
         return {
             success: true,
