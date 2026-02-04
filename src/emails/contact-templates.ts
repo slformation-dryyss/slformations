@@ -31,7 +31,9 @@ export function baseLayout(content: string, previewText?: string) {
       ${previewText ? `<div style="display: none; max-height: 0px; overflow: hidden;">${previewText}</div>` : ''}
       <div class="container">
         <div class="header">
-          <a href="https://sl-formations.fr" class="logo">SL Formations</a>
+          <a href="https://sl-formations.fr" style="display: inline-block;">
+            <img src="https://sl-formations.fr/LOGO.png" alt="SL Formations" style="height: 60px; width: auto; display: block; margin: 0 auto;" />
+          </a>
         </div>
         <div class="content">
           ${content}
