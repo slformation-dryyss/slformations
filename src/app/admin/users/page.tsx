@@ -230,8 +230,7 @@ export default async function AdminUsersPage({
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      {/* Pass both explicit roles array and legacy role for fallback */}
-                      <RoleBadge roles={user.roles} role={user.role} />
+                      {/* RoleBadge removed - displayed in Actions column */}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                       {new Date(user.createdAt).toLocaleDateString()}
