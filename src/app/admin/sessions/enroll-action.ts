@@ -75,7 +75,7 @@ export async function enrollUserInSessionAction(formData: FormData) {
                     userName: user.name || user.email!.split('@')[0],
                     userEmail: user.email!,
                     courseTitle: session.course.title,
-                    courseSlug: session.course.slug,
+                    courseSlug: session.course.slug || '',
                     enrollmentDate: new Date().toLocaleDateString('fr-FR'),
                 });
             } catch (error) {
