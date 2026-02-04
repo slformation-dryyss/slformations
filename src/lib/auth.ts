@@ -405,9 +405,10 @@ export async function requireVerifiedUser(req?: NextRequest) {
     redirect("/api/auth/login");
   }
 
-  if (user.mustChangePassword && !req?.nextUrl?.pathname?.includes("/dashboard/change-password")) {
-    redirect("/dashboard/change-password");
-  }
+  // Password change is now handled via modal in the dashboard
+  // if (user.mustChangePassword && !req?.nextUrl?.pathname?.includes("/dashboard/change-password")) {
+  //   redirect("/dashboard/change-password");
+  // }
 
   return { user, auth0User };
 }

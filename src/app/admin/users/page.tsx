@@ -7,28 +7,65 @@ import { UserRoleSelector } from "@/components/admin/UserRoleSelector";
 import { DeleteUserButton } from "@/components/admin/DeleteUserButton";
 import { CreateUserButton } from "@/components/admin/CreateUserButton";
 import { BlockUserButton } from "@/components/admin/BlockUserButton";
+import { FirstLoginModal } from "@/components/dashboard/FirstLoginModal";
 
-// Helper components
+// Improved role badge with distinct colors and better visual hierarchy
 function RoleBadge({ roles, role }: { roles?: string[], role?: string }) {
-  const colors: any = {
-    OWNER: "bg-purple-100 text-purple-800",
-    ADMIN: "bg-gold-100 text-gold-800",
-    INSTRUCTOR: "bg-blue-100 text-blue-800",
-    TEACHER: "bg-emerald-100 text-emerald-800",
-    SECRETARY: "bg-pink-100 text-pink-800",
-    STUDENT: "bg-slate-100 text-slate-800",
+  const allRoles = roles || (role ? [role] : []);
+  
+  const roleConfig: Record<string, { bg: string; text: string; border: string; icon: string }> = {
+    OWNER: { 
+      bg: 'bg-purple-100', 
+      text: 'text-purple-800', 
+      border: 'border-purple-300',
+      icon: '👑'
+    },
+    ADMIN: { 
+      bg: 'bg-blue-100', 
+      text: 'text-blue-800', 
+      border: 'border-blue-300',
+      icon: '🛡️'
+    },
+    SECRETARY: { 
+      bg: 'bg-pink-100', 
+      text: 'text-pink-800', 
+      border: 'border-pink-300',
+      icon: '📋'
+    },
+    INSTRUCTOR: { 
+      bg: 'bg-green-100', 
+      text: 'text-green-800', 
+      border: 'border-green-300',
+      icon: '🚗'
+    },
+    TEACHER: { 
+      bg: 'bg-amber-100', 
+      text: 'text-amber-800', 
+      border: 'border-amber-300',
+      icon: '👨‍🏫'
+    },
+    STUDENT: { 
+      bg: 'bg-slate-100', 
+      text: 'text-slate-700', 
+      border: 'border-slate-300',
+      icon: '🎓'
+    },
   };
 
-  // Normalize roles
-  const displayRoles = roles && roles.length > 0 ? roles : (role ? [role] : ["STUDENT"]);
-
   return (
-    <div className="flex flex-wrap gap-1">
-      {displayRoles.map(r => (
-        <span key={r} className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${colors[r] || colors.STUDENT}`}>
-          {r}
-        </span>
-      ))}
+    <div className="flex flex-wrap gap-1.5">
+      {allRoles.map((r) => {
+        const config = roleConfig[r] || roleConfig.STUDENT;
+        return (
+          <span
+            key={r}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${config.bg} ${config.text} ${config.border}`}
+          >
+            <span className="text-sm">{config.icon}</span>
+            {r}
+          </span>
+        );
+      })}
     </div>
   );
 }

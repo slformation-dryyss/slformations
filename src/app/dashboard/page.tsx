@@ -21,6 +21,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WelcomeTour } from "@/components/dashboard/WelcomeTour";
+import { FirstLoginModal } from "@/components/dashboard/FirstLoginModal";
 
 type ProfileResponse = {
   id: string;
@@ -30,6 +31,7 @@ type ProfileResponse = {
   roles?: string[]; // New field
   primaryRole?: string; // New field
   isProfileComplete: boolean;
+  mustChangePassword?: boolean; // Add this field
   createdAt: string;
   firstName: string | null;
   lastName: string | null;
@@ -63,6 +65,7 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
     if (isLoading) return;
@@ -111,6 +114,11 @@ export default function Dashboard() {
           ...profileData,
           picture: (auth0User as any).picture ?? null,
         });
+        
+        // Show password change modal if needed
+        if (profileData.mustChangePassword) {
+          setShowPasswordModal(true);
+        }
 
         // Load Stats
         const statsRes = await fetch("/api/dashboard/stats", { cache: "no-store" });
@@ -156,6 +164,10 @@ export default function Dashboard() {
 
   return (
     <>
+      <FirstLoginModal 
+        isOpen={showPasswordModal} 
+        onClose={() => setShowPasswordModal(false)} 
+      />
       <WelcomeTour role={user.role} onClose={() => { }} />
       <div className="pt-6">
         <div className="max-w-7xl mx-auto">
