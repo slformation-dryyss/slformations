@@ -106,9 +106,9 @@ export default async function PermisBPage() {
 
                 <div className="grid md:grid-cols-2 gap-8">
                   <PriceCard
-                    title={bmClassique?.title || "Formule Classique"}
+                    title={bmClassique?.title || "Classique"}
                     subtitle={bmClassique?.description || "L'essentiel pour débuter"}
-                    price={bmClassique ? `${bmClassique.price}€` : "1095€"}
+                    price={bmClassique ? `${bmClassique.price}€` : "1200€"}
                     features={[
                       "Frais d'inscription inclus",
                       "Démarches administratives ANTS",
@@ -122,9 +122,9 @@ export default async function PermisBPage() {
                     link={`/contact?subject=Inscription ${bmClassique?.title || "Permis B Manuelle Classique"}`}
                   />
                   <PriceCard
-                    title={bmSerenite?.title || "Formule Sérénité"}
+                    title={bmSerenite?.title || "Sérénité"}
                     subtitle={bmSerenite?.description || "Pour prendre le temps d'apprendre"}
-                    price={bmSerenite ? `${bmSerenite.price}€` : "1595€"}
+                    price={bmSerenite ? `${bmSerenite.price}€` : "1700€"}
                     features={[
                       "Tout inclus Formule Classique",
                       `${bmSerenite?.drivingHours || 30}h de conduite`,
@@ -154,7 +154,7 @@ export default async function PermisBPage() {
 
                 <div className="grid md:grid-cols-2 gap-8">
                   <PriceCard
-                    title={baClassique?.title || "Formule Classique"}
+                    title={baClassique?.title || "Classique"}
                     subtitle={baClassique?.description || "Rapide et efficace"}
                     price={baClassique ? `${baClassique.price}€` : "980€"}
                     features={[
@@ -170,9 +170,9 @@ export default async function PermisBPage() {
                     link={`/contact?subject=Inscription ${baClassique?.title || "Permis B Auto Classique"}`}
                   />
                   <PriceCard
-                    title={baConfort?.title || "Formule Confort"}
+                    title={baConfort?.title || "Confort"}
                     subtitle={baConfort?.description || "La maîtrise totale"}
-                    price={baConfort ? `${baConfort.price}€` : "1495€"}
+                    price={baConfort ? `${baConfort.price}€` : "1400€"}
                     features={[
                       "Tout inclus Formule Classique",
                       `${baConfort?.drivingHours || 20}h de conduite`,
