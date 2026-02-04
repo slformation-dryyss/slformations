@@ -10,7 +10,31 @@ export const metadata = {
   description: "Passez votre permis B en boîte manuelle ou automatique avec SL Formations. Forfaits adaptés et instructeurs qualifiés.",
 };
 
-export default function PermisBPage() {
+import { prisma } from "@/lib/prisma";
+
+export default async function PermisBPage() {
+  // Fetch courses directly from DB
+  const courses = await prisma.course.findMany({
+    where: {
+      slug: {
+        in: [
+          'permis-b-manuelle-classique',
+          'permis-b-manuelle-serenite',
+          'permis-b-auto-classique',
+          'permis-b-auto-confort'
+        ]
+      }
+    }
+  });
+
+  // Helper to find course by slug
+  const getCourse = (slug: string) => courses.find(c => c.slug === slug);
+
+  const bmClassique = getCourse('permis-b-manuelle-classique');
+  const bmSerenite = getCourse('permis-b-manuelle-serenite');
+  const baClassique = getCourse('permis-b-auto-classique');
+  const baConfort = getCourse('permis-b-auto-confort');
+
   return (
     <div className="min-h-screen text-slate-900 font-sans flex flex-col">
       <Header />
@@ -82,37 +106,37 @@ export default function PermisBPage() {
 
                 <div className="grid md:grid-cols-2 gap-8">
                   <PriceCard
-                    title="Formule Classique"
-                    subtitle="L'essentiel pour débuter"
-                    price="1095€"
+                    title={bmClassique?.title || "Formule Classique"}
+                    subtitle={bmClassique?.description || "L'essentiel pour débuter"}
+                    price={bmClassique ? `${bmClassique.price}€` : "1095€"}
                     features={[
                       "Frais d'inscription inclus",
                       "Démarches administratives ANTS",
-                      "20h de conduite",
+                      `${bmClassique?.drivingHours || 20}h de conduite`,
                       "Kit pédagogique numérique",
                       "Accompagnement à l'examen"
                     ]}
                     color="navy"
-                    badge="20 Heures"
+                    badge={`${bmClassique?.drivingHours || 20} Heures`}
                     buttonText="S'inscrire"
-                    link="/contact?subject=Inscription Permis B Manuelle Classique (20h)"
+                    link={`/contact?subject=Inscription ${bmClassique?.title || "Permis B Manuelle Classique"}`}
                   />
                   <PriceCard
-                    title="Formule Sérénité"
-                    subtitle="Pour prendre le temps d'apprendre"
-                    price="1595€"
+                    title={bmSerenite?.title || "Formule Sérénité"}
+                    subtitle={bmSerenite?.description || "Pour prendre le temps d'apprendre"}
+                    price={bmSerenite ? `${bmSerenite.price}€` : "1595€"}
                     features={[
                       "Tout inclus Formule Classique",
-                      "30h de conduite (10h supplémentaires)",
+                      `${bmSerenite?.drivingHours || 30}h de conduite`,
                       "Préparation intensive examen",
                       "Bilan de compétences inclus",
                       "Priorité sur le planning"
                     ]}
                     color="gold"
                     isPopular={true}
-                    badge="30 Heures"
+                    badge={`${bmSerenite?.drivingHours || 30} Heures`}
                     buttonText="Choisir cette formule"
-                    link="/contact?subject=Inscription Permis B Manuelle Sérénité (30h)"
+                    link={`/contact?subject=Inscription ${bmSerenite?.title || "Permis B Manuelle Sérénité"}`}
                   />
                 </div>
               </div>
@@ -130,36 +154,36 @@ export default function PermisBPage() {
 
                 <div className="grid md:grid-cols-2 gap-8">
                   <PriceCard
-                    title="Formule Classique"
-                    subtitle="Rapide et efficace"
-                    price="980€"
+                    title={baClassique?.title || "Formule Classique"}
+                    subtitle={baClassique?.description || "Rapide et efficace"}
+                    price={baClassique ? `${baClassique.price}€` : "980€"}
                     features={[
                       "Frais d'inscription inclus",
                       "Démarches administratives ANTS",
-                      "13h de conduite (Minimum légal)",
+                      `${baClassique?.drivingHours || 13}h de conduite (Minimum légal)`,
                       "Apprentissage facilité",
                       "Accompagnement à l'examen"
                     ]}
                     color="blue"
-                    badge="13 Heures"
+                    badge={`${baClassique?.drivingHours || 13} Heures`}
                     buttonText="S'inscrire"
-                    link="/contact?subject=Inscription Permis B Auto Classique (13h)"
+                    link={`/contact?subject=Inscription ${baClassique?.title || "Permis B Auto Classique"}`}
                   />
                   <PriceCard
-                    title="Formule Confort"
-                    subtitle="La maîtrise totale"
-                    price="1495€"
+                    title={baConfort?.title || "Formule Confort"}
+                    subtitle={baConfort?.description || "La maîtrise totale"}
+                    price={baConfort ? `${baConfort.price}€` : "1495€"}
                     features={[
                       "Tout inclus Formule Classique",
-                      "20h de conduite",
+                      `${baConfort?.drivingHours || 20}h de conduite`,
                       "Perfectionnement manœuvres",
                       "Conduite autonome",
                       "Préparation examen blanc"
                     ]}
                     color="navy"
-                    badge="20 Heures"
+                    badge={`${baConfort?.drivingHours || 20} Heures`}
                     buttonText="Choisir cette formule"
-                    link="/contact?subject=Inscription Permis B Auto Confort (20h)"
+                    link={`/contact?subject=Inscription ${baConfort?.title || "Permis B Auto Confort"}`}
                   />
                 </div>
               </div>

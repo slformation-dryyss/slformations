@@ -26,47 +26,87 @@ async function main() {
 
   const courses = [
     // --- PERMIS B (Voiture) ---
+    // 1. Boîte Manuelle
     {
-      title: 'Permis B - Classique',
-      slug: 'permis-b-classique',
+      title: 'Permis B - Manuelle - Classique',
+      slug: 'permis-b-manuelle-classique',
       type: 'PERMIS',
-      imageUrl: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1000&auto=format&fit=crop',
-      description: `La formation indispensable pour conduire une voiture. Apprentissage du code et de la conduite.
-      
-Objectifs : Maîtriser le véhicule, respecter le code de la route, conduire en sécurité.
-Durée : Minimum 20h de conduite.
-Examen : Code + Conduite.`,
+      imageUrl: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d',
+      description: 'L\'essentiel pour débuter en boîte manuelle.',
+      price: 1200,
+      drivingHours: 20,
       modules: [
-        { title: "Code de la Route", lessons: ["Signalisation", "Priorités", "Règles de circulation"] },
-        { title: "Maîtrise du Véhicule", lessons: ["Installation", "Démarrage & Arrêt", "Passage des vitesses"] },
-        { title: "Circulation", lessons: ["Insertion", "Dépassement", "Ronds-points", "Conduite écologique"] }
+        { title: "Code de la Route", lessons: ["Signalisation", "Règles"] },
+        { title: "Conduite Manuelle", lessons: ["Passage vitesses", "Mécanique"] }
       ]
     },
     {
-        title: 'Permis B - Accéléré',
-        slug: 'permis-b-accelere',
+      title: 'Permis B - Manuelle - Sérénité',
+      slug: 'permis-b-manuelle-serenite',
+      type: 'PERMIS',
+      imageUrl: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d',
+      description: 'Pour prendre le temps d\'apprendre en boîte manuelle.',
+      price: 1700,
+      drivingHours: 30,
+      modules: [
+        { title: "Code de la Route", lessons: ["Signalisation", "Règles"] },
+        { title: "Conduite Intensive", lessons: ["30h de conduite", "Préparation examen"] }
+      ]
+    },
+
+    // 2. Boîte Automatique
+    {
+      title: 'Permis B - Automatique - Classique',
+      slug: 'permis-b-auto-classique',
+      type: 'PERMIS',
+      imageUrl: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2',
+      description: 'Rapide et efficace (Minimum légal 13h).',
+      price: 980,
+      drivingHours: 13,
+      modules: [
+        { title: "Code de la Route", lessons: ["Signalisation"] },
+        { title: "Conduite Auto", lessons: ["13h de conduite"] }
+      ]
+    },
+    {
+      title: 'Permis B - Automatique - Confort',
+      slug: 'permis-b-auto-confort',
+      type: 'PERMIS',
+      imageUrl: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2',
+      description: 'La maîtrise totale en automatique.',
+      price: 1400,
+      drivingHours: 20,
+      modules: [
+        { title: "Code de la Route", lessons: ["Signalisation"] },
+        { title: "Conduite Auto", lessons: ["20h de conduite", "Perfectionnement"] }
+      ]
+    },
+
+    // 3. Conduite Accompagnée (AAC)
+    {
+        title: 'Permis B - AAC - Manuelle',
+        slug: 'permis-b-aac-manuelle',
         type: 'PERMIS',
-        imageUrl: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000&auto=format&fit=crop',
-        description: `Obtenez votre permis en un temps record (2 à 4 semaines). Stage intensif code et conduite.
-        
-Objectifs : Même programme que le permis B mais condensé pour une réussite rapide.
-Idéal pour : Les personnes pressées ou disponibles à temps plein.`,
+        imageUrl: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98',
+        description: 'Conduite accompagnée en boîte manuelle (dès 15 ans).',
+        price: 1400,
+        drivingHours: 20,
         modules: [
-          { title: "Stage Code Intensif", lessons: ["Cours théoriques quotidiens", "Tests blancs en série"] },
-          { title: "Conduite Intensive", lessons: ["2 à 4h de conduite par jour", "Préparation examen"] }
+          { title: "Formation Initiale", lessons: ["20h de conduite"] },
+          { title: "Phase Accompagnée", lessons: ["RDV Pédagogiques"] }
         ]
     },
-      {
-        title: 'Permis B - Conduite Accompagnée (AAC)',
-        slug: 'permis-b-aac',
+    {
+        title: 'Permis B - AAC - Automatique',
+        slug: 'permis-b-aac-auto',
         type: 'PERMIS',
-        imageUrl: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?q=80&w=1000&auto=format&fit=crop',
-        description: `Dès 15 ans, apprenez à conduire avec vos proches pour plus d'expérience.
-        
-Avantages : Meilleur taux de réussite, période probatoire réduite (2 ans au lieu de 3), coût d'assurance réduit.`,
+        imageUrl: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98',
+        description: 'Conduite accompagnée en boîte automatique (dès 15 ans).',
+        price: 1200,
+        drivingHours: 13,
         modules: [
-          { title: "Formation Initiale", lessons: ["Code de la route", "20h de conduite avec moniteur"] },
-          { title: "Phase Accompagnée", lessons: ["RDV Pédagogique 1", "3000km avec accompagnateur", "RDV Pédagogique 2"] }
+          { title: "Formation Initiale", lessons: ["13h de conduite"] },
+          { title: "Phase Accompagnée", lessons: ["RDV Pédagogiques"] }
         ]
     },
 
@@ -170,6 +210,8 @@ Idéal pour caravanes, vans à chevaux, porte-voitures.`,
         type: courseData.type,
         imageUrl: courseData.imageUrl,
         isPublished: true,
+        price: (courseData as any).price || 0,
+        drivingHours: (courseData as any).drivingHours || 0,
       },
       create: {
         title: courseData.title,
@@ -178,7 +220,8 @@ Idéal pour caravanes, vans à chevaux, porte-voitures.`,
         type: courseData.type,
         imageUrl: courseData.imageUrl,
         isPublished: true,
-        price: 1200, // Prix indicatif moyen
+        price: (courseData as any).price || 0,
+        drivingHours: (courseData as any).drivingHours || 0,
       },
     });
 

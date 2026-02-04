@@ -23,7 +23,10 @@ export default async function ChangePasswordPage() {
                         <div className="space-y-2">
                             <h1 className="text-2xl font-bold text-slate-900">Sécurité de votre compte</h1>
                             <p className="text-slate-500">
-                                Bienvenue sur <strong>SL Formations</strong> ! Pour garantir la sécurité de vos données, vous devez personnaliser votre mot de passe lors de votre première connexion.
+                                {user.mustChangePassword
+                                    ? <span>Bienvenue sur <strong>SL Formations</strong> ! Pour garantir la sécurité de vos données, vous devez personnaliser votre mot de passe lors de votre première connexion.</span>
+                                    : <span>Vous avez demandé à modifier votre mot de passe. Cliquez sur le bouton ci-dessous pour être redirigé vers notre interface sécurisée.</span>
+                                }
                             </p>
                         </div>
 
