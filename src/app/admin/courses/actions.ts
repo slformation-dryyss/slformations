@@ -110,6 +110,10 @@ export async function updateCourseAction(formData: FormData) {
     revalidatePath("/admin/courses");
     if (updatedCourse.slug) {
         revalidatePath(`/formations/${updatedCourse.slug}`);
+        // Revalidate Permis B landing page if relevant
+        if (updatedCourse.slug.startsWith('permis-b')) {
+            revalidatePath('/formations/permis-b');
+        }
     }
   } catch (error: any) {
     if (error?.digest?.startsWith("NEXT_REDIRECT")) {

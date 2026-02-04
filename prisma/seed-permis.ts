@@ -140,64 +140,7 @@ Passerelle vers le permis A (Full) possible après 2 ans.`,
         ]
     },
 
-     // --- PERMIS Poids Lourds ---
-     {
-        title: 'Permis C - Poids Lourd (Porteur)',
-        slug: 'permis-c',
-        type: 'FIMO', // Categorized as Transport/FIMO type typically
-        imageUrl: 'https://images.unsplash.com/photo-1519339113688-640c98585698?q=80&w=1000&auto=format&fit=crop',
-        description: `Pour conduire des véhicules de transport de marchandises de plus de 3,5 tonnes (camion porteur).
-        
-Prérequis : Avoir le permis B et 21 ans (ou titre pro).
-Inclus : Code, Plateau, Circulation.`,
-        modules: [
-            { title: "Théorie Professionnelle", lessons: ["Réglementation transport", "Mécanique Poids Lourd", "Sécurité"] },
-            { title: "Maniabilité", lessons: ["Vérifications courantes", "Attelage/Dételage (si CE)", "Manœuvres"] },
-            { title: "Circulation", lessons: ["Gabarit", "Anticipation", "Conduite économique"] }
-        ]
-    },
-    {
-        title: 'Permis CE - Super Lourd',
-        slug: 'permis-ce',
-        type: 'FIMO',
-        imageUrl: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=1000&auto=format&fit=crop',
-        description: `Pour conduire des ensembles de véhicules (Poids Lourd + Remorque > 750kg).
-        
-Le permis des routiers longue distance. Maîtrisez les ensembles articulés.`,
-        modules: [
-            { title: "Maniabilité Complexe", lessons: ["Marche arrière articulée", "Mise à quai", "Attelage de précision"] },
-            { title: "Route", lessons: ["Gestion du gabarit long", "Forces physiques", "Montagne & Descente"] }
-        ]
-    },
-
-    // --- PERMIS D (Transport en commun) ---
-    {
-        title: 'Permis D - Transport de Voyageurs',
-        slug: 'permis-d',
-        type: 'TRANSPORT',
-        imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1000&auto=format&fit=crop',
-        description: `Pour conduire des bus et autocars (plus de 8 passagers).
-        
-Responsabilité, confort des passagers et sécurité sont au cœur de cette formation.`,
-        modules: [
-            { title: "Sécurité & Confort", lessons: ["Accueil des passagers", "Conduite souple", "Réglementation sociale"] },
-            { title: "Conduite", lessons: ["Gabarit bus", "Arrêts fréquents", "Gestion des conflits"] }
-        ]
-    },
-     // --- PERMIS BE (Remorque) ---
-     {
-        title: 'Permis BE - Remorque',
-        slug: 'permis-be',
-        type: 'PERMIS',
-        imageUrl: 'https://images.unsplash.com/photo-1626127117180-2a5cb82bc5fc?q=80&w=1000&auto=format&fit=crop',
-        description: `Nécessaire pour tracter une remorque de plus de 750kg si le total (Voiture + Remorque) dépasse 4250kg.
-        
-Idéal pour caravanes, vans à chevaux, porte-voitures.`,
-        modules: [
-            { title: "Plateau", lessons: ["Vérifications", "Attelage", "Marche arrière sinueuse"] },
-            { title: "Circulation", lessons: ["Adaptation de l'allure", "Dépassement avec remorque"] }
-        ]
-    }
+    
   ];
 
   for (const courseData of courses) {

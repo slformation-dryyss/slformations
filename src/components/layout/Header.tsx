@@ -214,12 +214,35 @@ export function Header() {
                         <Loader2 className="w-5 h-5 animate-spin text-gold-500" />
                       </div>
                     ) : (
-                      categories.map((category) => (
+                      categories.map((category) => {
+                          const categoryUrlMap: Record<string, string> = {
+                              'permis-b': '/formations/permis-b',
+                              'permis-moto': '/formations/permis-moto',
+                              'formations-video': '/formations/catalogue?category=formations-video',
+                              // Add other mappings if needed, or rely on slug matching conventions
+                              // For now, these are the ones with dedicated Landing Pages
+                          }; 
+                          
+                          // Also check by name/slug conventions if needed
+                          let targetUrl = categoryUrlMap[category.slug];
+                          
+                          // Transport logic: if slug is 'transport', maybe link to /formations/vtc? 
+                          // Or keep as catalogue filter.
+                          if (category.slug === 'transport') targetUrl = '/formations/vtc'; // Approximate mapping based on Sidebar
+                          if (category.slug === 'securite') targetUrl = '/formations/incendie';
+                          
+                          return (
                         <div key={category.id} className="relative group/sub">
                           {category.courses.length > 0 ? (
                             <>
                               <div className="flex items-center justify-between px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 cursor-pointer transition">
-                                <span className="text-sm font-semibold">{category.name}</span>
+                                {targetUrl ? (
+                                    <Link href={targetUrl} className="flex-1 text-sm font-semibold hover:text-gold-600">
+                                        {category.name}
+                                    </Link>
+                                ) : (
+                                    <span className="text-sm font-semibold flex-1">{category.name}</span>
+                                )}
                                 <ChevronDown className="w-3.5 h-3.5 -rotate-90" />
                               </div>
                               <div className="absolute left-full top-0 w-72 ml-0 opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible group-hover/sub:translate-x-0 translate-x-2 transition-all duration-200">
@@ -238,14 +261,14 @@ export function Header() {
                             </>
                           ) : (
                             <Link
-                              href={`/formations/catalogue?category=${category.slug}`}
+                              href={targetUrl || `/formations/catalogue?category=${category.slug}`}
                               className="flex items-center space-x-3 px-5 py-2 hover:bg-slate-50 text-slate-700 hover:text-gold-600 transition"
                             >
                               <span className="text-sm font-semibold">{category.name}</span>
                             </Link>
                           )}
                         </div>
-                      ))
+                      )})
                     )}
                   </div>
                 </div>
