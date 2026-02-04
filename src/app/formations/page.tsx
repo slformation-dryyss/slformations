@@ -3,8 +3,34 @@ import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
 import { Clock } from "lucide-react";
 import SidebarFilter from "@/components/formations/SidebarFilter";
+import { prisma } from "@/lib/prisma";
 
-export default function FormationsPage() {
+export default async function FormationsPage() {
+  const courses = await prisma.course.findMany({
+    where: {
+      slug: {
+        in: [
+          'permis-a1',
+          'permis-b-auto-classique',
+          'permis-b-aac-auto'
+        ]
+      }
+    },
+    select: {
+      slug: true,
+      price: true
+    }
+  });
+
+  const getPrice = (slug: string, fallback: string) => {
+    const course = courses.find(c => c.slug === slug);
+    return course?.price ? `${course.price}€` : fallback;
+  };
+
+  const priceMoto = getPrice('permis-a1', '695€');
+  const priceB = getPrice('permis-b-auto-classique', '980€');
+  const priceAAC = getPrice('permis-b-aac-auto', '1255€');
+
   return (
       <div className="min-h-screen flex flex-col text-slate-900 font-sans">
       <Header />
@@ -61,7 +87,7 @@ export default function FormationsPage() {
                                             <Clock className="w-4 h-4" />
                                             <span>20h min</span>
                                         </div>
-                                        <div className="text-slate-900 font-bold text-lg">Dès 695€</div>
+                                        <div className="text-slate-900 font-bold text-lg">Dès {priceMoto}</div>
                                     </div>
                                     <Link href="/formations/permis-moto" className="w-full py-3 bg-slate-900 hover:bg-gold-500 hover:text-white text-white rounded-lg font-semibold transition text-center block">
                                         Voir les forfaits
@@ -88,7 +114,7 @@ export default function FormationsPage() {
                                             <Clock className="w-4 h-4" />
                                             <span>13h min</span>
                                         </div>
-                                        <div className="text-slate-900 font-bold text-lg">Dès 980€</div>
+                                        <div className="text-slate-900 font-bold text-lg">Dès {priceB}</div>
                                     </div>
                                     <Link href="/formations/permis-b" className="w-full py-3 bg-slate-900 hover:bg-gold-500 hover:text-white text-white rounded-lg font-semibold transition text-center block">
                                         Voir les formules
@@ -140,7 +166,7 @@ export default function FormationsPage() {
                                             <Clock className="w-4 h-4" />
                                             <span>13h min</span>
                                         </div>
-                                        <div className="text-slate-900 font-bold text-lg">Dès 1255€</div>
+                                        <div className="text-slate-900 font-bold text-lg">Dès {priceAAC}</div>
                                     </div>
                                     <Link href="/formations/permis-aac" className="w-full py-3 bg-slate-900 hover:bg-gold-500 hover:text-white text-white rounded-lg font-semibold transition text-center block">
                                         Voir les forfaits

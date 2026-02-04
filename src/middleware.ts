@@ -93,6 +93,6 @@ export const config = {
     "/dashboard/:path*",
     "/instructor/:path*",
     "/teacher/:path*",
+    "/admin/:path*",
   ],
 };
-

@@ -10,6 +10,7 @@ import {
 import SessionCalendar from "@/components/formations/SessionCalendar";
 import SidebarFilter from "@/components/formations/SidebarFilter";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
 
@@ -19,8 +20,27 @@ export const metadata = {
 };
 
 export default async function FormationVTCPage() {
-  const courses = await getCoursesByType("VTC");
-  const upcomingSessions = await getAllSessionsByType("VTC");
+  const [courses, upcomingSessions, packs] = await Promise.all([
+    getCoursesByType("VTC"),
+    getAllSessionsByType("VTC"),
+    prisma.course.findMany({
+      where: {
+        slug: {
+          in: ['vtc-pack-digital', 'vtc-pack-essentiel', 'vtc-pack-gold', 'vtc-pack-excellence']
+        }
+      }
+    })
+  ]);
+
+  const getPackPrice = (slug: string, fallback: string) => {
+    const p = packs.find(course => course.slug === slug);
+    return p?.price ? `${p.price}€` : fallback;
+  };
+
+  const priceDigital = getPackPrice('vtc-pack-digital', '999€');
+  const priceEssentiel = getPackPrice('vtc-pack-essentiel', '1199€');
+  const priceGold = getPackPrice('vtc-pack-gold', '1499€');
+  const priceExcellence = getPackPrice('vtc-pack-excellence', '1999€');
 
   const programmeModules = [
     {
@@ -373,7 +393,7 @@ export default async function FormationVTCPage() {
                     <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-lg transition-all h-full flex flex-col">
                         <h3 className="text-lg font-black text-slate-900 uppercase mb-2">Pack Digital</h3>
                         <p className="text-xs text-slate-500 mb-4 italic">"Vous avez des bases mais il faut les consolider !"</p>
-                        <div className="text-3xl font-black text-slate-900 mb-6">999€</div>
+                        <div className="text-3xl font-black text-slate-900 mb-6">{priceDigital}</div>
                         <ul className="space-y-3 text-sm flex-1 mb-6">
                             <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-slate-900 mt-0.5" /> E-learning Théorique</li>
                             <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-slate-900 mt-0.5" /> E-learning Pratique</li>
@@ -389,7 +409,7 @@ export default async function FormationVTCPage() {
                          <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-bl-full -mr-8 -mt-8"></div>
                         <h3 className="text-lg font-black text-blue-900 uppercase mb-2">Pack Essentiel</h3>
                         <p className="text-xs text-slate-500 mb-4 italic">"Vous avez quelques notions et voulez apprendre les bases"</p>
-                        <div className="text-3xl font-black text-blue-600 mb-6">1199€</div>
+                        <div className="text-3xl font-black text-blue-600 mb-6">{priceEssentiel}</div>
                         <ul className="space-y-3 text-sm flex-1 mb-6">
                             <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-blue-500 mt-0.5" /> <strong>2 Semaines</strong> de cours</li>
                             <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-blue-500 mt-0.5" /> E-learning inclus</li>
@@ -405,7 +425,7 @@ export default async function FormationVTCPage() {
                         <div className="absolute top-0 inset-x-0 bg-gold-500 text-slate-900 text-xs font-bold text-center py-1 uppercase tracking-wider">Recommandé</div>
                         <h3 className="text-lg font-black text-white uppercase mb-2 mt-4">Pack Gold</h3>
                         <p className="text-xs text-gray-400 mb-4 italic">"Vous n'avez aucune base et voulez tout apprendre !"</p>
-                        <div className="text-3xl font-black text-white mb-6">1499€</div>
+                        <div className="text-3xl font-black text-white mb-6">{priceGold}</div>
                         <ul className="space-y-3 text-sm flex-1 mb-6 text-gray-300">
                             <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-gold-500 mt-0.5" /> Tout inclus Pack Essentiel</li>
                             <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-gold-500 mt-0.5" /> <strong>Frais d'examen (206€) offerts</strong></li>
@@ -421,7 +441,7 @@ export default async function FormationVTCPage() {
                     <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-lg transition-all h-full flex flex-col">
                         <h3 className="text-lg font-black text-slate-900 uppercase mb-2">Pack Excellence</h3>
                         <p className="text-xs text-slate-500 mb-4 italic">"Vous voulez mettre toutes les chances de votre côté !"</p>
-                        <div className="text-3xl font-black text-slate-900 mb-6">1999€</div>
+                        <div className="text-3xl font-black text-slate-900 mb-6">{priceExcellence}</div>
                         <ul className="space-y-3 text-sm flex-1 mb-6">
                             <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" /> Tout inclus Pack Gold</li>
                             <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" /> <strong>Assurance Réussite</strong></li>

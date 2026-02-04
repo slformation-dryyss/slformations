@@ -27,6 +27,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { prisma } from "@/lib/prisma";
 
 export const metadata = {
   title: "SL Formations | Centre de Formation Professionnelle Pluridisciplinaire",
@@ -38,7 +39,35 @@ export const metadata = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
+  const courses = await prisma.course.findMany({
+    where: {
+      slug: {
+        in: [
+          'permis-a1',
+          'permis-a2',
+          'permis-b-manuelle-classique',
+          'permis-b-auto-classique',
+          'permis-b-aac-auto'
+        ]
+      }
+    },
+    select: {
+      slug: true,
+      price: true
+    }
+  });
+
+  const getPrice = (slug: string, fallback: string) => {
+    const course = courses.find(c => c.slug === slug);
+    return course?.price ? `${course.price}€` : fallback;
+  };
+
+  const priceA1 = getPrice('permis-a1', '695€');
+  const priceBA = getPrice('permis-b-auto-classique', '980€');
+  const priceBM = getPrice('permis-b-manuelle-classique', '1095€');
+  const priceAAC = getPrice('permis-b-aac-auto', '1255€');
+
   return (
     <div className="min-h-screen flex flex-col text-slate-900 font-sans">
       <Header />
@@ -317,7 +346,7 @@ export default function Home() {
                     </span>
                     <span className="flex items-center space-x-1 text-gold-500 font-semibold">
                       <Euro className="w-4 h-4" />
-                      <span>à partir de 695€</span>
+                      <span>à partir de {priceA1}</span>
                     </span>
                   </div>
                 </div>
@@ -348,8 +377,8 @@ export default function Home() {
                       <span>20h de conduite</span>
                     </span>
                     <span className="flex flex-col items-end text-gold-500 font-semibold">
-                      <span>Auto : 980€</span>
-                      <span>Manuelle : 1095€</span>
+                      <span>Auto : {priceBA}</span>
+                      <span>Manuelle : {priceBM}</span>
                     </span>
                   </div>
                 </div>
@@ -444,7 +473,7 @@ export default function Home() {
                       <span>Expérience</span>
                     </span>
                     <Link href="/formations/permis-aac" className="text-gold-500 font-semibold hover:underline">
-                      Dès 1255€
+                      Dès {priceAAC}
                     </Link>
                   </div>
                 </div>

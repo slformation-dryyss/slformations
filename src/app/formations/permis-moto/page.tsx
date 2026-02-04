@@ -4,13 +4,27 @@ import { PriceCard } from "@/components/cards/PriceCard";
 import SidebarFilter from "@/components/formations/SidebarFilter";
 import { Bike, Clock, Shield, Award, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
 export const metadata = {
   title: "Permis Moto A2 - Auto-école SL Formations",
   description: "Passez votre permis moto A2 avec SL Formations. Formation plateau et circulation sur pistes privées.",
 };
 
-export default function PermisMotoPage() {
+export default async function PermisMotoPage() {
+  const courses = await prisma.course.findMany({
+    where: {
+      type: 'PERMIS',
+      slug: {
+        in: ['permis-a1', 'permis-a2']
+      }
+    }
+  });
+
+  const getCourse = (slug: string) => courses.find(c => c.slug === slug);
+  const a2 = getCourse('permis-a2');
+  const a1 = getCourse('permis-a1');
+
   return (
     <div className="min-h-screen text-slate-900 font-sans flex flex-col">
       <Header />
@@ -72,8 +86,8 @@ export default function PermisMotoPage() {
                     <div className="grid md:grid-cols-2 gap-8">
                         <PriceCard
                         title="Formule Essentielle"
-                        subtitle="Le minimum légal"
-                        price="695€"
+                        subtitle="Permis A1 (125cc)"
+                        price={a1?.price ? `${a1.price}€` : "695€"}
                         features={[
                             "Frais d'inscription inclus",
                             "Démarches administratives ANTS",
@@ -86,12 +100,12 @@ export default function PermisMotoPage() {
                         color="navy"
                         badge="20 Heures"
                         buttonText="Je m'inscris"
-                        link="/contact?subject=Inscription Permis Moto Essentielle (20h)"
+                        link="/contact?subject=Inscription Permis Moto Essentielle"
                         />
                         <PriceCard
                         title="Formule Maîtrise"
-                        subtitle="Pour assurer votre réussite"
-                        price="995€"
+                        subtitle="Permis A2 (35kW)"
+                        price={a2?.price ? `${a2.price}€` : "995€"}
                         features={[
                             "Tout inclus Formule Essentielle",
                             "25h de formation (5h supplémentaires)",
@@ -104,7 +118,7 @@ export default function PermisMotoPage() {
                         isPopular={true}
                         badge="25 Heures"
                         buttonText="Choisir ce forfait"
-                        link="/contact?subject=Inscription Permis Moto Maîtrise (25h)"
+                        link="/contact?subject=Inscription Permis Moto Maîtrise"
                         />
                     </div>
                 </section>

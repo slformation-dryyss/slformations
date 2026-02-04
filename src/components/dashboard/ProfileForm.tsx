@@ -106,16 +106,26 @@ export function ProfileForm({ user }: ProfileFormProps) {
   }
 
   return (
-    <section className="bg-navy-800 rounded-2xl p-6 md:p-8 border border-navy-700">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg md:text-2xl font-bold">Informations personnelles</h3>
+    <section className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-xl shadow-slate-200/40">
+      <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+        <div>
+          <h3 className="text-xl font-black text-slate-900">Informations personnelles</h3>
+          <p className="text-xs text-slate-500 mt-1">Complétez votre profil pour un meilleur suivi</p>
+        </div>
         <button
           type="submit"
           form="profile-form"
-          className="px-4 py-2 bg-gold-500 text-navy-900 rounded-lg font-semibold text-xs md:text-sm hover:bg-gold-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-6 py-2.5 bg-gold-500 text-navy-900 rounded-xl font-black text-xs md:text-sm hover:bg-gold-600 transition-all shadow-lg shadow-gold-500/20 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 flex items-center gap-2"
           disabled={isSaving}
         >
-          {isSaving ? 'Enregistrement...' : 'Enregistrer'}
+          {isSaving ? (
+            <>
+              <div className="w-3.5 h-3.5 border-2 border-navy-900/30 border-t-navy-900 rounded-full animate-spin" />
+              Sauvegarde...
+            </>
+          ) : (
+            'Enregistrer les modifications'
+          )}
         </button>
       </div>
 
@@ -129,32 +139,32 @@ export function ProfileForm({ user }: ProfileFormProps) {
       <form
         id="profile-form"
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-xs md:text-sm"
+        className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 text-xs md:text-sm"
       >
         {/* Bloc identité */}
         <div>
-          <label className="block text-gray-400 mb-1">Prénom</label>
+          <label className="block text-slate-500 font-bold mb-1.5 uppercase tracking-wide text-[10px]">Prénom</label>
           <input
             type="text"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400"
           />
         </div>
         <div>
-          <label className="block text-gray-400 mb-1">Nom</label>
+          <label className="block text-slate-500 font-bold mb-1.5 uppercase tracking-wide text-[10px]">Nom</label>
           <input
             type="text"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400"
           />
         </div>
         <div>
-          <label className="block text-gray-400 mb-1 flex items-center gap-2">
+          <label className="block text-slate-500 font-bold mb-1.5 flex items-center justify-between">
             Email
-            <span className="text-[10px] bg-navy-900 border border-navy-600 px-1.5 py-0.5 rounded text-gray-500 font-normal">
-              Non modifiable directement
+            <span className="text-[10px] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full text-slate-500 font-bold uppercase tracking-tighter">
+              Lecture seule
             </span>
           </label>
           <div className="space-y-2">
@@ -162,7 +172,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
               type="email"
               value={user.email}
               readOnly
-              className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg opacity-80 cursor-not-allowed text-gray-400"
+              className="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl opacity-80 cursor-not-allowed text-slate-400 font-medium"
             />
             <button
               type="button"
@@ -179,45 +189,45 @@ export function ProfileForm({ user }: ProfileFormProps) {
           </div>
         </div>
         <div>
-          <label className="block text-gray-400 mb-1">Téléphone</label>
+          <label className="block text-slate-500 font-bold mb-1.5 uppercase tracking-wide text-[10px]">Téléphone</label>
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400"
           />
         </div>
         <div>
-          <label className="block text-gray-400 mb-1">Date de naissance</label>
+          <label className="block text-slate-500 font-bold mb-1.5 uppercase tracking-wide text-[10px]">Date de naissance</label>
           <input
             type="date"
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
-            className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400"
           />
         </div>
 
         {/* Adresse */}
         <div>
-          <label className="block text-gray-400 mb-1">Code postal</label>
+          <label className="block text-slate-500 font-bold mb-1.5 uppercase tracking-wide text-[10px]">Code postal</label>
           <input
             type="text"
             value={postalCode}
             onChange={(e) => setPostalCode(e.target.value)}
-            className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400"
           />
         </div>
         <div>
-          <label className="block text-gray-400 mb-1">Ville</label>
+          <label className="block text-slate-500 font-bold mb-1.5 uppercase tracking-wide text-[10px]">Ville</label>
           <input
             type="text"
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400"
           />
         </div>
         <div className="md:col-span-2">
-          <label className="block text-gray-400 mb-1">Adresse</label>
+          <label className="block text-slate-500 font-bold mb-1.5 uppercase tracking-wide text-[10px]">Adresse</label>
           <input
             type="text"
             value={addressLine1}
@@ -229,7 +239,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             value={addressLine2}
             onChange={(e) => setAddressLine2(e.target.value)}
             placeholder="Complément d'adresse (facultatif)"
-            className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -238,7 +248,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             type="text"
             value={country}
             onChange={(e) => setCountry(e.target.value)}
-            className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400"
           />
         </div>
 
@@ -249,7 +259,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             type="text"
             value={profession}
             onChange={(e) => setProfession(e.target.value)}
-            className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -258,7 +268,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             type="text"
             value={employerName}
             onChange={(e) => setEmployerName(e.target.value)}
-            className="w-full px-4 py-2.5 bg-navy-700 border border-navy-600 rounded-lg"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400"
           />
         </div>
 

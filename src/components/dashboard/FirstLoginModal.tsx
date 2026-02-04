@@ -46,16 +46,18 @@ export function FirstLoginModal({ isOpen, onClose }: FirstLoginModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-300">
         {/* Header with gradient */}
-        <div className="bg-gradient-to-br from-gold-500 to-gold-600 p-8 text-center relative">
-          <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-10"></div>
+        {/* Header with gradient */}
+        <div className="bg-navy-950 p-10 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-navy-900/50 to-transparent"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gold-400/10 blur-3xl rounded-full -mr-16 -mt-16"></div>
           <div className="relative">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-4 border-4 border-white/30">
-              <KeyRound className="w-10 h-10 text-white" />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 backdrop-blur-md rounded-full mb-6 border border-white/20 shadow-2xl">
+              <KeyRound className="w-10 h-10 text-gold-500" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Sécurisez votre compte
+            <h2 className="text-3xl font-black text-white mb-2 tracking-tight">
+              <span className="text-gradient-gold">Sécurité</span> du compte
             </h2>
-            <p className="text-gold-100 text-sm">
+            <p className="text-slate-400 text-sm font-medium">
               Première connexion détectée
             </p>
           </div>
@@ -84,19 +86,19 @@ export function FirstLoginModal({ isOpen, onClose }: FirstLoginModalProps) {
             <button
               onClick={handleChangeNow}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="w-full flex items-center justify-center gap-3 px-6 py-4.5 bg-slate-950 text-white font-black rounded-2xl transition-all shadow-xl shadow-slate-950/20 hover:bg-navy-900 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
             >
-              <KeyRound className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-              <span>Changer mon mot de passe maintenant</span>
+              <KeyRound className="w-5 h-5 text-gold-500 group-hover:rotate-12 transition-transform" />
+              <span>Changer mon mot de passe</span>
             </button>
 
             {/* Secondary Action */}
             <button
               onClick={handleLater}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-all border border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-2xl transition-all border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed group"
             >
-              <Clock className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              <Clock className="w-5 h-5 text-slate-400 group-hover:scale-110 transition-transform" />
               <span>Me le rappeler plus tard</span>
             </button>
 
@@ -104,11 +106,11 @@ export function FirstLoginModal({ isOpen, onClose }: FirstLoginModalProps) {
             <button
               onClick={handleSkip}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-slate-500 hover:text-slate-700 font-medium transition-colors group"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-slate-400 hover:text-red-500 font-bold transition-colors group"
             >
               <X className="w-4 h-4" />
               <span>Ignorer définitivement</span>
-              <span className="text-xs text-red-500 ml-1">(non recommandé)</span>
+              <span className="text-[10px] bg-red-50 text-red-500 px-1.5 py-0.5 rounded ml-1 border border-red-100 uppercase tracking-tighter">Non recommandé</span>
             </button>
           </div>
 

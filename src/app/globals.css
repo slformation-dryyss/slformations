@@ -14,6 +14,7 @@
   
   /* Redéfinition des variables 'navy' pour un Thème Clair Logique */
   /* Fond : Slate 100 (léger gris) | Cartes : White | Bordures : Slate 200/300 */
+  --color-navy-950: #0f172a; /* Deep Navy (Slate 950) - For dark accents */
   --color-navy-900: #e2e8f0; /* Page Background (Slate 200) */
   --color-navy-800: #ffffff; /* Card Background (White) */
   --color-navy-700: #e2e8f0; /* Borders (Slate 200) */

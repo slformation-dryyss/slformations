@@ -4,13 +4,25 @@ import { PriceCard } from "@/components/cards/PriceCard";
 import SidebarFilter from "@/components/formations/SidebarFilter";
 import { CheckCircle2, Users, Clock, Shield, Award } from "lucide-react";
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
 export const metadata = {
   title: "Permis AAC (Conduite Accompagnée) - Auto-école SL Formations",
   description: "Apprenez à conduire dès 15 ans avec la conduite accompagnée (AAC). Un meilleur taux de réussite et plus d'expérience.",
 };
 
-export default function PermisAACPage() {
+export default async function PermisAACPage() {
+  const courses = await prisma.course.findMany({
+    where: {
+      slug: {
+        in: ['permis-b-aac-auto', 'permis-b-aac-manuelle', 'permis-b-aac-auto-13h', 'permis-b-aac-manuelle-13h']
+      }
+    }
+  });
+
+  const aac13h = courses.find(c => c.slug === 'permis-b-aac-auto-13h' || c.slug === 'permis-b-aac-manuelle-13h');
+  const aac20h = courses.find(c => c.slug === 'permis-b-aac-auto' || c.slug === 'permis-b-aac-manuelle');
+
   return (
     <div className="min-h-screen text-slate-900 font-sans flex flex-col">
       <Header />
@@ -69,7 +81,7 @@ export default function PermisAACPage() {
                         <PriceCard
                             title="FORFAIT 13H"
                             subtitle="Conduite Accompagnée"
-                            price="1255€"
+                            price={aac13h?.price ? `${aac13h.price}€` : "1255€"}
                             features={[
                                 "Frais d'inscription",
                                 "Démarches ANTS",
@@ -86,7 +98,7 @@ export default function PermisAACPage() {
                         <PriceCard
                             title="FORFAIT 20H"
                             subtitle="Conduite Accompagnée"
-                            price="1495€"
+                            price={aac20h?.price ? `${aac20h.price}€` : "1495€"}
                             features={[
                                 "Frais d'inscription",
                                 "Démarches ANTS",

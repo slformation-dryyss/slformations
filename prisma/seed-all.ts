@@ -9,6 +9,7 @@ async function main() {
   const seedScripts = [
     'seed-permis.ts',
     'seed-vtc.ts',
+    'seed-vtc-packs.ts',
     'seed-caces.ts',
     'seed-tech.ts',
     'seed-secourisme.ts',
