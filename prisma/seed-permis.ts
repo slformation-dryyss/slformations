@@ -31,7 +31,7 @@ async function main() {
       title: 'Permis B - Manuelle - Classique',
       slug: 'permis-b-manuelle-classique',
       type: 'PERMIS',
-      imageUrl: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d',
+      imageUrl: '/images/courses/permis-b-manuelle.jpg',
       description: 'L\'essentiel pour débuter en boîte manuelle.',
       price: 1200,
       drivingHours: 20,
@@ -44,7 +44,7 @@ async function main() {
       title: 'Permis B - Manuelle - Sérénité',
       slug: 'permis-b-manuelle-serenite',
       type: 'PERMIS',
-      imageUrl: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d',
+      imageUrl: '/images/courses/permis-b-manuelle.jpg',
       description: 'Pour prendre le temps d\'apprendre en boîte manuelle.',
       price: 1700,
       drivingHours: 30,
@@ -59,7 +59,7 @@ async function main() {
       title: 'Permis B - Automatique - Classique',
       slug: 'permis-b-auto-classique',
       type: 'PERMIS',
-      imageUrl: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2',
+      imageUrl: '/images/courses/permis-b-auto.jpg',
       description: 'Rapide et efficace (Minimum légal 13h).',
       price: 980,
       drivingHours: 13,
@@ -72,7 +72,7 @@ async function main() {
       title: 'Permis B - Automatique - Confort',
       slug: 'permis-b-auto-confort',
       type: 'PERMIS',
-      imageUrl: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2',
+      imageUrl: '/images/courses/permis-b-auto.jpg',
       description: 'La maîtrise totale en automatique.',
       price: 1400,
       drivingHours: 20,
@@ -87,7 +87,7 @@ async function main() {
         title: 'Permis B - AAC - Manuelle',
         slug: 'permis-b-aac-manuelle',
         type: 'PERMIS',
-        imageUrl: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98',
+        imageUrl: '/images/courses/permis-b-aac.jpg',
         description: 'Conduite accompagnée en boîte manuelle (dès 15 ans).',
         price: 1400,
         drivingHours: 20,
@@ -100,7 +100,7 @@ async function main() {
         title: 'Permis B - AAC - Automatique',
         slug: 'permis-b-aac-auto',
         type: 'PERMIS',
-        imageUrl: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98',
+        imageUrl: '/images/courses/permis-b-aac.jpg',
         description: 'Conduite accompagnée en boîte automatique (dès 15 ans).',
         price: 1200,
         drivingHours: 13,
@@ -115,7 +115,7 @@ async function main() {
         title: 'Permis A1 (125cc) - Dès 16 ans',
         slug: 'permis-a1',
         type: 'PERMIS',
-        imageUrl: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?q=80&w=1000&auto=format&fit=crop',
+        imageUrl: '/images/courses/permis-a1.jpg',
         description: `Pour conduire des motos légères (max 125cm3 / 11kW).
         
 Contenu : Code moto (ETM), Plateau, Circulation.`,
@@ -128,7 +128,7 @@ Contenu : Code moto (ETM), Plateau, Circulation.`,
         title: 'Permis A2 - Moto (Max 35kW)',
         slug: 'permis-a2',
         type: 'PERMIS',
-        imageUrl: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?q=80&w=1000&auto=format&fit=crop',
+        imageUrl: '/images/courses/permis-a2.jpg',
         description: `Le permis moto standard pour les motards de tous âges (machines bridées à 47.5ch).
         
 Formation complète pour maîtriser un deux-roues en toute circonstance.
@@ -140,7 +140,64 @@ Passerelle vers le permis A (Full) possible après 2 ans.`,
         ]
     },
 
-    
+     // --- PERMIS Poids Lourds ---
+     {
+        title: 'Permis C - Poids Lourd (Porteur)',
+        slug: 'permis-c',
+        type: 'FIMO', // Categorized as Transport/FIMO type typically
+        imageUrl: '/images/courses/permis-c.jpg',
+        description: `Pour conduire des véhicules de transport de marchandises de plus de 3,5 tonnes (camion porteur).
+        
+Prérequis : Avoir le permis B et 21 ans (ou titre pro).
+Inclus : Code, Plateau, Circulation.`,
+        modules: [
+            { title: "Théorie Professionnelle", lessons: ["Réglementation transport", "Mécanique Poids Lourd", "Sécurité"] },
+            { title: "Maniabilité", lessons: ["Vérifications courantes", "Attelage/Dételage (si CE)", "Manœuvres"] },
+            { title: "Circulation", lessons: ["Gabarit", "Anticipation", "Conduite économique"] }
+        ]
+    },
+    {
+        title: 'Permis CE - Super Lourd',
+        slug: 'permis-ce',
+        type: 'FIMO',
+        imageUrl: '/images/courses/permis-ce.jpg',
+        description: `Pour conduire des ensembles de véhicules (Poids Lourd + Remorque > 750kg).
+        
+Le permis des routiers longue distance. Maîtrisez les ensembles articulés.`,
+        modules: [
+            { title: "Maniabilité Complexe", lessons: ["Marche arrière articulée", "Mise à quai", "Attelage de précision"] },
+            { title: "Route", lessons: ["Gestion du gabarit long", "Forces physiques", "Montagne & Descente"] }
+        ]
+    },
+
+    // --- PERMIS D (Transport en commun) ---
+    {
+        title: 'Permis D - Transport de Voyageurs',
+        slug: 'permis-d',
+        type: 'TRANSPORT',
+        imageUrl: '/images/courses/permis-d.jpg',
+        description: `Pour conduire des bus et autocars (plus de 8 passagers).
+        
+Responsabilité, confort des passagers et sécurité sont au cœur de cette formation.`,
+        modules: [
+            { title: "Sécurité & Confort", lessons: ["Accueil des passagers", "Conduite souple", "Réglementation sociale"] },
+            { title: "Conduite", lessons: ["Gabarit bus", "Arrêts fréquents", "Gestion des conflits"] }
+        ]
+    },
+     // --- PERMIS BE (Remorque) ---
+     {
+        title: 'Permis BE - Remorque',
+        slug: 'permis-be',
+        type: 'PERMIS',
+        imageUrl: '/images/courses/permis-be.jpg',
+        description: `Nécessaire pour tracter une remorque de plus de 750kg si le total (Voiture + Remorque) dépasse 4250kg.
+        
+Idéal pour caravanes, vans à chevaux, porte-voitures.`,
+        modules: [
+            { title: "Plateau", lessons: ["Vérifications", "Attelage", "Marche arrière sinueuse"] },
+            { title: "Circulation", lessons: ["Adaptation de l'allure", "Dépassement avec remorque"] }
+        ]
+    }
   ];
 
   for (const courseData of courses) {
