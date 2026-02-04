@@ -45,6 +45,7 @@ model User {
   roles                  String[]               @default(["STUDENT"])
   primaryRole            String                 @default("STUDENT")
   mustChangePassword     Boolean                @default(false)
+  isBlocked              Boolean                @default(false)
   passwordChangedAt      DateTime?
   drivingBalance         Int                    @default(0)
   addresses              Address[]

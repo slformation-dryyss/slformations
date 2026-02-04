@@ -4,6 +4,10 @@ import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+import { sendEnrollmentConfirmation } from "@/lib/email/transactional";
+
+// ... (existing imports)
+
 export async function enrollUserInSessionAction(formData: FormData) {
     await requireAdmin();
 
@@ -17,12 +21,19 @@ export async function enrollUserInSessionAction(formData: FormData) {
     }
 
     try {
-        const session = await prisma.courseSession.findUnique({
-            where: { id: sessionId },
-            include: { course: true }
-        });
+        // Fetch session with course AND user details
+        const [session, user] = await Promise.all([
+            prisma.courseSession.findUnique({
+                where: { id: sessionId },
+                include: { course: true }
+            }),
+            prisma.user.findUnique({
+                where: { id: userId }
+            })
+        ]);
 
         if (!session) return { error: "Session introuvable." };
+        if (!user) return { error: "Utilisateur introuvable." };
 
         // 1. Create Session Booking
         await prisma.courseSessionBooking.create({
@@ -56,6 +67,21 @@ export async function enrollUserInSessionAction(formData: FormData) {
                 bookedSpots: { increment: 1 }
             }
         });
+
+        // 4. Send Email
+        if (user.email) {
+            try {
+                await sendEnrollmentConfirmation({
+                    userName: user.name || user.email!.split('@')[0],
+                    userEmail: user.email!,
+                    courseTitle: session.course.title,
+                    courseSlug: session.course.slug,
+                    enrollmentDate: new Date().toLocaleDateString('fr-FR'),
+                });
+            } catch (error) {
+                console.error("Failed to send session enrollment email:", error);
+            }
+        }
 
         revalidatePath(`/admin/sessions/${sessionId}`);
         return { success: true };

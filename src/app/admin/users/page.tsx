@@ -6,6 +6,7 @@ import { Search, User as UserIcon } from "lucide-react";
 import { UserRoleSelector } from "@/components/admin/UserRoleSelector";
 import { DeleteUserButton } from "@/components/admin/DeleteUserButton";
 import { CreateUserButton } from "@/components/admin/CreateUserButton";
+import { BlockUserButton } from "@/components/admin/BlockUserButton";
 
 // Helper components
 function RoleBadge({ roles, role }: { roles?: string[], role?: string }) {
@@ -205,8 +206,13 @@ export default async function AdminUsersPage({
                           currentRoles={user.roles || []}
                           currentRole={user.role}
                         />
+                        <BlockUserButton 
+                          userId={user.id} 
+                          userName={user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email}
+                          isBlocked={user.isBlocked}
+                        />
                         <DeleteUserButton
-                          userId={user.id}
+                          userId={user.id} 
                           userName={user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email}
                         />
 

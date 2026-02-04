@@ -48,6 +48,7 @@ export function Header() {
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
+  const [expandedMobileCategory, setExpandedMobileCategory] = useState<string | null>(null);
 
   const toggleDropdown = (name: string) => {
     setActiveDropdown(activeDropdown === name ? null : name);
@@ -456,27 +457,50 @@ export function Header() {
                   </div>
                 ) : (
                   categories.map((category) => (
-                    <div key={category.id} className="py-1">
-                      <p className="px-3 text-[10px] font-black text-slate-400">{category.name}</p>
-                      {category.courses.map((course) => (
-                        <Link
-                          key={course.id}
-                          href={`/formations/${course.slug}`}
-                          className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          {course.title}
-                        </Link>
-                      ))}
-                      {category.courses.length === 0 && (
-                        <Link
-                          href={`/formations/catalogue?category=${category.slug}`}
-                          className="block py-1.5 px-3 text-slate-600 hover:text-gold-500 transition"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          Voir tout
-                        </Link>
-                      )}
+                    <div key={category.id} className="border-b border-slate-50 last:border-0/0">
+                      <button
+                        onClick={() =>
+                          setExpandedMobileCategory(
+                            expandedMobileCategory === category.id ? null : category.id
+                          )
+                        }
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium text-slate-700 hover:text-gold-600 hover:bg-slate-50 transition rounded-lg"
+                      >
+                        <span>{category.name}</span>
+                        <ChevronDown 
+                          className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                            expandedMobileCategory === category.id ? "rotate-180 text-gold-500" : ""
+                          }`} 
+                        />
+                      </button>
+                      
+                      <div 
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                          expandedMobileCategory === category.id ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+                        }`}
+                      >
+                        <div className="pl-4 pr-2 pb-2 space-y-1">
+                          {category.courses.map((course) => (
+                            <Link
+                              key={course.id}
+                              href={`/formations/${course.slug}`}
+                              className="block py-1.5 px-3 text-sm text-slate-500 hover:text-gold-500 hover:bg-slate-50 rounded-md transition"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              {course.title}
+                            </Link>
+                          ))}
+                          {category.courses.length === 0 && (
+                            <Link
+                              href={`/formations/catalogue?category=${category.slug}`}
+                              className="block py-1.5 px-3 text-sm text-slate-500 hover:text-gold-500 hover:bg-slate-50 rounded-md transition italic"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              Voir les formations
+                            </Link>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   ))
                 )}

@@ -4,6 +4,10 @@ import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+import { sendEnrollmentConfirmation } from "@/lib/email/transactional";
+
+// ... (existing imports)
+
 export async function addManualPaymentAction(formData: FormData) {
   const admin = await requireAdmin();
 
@@ -15,6 +19,16 @@ export async function addManualPaymentAction(formData: FormData) {
 
   if (!userId || !courseId || isNaN(amount)) {
     throw new Error("Champs manquants");
+  }
+
+  // Fetch details for email
+  const [user, course] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId } }),
+    prisma.course.findUnique({ where: { id: courseId } })
+  ]);
+
+  if (!user || !course) {
+    throw new Error("Utilisateur ou Formation introuvable");
   }
 
   // 1. Create Order
@@ -32,16 +46,14 @@ export async function addManualPaymentAction(formData: FormData) {
     data: {
       orderId: order.id,
       amount,
-      // method, // Not in schema
       status: "SUCCEEDED",
-      provider: method || "MANUAL", // Store method (ESPECE, VIREMENT) in provider
-      providerPaymentId: `MANUAL-${Date.now()}`, // Required field
-      // adminNote: ... // Not in schema, skipping for now
+      provider: method || "MANUAL",
+      providerPaymentId: `MANUAL-${Date.now()}`,
     },
   });
 
   // 3. Create Enrollment
-  await prisma.enrollment.upsert({
+  const enrollment = await prisma.enrollment.upsert({
     where: {
       userId_courseId: {
         userId,
@@ -55,6 +67,22 @@ export async function addManualPaymentAction(formData: FormData) {
       status: "ACTIVE",
     },
   });
+
+  // 4. Send Confirmation Email
+  if (user.email) {
+    try {
+      await sendEnrollmentConfirmation({
+        userName: user.name || user.email!.split('@')[0],
+        userEmail: user.email!,
+        courseTitle: course.title,
+        courseSlug: course.slug,
+        enrollmentDate: new Date().toLocaleDateString('fr-FR'),
+      });
+    } catch (error) {
+      console.error("Failed to send manual payment confirmation email:", error);
+      // Don't block the UI for email failure
+    }
+  }
 
   revalidatePath("/admin/payments");
   revalidatePath("/dashboard/mes-formations");

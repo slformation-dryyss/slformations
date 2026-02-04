@@ -36,7 +36,7 @@ export default function AddStudentForm({ sessionId, users }: { sessionId: string
         return (
             <div className="bg-green-50 p-4 rounded border border-green-200 flex items-center justify-between">
                 <span className="text-green-800 font-bold flex items-center gap-2">
-                    <Check className="w-5 h-5" /> Élève ajouté avec succès !
+                    <Check className="w-5 h-5" /> Élève inscrit ! Email de confirmation envoyé.
                 </span>
                 <button onClick={() => setSuccess(false)} className="text-sm underline text-green-700">Ajouter un autre</button>
             </div>

@@ -97,4 +97,55 @@ export async function createAuth0User(data: { email: string; firstName: string; 
     }
 
     return await response.json();
+    return await response.json();
+}
+
+export async function deleteAuth0User(auth0UserId: string) {
+    const token = await getManagementApiToken();
+    const rawDomain = process.env.AUTH0_ISSUER_BASE_URL;
+    if (!rawDomain) throw new Error("Missing AUTH0_ISSUER_BASE_URL");
+
+    const domain = rawDomain.replace(/\/$/, "");
+
+    const response = await fetch(`${domain}/api/v2/users/${auth0UserId}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        console.error("Auth0 User Deletion Error:", error);
+        throw new Error(`Failed to delete Auth0 user: ${error.message || error.error}`);
+    }
+
+    return true;
+}
+
+export async function updateAuth0UserBlockStatus(auth0UserId: string, blocked: boolean) {
+    const token = await getManagementApiToken();
+    const rawDomain = process.env.AUTH0_ISSUER_BASE_URL;
+    if (!rawDomain) throw new Error("Missing AUTH0_ISSUER_BASE_URL");
+
+    const domain = rawDomain.replace(/\/$/, "");
+
+    const response = await fetch(`${domain}/api/v2/users/${auth0UserId}`, {
+        method: "PATCH",
+        headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+            blocked: blocked
+        }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        console.error("Auth0 User Block/Unblock Error:", error);
+        throw new Error(`Failed to update Auth0 user block status: ${error.message || error.error}`);
+    }
+
+    return await response.json();
 }

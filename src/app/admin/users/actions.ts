@@ -4,7 +4,7 @@
 import { requireOwner, requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { createAuth0User } from "@/lib/auth0-mgmt";
+import { createAuth0User, deleteAuth0User, updateAuth0UserBlockStatus } from "@/lib/auth0-mgmt";
 import { sendEmail } from "@/lib/email";
 import { renderWelcomeEmail } from "@/emails/user-onboarding-templates";
 
@@ -135,6 +135,8 @@ export async function updateUserRolesAction(userId: string, newRoles: string[]) 
   revalidatePath("/admin/users");
 }
 
+
+
 export async function deleteUserAction(userId: string) {
   // 1. Get current user & ensure they are at least ADMIN
   const currentUser = await requireAdmin();
@@ -151,7 +153,7 @@ export async function deleteUserAction(userId: string) {
   // 3. Find target user
   const targetUser = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, role: true, roles: true }
+    select: { id: true, role: true, roles: true, auth0Id: true }
   });
 
   if (!targetUser) {
@@ -173,9 +175,51 @@ export async function deleteUserAction(userId: string) {
     }
   }
 
-  // 5. Delete from DB
+  // 5. Delete from Auth0
+  if (targetUser.auth0Id) {
+    try {
+      await deleteAuth0User(targetUser.auth0Id);
+    } catch (e) {
+      console.error("Failed to delete Auth0 user:", e);
+    }
+  }
+
+  // 6. Delete from DB
   await prisma.user.delete({
     where: { id: userId }
+  });
+
+  revalidatePath("/admin/users");
+}
+
+export async function toggleBlockUserAction(userId: string, shouldBlock: boolean) {
+  const currentUser = await requireAdmin();
+
+  if (!userId) throw new Error("ID manquant");
+  if (currentUser.id === userId) throw new Error("Vous ne pouvez pas vous bloquer vous-même");
+
+  const targetUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, auth0Id: true, isBlocked: true }
+  });
+
+  if (!targetUser) throw new Error("Utilisateur introuvable");
+
+  // 1. Update Auth0 if linked
+  if (targetUser.auth0Id) {
+    try {
+      await updateAuth0UserBlockStatus(targetUser.auth0Id, shouldBlock);
+    } catch (error) {
+       console.error("Failed to sync block status with Auth0:", error);
+       // We continue to update local state, or should we abort?
+       // Let's warn but continue, so local state reflects intent.
+    }
+  }
+
+  // 2. Update Local DB
+  await prisma.user.update({
+    where: { id: userId },
+    data: { isBlocked: shouldBlock }
   });
 
   revalidatePath("/admin/users");
