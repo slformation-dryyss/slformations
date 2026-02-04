@@ -199,33 +199,23 @@ export async function POST(request: Request) {
             });
             console.log(`[Stripe Webhook] Email de confirmation envoyé à ${user.email}`);
 
-            // --- NOUVEAU: Envoyer la facture ---
-            try {
-              await sendInvoice({
-                invoiceNumber: `FAC-${Date.now().toString().slice(-6)}`,
-                invoiceDate: new Date().toLocaleDateString('fr-FR'),
-                dueDate: new Date().toLocaleDateString('fr-FR'),
-                clientName: user.name || "Étudiant",
-                clientAddress: (user as any).addressLine1 || "",
-                clientPostal: (user as any).postalCode || "",
-                clientCity: (user as any).city || "",
-                companyName: "SL FORMATIONS",
-                companyAddress: "123 Avenue de Paris",
-                companyPostal: "75001",
-                companyCity: "Paris",
-                companySIRET: "123 456 789 00012",
-                companyTVA: "FR 12 345678901",
-                companyAPE: "8559A",
-                items: [{
-                  description: `Formation : ${course.title}`,
-                  quantity: 1,
-                  unitPrice: (session.amount_total || 0) / 100,
-                  vatRate: 0
-                }]
-              }, user.email);
-              console.log(`[Stripe Webhook] Facture envoyée à ${user.email}`);
-            } catch (invoiceError) {
-              console.error("[Stripe Webhook] Erreur lors de l'envoi de la facture:", invoiceError);
+            // --- NOUVEAU: Récupérer la facture Stripe ---
+            if (session.invoice) {
+              try {
+                const invoiceId = session.invoice as string;
+                const invoice = await stripe.invoices.retrieve(invoiceId);
+                
+                await prisma.order.update({
+                  where: { stripeSessionId: session.id },
+                  data: {
+                    invoiceNumber: invoice.number,
+                    invoiceUrl: invoice.hosted_invoice_url || invoice.invoice_pdf,
+                  }
+                });
+                console.log(`[Stripe Webhook] Facture liée à la commande: ${invoice.number}`);
+              } catch (invError) {
+                console.error("[Stripe Webhook] Erreur récupération facture Stripe:", invError);
+              }
             }
           }
         } catch (emailError) {

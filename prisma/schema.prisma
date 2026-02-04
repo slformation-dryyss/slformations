@@ -297,6 +297,8 @@ model Order {
   currency        String      @default("EUR")
   status          String      @default("PENDING")
   stripeSessionId String?     @unique
+  invoiceNumber   String?     @unique
+  invoiceUrl      String? // Link to Stripe hosted invoice PDF
   stripePaymentId String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt

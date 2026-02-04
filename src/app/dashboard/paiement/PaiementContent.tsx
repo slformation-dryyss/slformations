@@ -541,15 +541,27 @@ export default function PaiementContent({
                             <CreditCardIcon className="w-4 h-4" />
                           </td>
                           <td className="p-4 text-center">
-                            <button
-                              onClick={() => {
-                                window.open(`/api/orders/${order.id}/invoice`, '_blank');
-                              }}
-                              className="text-gold-600 hover:text-gold-700"
-                              title="Télécharger la facture"
-                            >
-                              <Download className="w-4 h-4" />
-                            </button>
+                            {order.invoiceUrl ? (
+                              <Link
+                                href={order.invoiceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-gold-600 hover:text-gold-700"
+                                title="Télécharger la facture Stripe"
+                              >
+                                <Download className="w-4 h-4" />
+                              </Link>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  window.open(`/api/orders/${order.id}/invoice`, '_blank');
+                                }}
+                                className="text-gold-600 hover:text-gold-700"
+                                title="Télécharger la facture (Générée)"
+                              >
+                                <Download className="w-4 h-4" />
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))

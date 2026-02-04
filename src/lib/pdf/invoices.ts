@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 interface InvoiceData {
   invoiceNumber: string;
@@ -90,7 +90,7 @@ export const generateInvoice = (data: InvoiceData) => {
     ];
   });
   
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: tableStartY,
     head: [['Description', 'Qté', 'Prix Unit. HT', 'TVA', 'Total HT', 'Total TTC']],
     body: tableData,
@@ -106,7 +106,7 @@ export const generateInvoice = (data: InvoiceData) => {
       5: { cellWidth: 25, halign: 'right' }
     }
   });
-  
+
   // Totals
   const finalY = (doc as any).lastAutoTable.finalY + 10;
   

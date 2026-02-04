@@ -54,6 +54,9 @@ export async function createCheckoutSession(user: User, courseId: string, quanti
     },
     success_url: `${appUrl}/paiement/success?session_id={CHECKOUT_SESSION_ID}${sessionId ? `&booked_session=${sessionId}` : ''}`,
     cancel_url: `${appUrl}/formations/${course.slug ?? ""}`,
+    invoice_creation: {
+      enabled: true,
+    },
   });
 
   return session;
