@@ -75,7 +75,7 @@ export async function addManualPaymentAction(formData: FormData) {
         userName: user.name || user.email!.split('@')[0],
         userEmail: user.email!,
         courseTitle: course.title,
-        courseSlug: course.slug,
+        courseSlug: course.slug || '',
         enrollmentDate: new Date().toLocaleDateString('fr-FR'),
       });
     } catch (error) {
