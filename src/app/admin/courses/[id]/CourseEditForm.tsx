@@ -10,25 +10,30 @@ interface CourseEditFormProps {
     course: Course;
 }
 
+import { useRouter } from "next/navigation";
+
+// ...
+
 export function CourseEditForm({ course }: CourseEditFormProps) {
     const [status, setStatus] = useState<"idle" | "saving" | "success">("idle");
+    const router = useRouter();
 
     async function handleSubmit(formData: FormData) {
         setStatus("saving");
         try {
             await updateCourseAction(formData);
             setStatus("success");
+            router.refresh(); // Sync client with server data
             // Reset to idle after 2 seconds
             setTimeout(() => setStatus("idle"), 2000);
         } catch (e) {
             console.error(e);
             setStatus("idle");
-            // Optionally handle error state
         }
     }
 
     return (
-        <form action={handleSubmit} className="space-y-4">
+        <form key={course.updatedAt?.toString()} action={handleSubmit} className="space-y-4">
             <input type="hidden" name="courseId" value={course.id} />
 
             <div>

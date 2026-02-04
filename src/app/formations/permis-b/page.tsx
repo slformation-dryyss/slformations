@@ -23,7 +23,9 @@ export default async function PermisBPage() {
           'permis-b-auto-classique',
           'permis-b-auto-confort',
           'permis-b-aac-manuelle',
-          'permis-b-aac-auto'
+          'permis-b-aac-auto',
+          'permis-b-h-manuelle',
+          'permis-b-h-auto'
         ]
       }
     }
@@ -38,6 +40,8 @@ export default async function PermisBPage() {
   const baConfort = getCourse('permis-b-auto-confort');
   const aacManuelle = getCourse('permis-b-aac-manuelle');
   const aacAuto = getCourse('permis-b-aac-auto');
+  const unitManuelle = getCourse('permis-b-h-manuelle');
+  const unitAuto = getCourse('permis-b-h-auto');
 
   return (
     <div className="min-h-screen text-slate-900 font-sans flex flex-col">
@@ -246,6 +250,51 @@ export default async function PermisBPage() {
                 </div>
               </div>
 
+
+              {/* Tarifs à la Carte (Heure à l'unité) */}
+              <div className="mb-20">
+                <div className="flex items-center gap-4 mb-10 justify-center">
+                  <div className="h-[1px] bg-slate-200 w-20"></div>
+                  <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+                    <span className="w-10 h-10 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center text-sm font-black">+</span>
+                    À la Carte
+                  </h3>
+                  <div className="h-[1px] bg-slate-200 w-20"></div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                  <PriceCard
+                    title={unitManuelle?.title || "Heure de Conduite (Manuelle)"}
+                    subtitle="Pour perfectionnement ou heure supplémentaire"
+                    price={unitManuelle ? `${unitManuelle.price}€` : "50€"}
+                    features={[
+                      "Leçon de conduite 1h",
+                      "Moniteur diplômé",
+                      "Véhicule double commande",
+                      "Boîte Manuelle",
+                      "Sans engagement"
+                    ]}
+                    color="navy"
+                    buttonText="Réserver"
+                    link={`/contact?subject=Réservation ${unitManuelle?.title || "Heure Manuelle"}`}
+                  />
+                  <PriceCard
+                    title={unitAuto?.title || "Heure de Conduite (Auto)"}
+                    subtitle="Pour perfectionnement ou heure supplémentaire"
+                    price={unitAuto ? `${unitAuto.price}€` : "40€"}
+                    features={[
+                      "Leçon de conduite 1h",
+                      "Moniteur diplômé",
+                      "Véhicule double commande",
+                      "Boîte Automatique",
+                      "Sans engagement"
+                    ]}
+                    color="navy"
+                    buttonText="Réserver"
+                    link={`/contact?subject=Réservation ${unitAuto?.title || "Heure Auto"}`}
+                  />
+                </div>
+              </div>
 
               {/* Legal Notice about Evaluation */}
               <div className="mt-12 p-8 bg-slate-900 rounded-3xl border border-white/10 relative overflow-hidden group">
