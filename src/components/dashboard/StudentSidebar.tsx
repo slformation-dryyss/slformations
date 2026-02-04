@@ -104,9 +104,16 @@ export function StudentSidebar({ role = "STUDENT", roles, socialLinks = {}, isOp
           }`}
       >
         <div className="flex items-center justify-between px-6 h-16 border-b border-white/5">
-          <span className="text-xl font-bold text-white tracking-wider">
-            SL <span className="text-gold-500">FORMATION</span>
-          </span>
+          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
+            <Image
+              src="/LOGO.png"
+              alt="SL Formations"
+              width={180}
+              height={60}
+              className="h-12 w-auto"
+              priority
+            />
+          </Link>
           <button
             onClick={onClose}
             className="md:hidden p-1 text-slate-400 hover:text-white"
