@@ -87,7 +87,7 @@ export async function updateCourseAction(formData: FormData) {
 
     if (!courseId) throw new Error("Course ID is missing");
 
-    await prisma.course.update({
+    const updatedCourse = await prisma.course.update({
       where: { id: courseId },
       data: { 
         title, 
@@ -108,6 +108,9 @@ export async function updateCourseAction(formData: FormData) {
 
     revalidatePath(`/admin/courses/${courseId}`);
     revalidatePath("/admin/courses");
+    if (updatedCourse.slug) {
+        revalidatePath(`/formations/${updatedCourse.slug}`);
+    }
   } catch (error: any) {
     if (error?.digest?.startsWith("NEXT_REDIRECT")) {
       throw error;

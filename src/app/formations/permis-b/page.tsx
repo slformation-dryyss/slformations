@@ -245,7 +245,7 @@ export default async function PermisBPage() {
                   />
                 </div>
               </div>
-              </div>
+
 
               {/* Legal Notice about Evaluation */}
               <div className="mt-12 p-8 bg-slate-900 rounded-3xl border border-white/10 relative overflow-hidden group">
