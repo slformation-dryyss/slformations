@@ -21,7 +21,9 @@ export default async function PermisBPage() {
           'permis-b-manuelle-classique',
           'permis-b-manuelle-serenite',
           'permis-b-auto-classique',
-          'permis-b-auto-confort'
+          'permis-b-auto-confort',
+          'permis-b-aac-manuelle',
+          'permis-b-aac-auto'
         ]
       }
     }
@@ -34,6 +36,8 @@ export default async function PermisBPage() {
   const bmSerenite = getCourse('permis-b-manuelle-serenite');
   const baClassique = getCourse('permis-b-auto-classique');
   const baConfort = getCourse('permis-b-auto-confort');
+  const aacManuelle = getCourse('permis-b-aac-manuelle');
+  const aacAuto = getCourse('permis-b-aac-auto');
 
   return (
     <div className="min-h-screen text-slate-900 font-sans flex flex-col">
@@ -186,6 +190,61 @@ export default async function PermisBPage() {
                     link={`/contact?subject=Inscription ${baConfort?.title || "Permis B Auto Confort"}`}
                   />
                 </div>
+              </div>
+
+              {/* Conduite Accompagnée (AAC) */}
+              <div className="mb-20">
+                <div className="flex items-center gap-4 mb-10 justify-center">
+                  <div className="h-[1px] bg-slate-200 w-20"></div>
+                  <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+                    <span className="w-10 h-10 bg-emerald-600 text-white rounded-lg flex items-center justify-center text-sm font-black">AAC</span>
+                    Conduite Accompagnée
+                  </h3>
+                  <div className="h-[1px] bg-slate-200 w-20"></div>
+                </div>
+
+                <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 mb-8 text-center max-w-3xl mx-auto">
+                    <p className="text-emerald-800 font-medium">
+                        Accessible dès 15 ans, la conduite accompagnée permet d'acquérir de l'expérience et d'augmenter ses chances de réussite.
+                        <span className="block mt-2 text-sm opacity-80">Période probatoire réduite à 2 ans (au lieu de 3) et tarifs d'assurance avantageux.</span>
+                    </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                  <PriceCard
+                    title={aacManuelle?.title || "AAC Manuelle"}
+                    subtitle={aacManuelle?.description || "Dès 15 ans en boîte manuelle"}
+                    price={aacManuelle ? `${aacManuelle.price}€` : "1400€"}
+                    features={[
+                      "Formation initiale (Code + 20h)",
+                      "RDV Pédagogiques inclus",
+                      "Suivi personnalisé",
+                      "Avantages assurance",
+                      "Taux de réussite élevé"
+                    ]}
+                    color="green" // Using green as emerald is not supported
+                    badge={`${aacManuelle?.drivingHours || 20} Heures`}
+                    buttonText="Choisir cette formule"
+                    link={`/contact?subject=Inscription ${aacManuelle?.title || "Permis B AAC Manuelle"}`}
+                  />
+                  <PriceCard
+                    title={aacAuto?.title || "AAC Automatique"}
+                    subtitle={aacAuto?.description || "Dès 15 ans en boîte auto"}
+                    price={aacAuto ? `${aacAuto.price}€` : "1200€"}
+                    features={[
+                      "Formation initiale (Code + 13h)",
+                      "RDV Pédagogiques inclus",
+                      "Apprentissage facilité",
+                      "Avantages assurance",
+                      "Conversion vers manuelle possible"
+                    ]}
+                    color="green"
+                    badge={`${aacAuto?.drivingHours || 13} Heures`}
+                    buttonText="Choisir cette formule"
+                    link={`/contact?subject=Inscription ${aacAuto?.title || "Permis B AAC Automatique"}`}
+                  />
+                </div>
+              </div>
               </div>
 
               {/* Legal Notice about Evaluation */}
