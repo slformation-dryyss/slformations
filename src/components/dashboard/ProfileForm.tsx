@@ -112,21 +112,29 @@ export function ProfileForm({ user }: ProfileFormProps) {
           <h3 className="text-xl font-black text-slate-900">Informations personnelles</h3>
           <p className="text-xs text-slate-500 mt-1">Complétez votre profil pour un meilleur suivi</p>
         </div>
-        <button
-          type="submit"
-          form="profile-form"
-          className="px-6 py-2.5 bg-gold-500 text-navy-900 rounded-xl font-black text-xs md:text-sm hover:bg-gold-600 transition-all shadow-lg shadow-gold-500/20 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 flex items-center gap-2"
-          disabled={isSaving}
-        >
-          {isSaving ? (
-            <>
-              <div className="w-3.5 h-3.5 border-2 border-navy-900/30 border-t-navy-900 rounded-full animate-spin" />
-              Sauvegarde...
-            </>
-          ) : (
-            'Enregistrer les modifications'
-          )}
-        </button>
+        <div className="flex flex-col items-end gap-2">
+          <button
+            type="submit"
+            form="profile-form"
+            className="px-6 py-2.5 bg-gold-500 text-navy-900 rounded-xl font-black text-xs md:text-sm hover:bg-gold-600 transition-all shadow-lg shadow-gold-500/20 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 flex items-center gap-2"
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <>
+                <div className="w-3.5 h-3.5 border-2 border-navy-900/30 border-t-navy-900 rounded-full animate-spin" />
+                Sauvegarde...
+              </>
+            ) : (
+              'Enregistrer les modifications'
+            )}
+          </button>
+          <a 
+            href="/dashboard/change-password" 
+            className="text-[10px] font-bold text-slate-400 hover:text-gold-500 transition-colors flex items-center gap-1"
+          >
+            Souhait de modifier le mot de passe ?
+          </a>
+        </div>
       </div>
 
       {message && (
