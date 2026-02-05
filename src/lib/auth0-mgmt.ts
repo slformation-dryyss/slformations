@@ -67,6 +67,33 @@ export async function createPasswordChangeTicket(auth0UserId: string, resultUrl:
     return data.ticket;
 }
 
+export async function triggerPasswordResetEmail(email: string) {
+    const rawDomain = process.env.AUTH0_ISSUER_BASE_URL;
+    const clientId = process.env.AUTH0_CLIENT_ID;
+    if (!rawDomain || !clientId) throw new Error("Missing Auth0 configuration");
+
+    let domain = rawDomain.includes("://") ? rawDomain : `https://${rawDomain}`;
+    domain = domain.replace(/\/$/, "");
+
+    const response = await fetch(`${domain}/dbconnections/change_password`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+            client_id: clientId,
+            email: email,
+            connection: "Username-Password-Authentication",
+        }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        console.error("Auth0 Password Reset Email Error:", error);
+        throw new Error(`Auth0 Reset Error: ${error.message || error.error || response.statusText}`);
+    }
+
+    return true;
+}
+
 export async function createAuth0User(data: { email: string; firstName: string; lastName: string; password?: string }) {
     const token = await getManagementApiToken();
     const rawDomain = process.env.AUTH0_ISSUER_BASE_URL;

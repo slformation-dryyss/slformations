@@ -2,12 +2,13 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { requireUser } from "@/lib/auth";
-import { AlertCircle, KeyRound, ShieldCheck, ArrowRight, ExternalLink } from "lucide-react";
+import { AlertCircle, KeyRound, ShieldCheck, ArrowRight, ExternalLink, CheckCircle } from "lucide-react";
 
-export default async function ChangePasswordPage(props: { searchParams: Promise<{ error?: string, social?: string }> }) {
+export default async function ChangePasswordPage(props: { searchParams: Promise<{ error?: string, success?: string, social?: string }> }) {
     const user = await requireUser();
     const searchParams = await props.searchParams;
     const error = searchParams.error;
+    const success = searchParams.success;
     const isSocial = searchParams.social === '1';
 
     return (
@@ -27,6 +28,19 @@ export default async function ChangePasswordPage(props: { searchParams: Promise<
                     </div>
 
                     <div className="p-10 space-y-8">
+                        {/* Message de succès */}
+                        {success && (
+                            <div className="p-5 rounded-3xl flex items-start gap-4 text-left border border-green-100 bg-green-50 text-green-800 animate-in slide-in-from-top-2 duration-300">
+                                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                                    <CheckCircle className="w-5 h-5 text-green-600" />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-sm font-black uppercase tracking-tight">Email envoyé</p>
+                                    <p className="text-xs font-medium leading-relaxed">{success}</p>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Alerte d'erreur */}
                         {error && (
                             <div className={`p-5 rounded-3xl flex items-start gap-4 text-left border animate-in slide-in-from-top-2 duration-300 ${
@@ -58,38 +72,49 @@ export default async function ChangePasswordPage(props: { searchParams: Promise<
                             </p>
                         </div>
 
-                        {!isSocial && (
+                        {!isSocial && !success && (
                             <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 flex items-start gap-4 text-left">
                                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                                     <ShieldCheck className="w-5 h-5 text-blue-600" />
                                 </div>
                                 <p className="text-xs text-blue-800 leading-relaxed font-medium">
-                                    Vous allez être redirigé vers notre interface sécurisée d'authentification pour définir votre nouveau mot de passe.
+                                    Vous allez recevoir un lien sécurisé par email pour définir votre nouveau mot de passe.
                                 </p>
                             </div>
                         )}
 
-                        <form action={isSocial ? "/dashboard/profile" : "/api/auth/change-password"} method={isSocial ? "GET" : "POST"}>
-                            <button
-                                type="submit"
-                                className={`w-full text-white font-black py-4.5 rounded-2xl transition-all shadow-xl flex items-center justify-center gap-3 group hover:scale-[1.02] active:scale-[0.98] ${
-                                    isSocial 
-                                    ? "bg-slate-500 hover:bg-slate-600 shadow-slate-500/10" 
-                                    : "bg-slate-950 hover:bg-navy-950 shadow-slate-950/20"
-                                }`}
-                            >
-                                {isSocial ? "Retour au profil" : "Changer mon mot de passe"}
-                                {isSocial ? (
-                                    <ExternalLink className="w-5 h-5 text-slate-300 group-hover:translate-x-1 transition-transform" />
-                                ) : (
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-gold-500" />
-                                )}
-                            </button>
-                        </form>
+                        {!success ? (
+                            <>
+                                <form action={isSocial ? "/dashboard/profile" : "/api/auth/change-password"} method={isSocial ? "GET" : "POST"}>
+                                    <button
+                                        type="submit"
+                                        className={`w-full text-white font-black py-4.5 rounded-2xl transition-all shadow-xl flex items-center justify-center gap-3 group hover:scale-[1.02] active:scale-[0.98] ${
+                                            isSocial 
+                                            ? "bg-slate-500 hover:bg-slate-600 shadow-slate-500/10" 
+                                            : "bg-slate-950 hover:bg-navy-950 shadow-slate-950/20"
+                                        }`}
+                                    >
+                                        {isSocial ? "Retour au profil" : "M'envoyer le lien par email"}
+                                        {isSocial ? (
+                                            <ExternalLink className="w-5 h-5 text-slate-300 group-hover:translate-x-1 transition-transform" />
+                                        ) : (
+                                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-gold-500" />
+                                        )}
+                                    </button>
+                                </form>
 
-                        <p className="text-xs text-slate-400">
-                            Une fois votre mot de passe modifié, vous pourrez accéder à votre tableau de bord.
-                        </p>
+                                <p className="text-xs text-slate-400">
+                                    Une fois votre mot de passe modifié, vous pourrez accéder à votre tableau de bord.
+                                </p>
+                            </>
+                        ) : (
+                            <a 
+                                href="/dashboard/profile"
+                                className="w-full bg-slate-100 text-slate-900 font-black py-4.5 rounded-2xl transition-all flex items-center justify-center gap-3 hover:bg-slate-200"
+                            >
+                                Retour au profil
+                            </a>
+                        )}
                     </div>
                 </div>
             </main>
