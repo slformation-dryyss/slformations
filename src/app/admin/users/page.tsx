@@ -8,6 +8,7 @@ import { DeleteUserButton } from "@/components/admin/DeleteUserButton";
 import { CreateUserButton } from "@/components/admin/CreateUserButton";
 import { BlockUserButton } from "@/components/admin/BlockUserButton";
 import { FirstLoginModal } from "@/components/dashboard/FirstLoginModal";
+import { Pagination } from "@/components/admin/Pagination";
 
 // Improved role badge with distinct colors and better visual hierarchy
 function RoleBadge({ roles, role }: { roles?: string[], role?: string }) {
@@ -73,38 +74,47 @@ function RoleBadge({ roles, role }: { roles?: string[], role?: string }) {
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; role?: string }>;
+  searchParams: Promise<{ q?: string; role?: string; page?: string }>;
 }) {
   const adminUser = await requireAdmin();
   const isOwner = adminUser.role === "OWNER" || (adminUser.roles && adminUser.roles.includes("OWNER"));
 
-  const { q, role } = await searchParams;
+  const { q, role, page: pageParam } = await searchParams;
   const query = q?.toLowerCase() || "";
   const selectedRole = role || "ALL";
+  const currentPage = parseInt(pageParam || '1') || 1;
+  const pageSize = 20;
 
-  const users = await prisma.user.findMany({
-    where: {
-      AND: [
-        query ? {
-          OR: [
-            { email: { contains: query, mode: 'insensitive' } },
-            { firstName: { contains: query, mode: 'insensitive' } },
-            { lastName: { contains: query, mode: 'insensitive' } }
-          ]
-        } : {},
-        // Filter by role check using array containment if possible, or fallback to legacy role
-        // Prisma standard filtering on arrays: roles: { has: selectedRole }
-        selectedRole !== "ALL" ? {
-          OR: [
-            { role: selectedRole as any }, // Legacy check
-            { roles: { has: selectedRole } } // New check
-          ]
-        } : {}
-      ]
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 100,
-  });
+  const whereClause = {
+    AND: [
+      query ? {
+        OR: [
+          { email: { contains: query, mode: 'insensitive' as const } },
+          { firstName: { contains: query, mode: 'insensitive' as const } },
+          { lastName: { contains: query, mode: 'insensitive' as const } }
+        ]
+      } : {},
+      selectedRole !== "ALL" ? {
+        OR: [
+          { role: selectedRole as any },
+          { roles: { has: selectedRole } }
+        ]
+      } : {}
+    ]
+  };
+
+  // Run count and findMany in parallel
+  const [totalCount, users] = await Promise.all([
+    prisma.user.count({ where: whereClause }),
+    prisma.user.findMany({
+      where: whereClause,
+      orderBy: { createdAt: 'desc' },
+      skip: (currentPage - 1) * pageSize,
+      take: pageSize,
+    })
+  ]);
+
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   // Role priority for "Général" view
   const rolePriority: Record<string, number> = {
@@ -189,7 +199,7 @@ export default async function AdminUsersPage({
             <thead className="bg-slate-50">
               <tr>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                  Utilisateur
+                  Utilisateur ({((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, totalCount)} sur {totalCount})
                 </th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                   Rôles
@@ -260,6 +270,17 @@ export default async function AdminUsersPage({
             </tbody>
           </table>
         </div>
+
+        {totalPages > 1 && (
+          <div className="border-t border-slate-200 bg-slate-50/50">
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+              baseUrl="/admin/users"
+              searchParams={{ q: query, role: selectedRole }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
