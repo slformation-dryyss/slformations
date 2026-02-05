@@ -13,32 +13,34 @@ async function handlePasswordChange(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const auth0User = session.user;
-        const sub = auth0User.sub as string;
+        const sub = session.user.sub as string;
+        console.log("🔍 [AUTH] Change attempt for sub:", sub);
 
         // 2. Vérification compte social
         if (!sub.startsWith("auth0|")) {
-            console.log("ℹ️ [AUTH] Social user detected, cannot create password ticket:", sub);
+            console.log("ℹ️ [AUTH] Social user detected - skipping ticket:", sub);
             const errorMsg = "Vous utilisez un compte externe (Google, etc.). Modifiez votre mot de passe sur leur plateforme.";
             return NextResponse.redirect(new URL(`/dashboard/change-password?error=${encodeURIComponent(errorMsg)}&social=1`, req.url));
         }
 
-        // 3. Synchronisation/Vérification DB
-        await getOrCreateUser(req);
+        // 3. Synchronisation DB
+        const dbUser = await getOrCreateUser(req);
+        console.log("👤 [AUTH] Database user matched:", dbUser?.id);
 
         const origin = req.nextUrl.origin;
         const resultUrl = `${origin}/api/auth/password-changed-callback`;
 
-        console.log("🔐 [AUTH] Creating password change ticket for:", sub);
+        console.log("🔐 [AUTH] Creating ticket with resultUrl:", resultUrl);
         const ticketUrl = await createPasswordChangeTicket(sub, resultUrl);
         
+        console.log("✅ [AUTH] Ticket created successfully, redirecting...");
         return NextResponse.redirect(new URL(ticketUrl));
     } catch (error: any) {
-        console.error("❌ [AUTH] Change Password API Error:", error.message || error);
+        console.error("❌ [AUTH] Global failure in change-password:", error);
         
         const errorMessage = error.message?.includes("User does not exist") 
             ? "L'identifiant utilisateur n'est pas reconnu par Auth0."
-            : "Une erreur technique est survenue.";
+            : `Erreur: ${error.message || "Inconnue"}`;
 
         return NextResponse.redirect(new URL(`/dashboard/change-password?error=${encodeURIComponent(errorMessage)}`, req.url));
     }

@@ -12,8 +12,9 @@ export async function getManagementApiToken() {
         throw new Error("Missing Auth0 credentials in environment variables");
     }
 
-    // Sanitize domain: remove trailing slash
-    const domain = rawDomain.replace(/\/$/, "");
+    // Sanitize domain: ensure it starts with https:// and remove trailing slash
+    let domain = rawDomain.includes("://") ? rawDomain : `https://${rawDomain}`;
+    domain = domain.replace(/\/$/, "");
 
     const response = await fetch(`${domain}/oauth/token`, {
         method: "POST",
@@ -41,7 +42,8 @@ export async function createPasswordChangeTicket(auth0UserId: string, resultUrl:
     const rawDomain = process.env.AUTH0_ISSUER_BASE_URL;
     if (!rawDomain) throw new Error("Missing AUTH0_ISSUER_BASE_URL");
 
-    const domain = rawDomain.replace(/\/$/, "");
+    let domain = rawDomain.includes("://") ? rawDomain : `https://${rawDomain}`;
+    domain = domain.replace(/\/$/, "");
 
     const response = await fetch(`${domain}/api/v2/tickets/password-change`, {
         method: "POST",
@@ -56,9 +58,9 @@ export async function createPasswordChangeTicket(auth0UserId: string, resultUrl:
     });
 
     if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({}));
         console.error("Auth0 Password Change Ticket Error:", error);
-        throw new Error(`Failed to create password change ticket: ${error.message || error.error}`);
+        throw new Error(`Auth0 Error: ${error.message || error.error || response.statusText}`);
     }
 
     const data = await response.json();
