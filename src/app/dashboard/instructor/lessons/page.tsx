@@ -8,6 +8,9 @@ import { LessonRecapModal } from "@/components/instructor/LessonRecapModal";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
+import { useRouter, useSearchParams } from "next/navigation";
+import { Pagination } from "@/components/admin/Pagination";
+
 type Lesson = {
     id: string;
     date: Date;
@@ -31,6 +34,9 @@ type Lesson = {
 };
 
 export default function InstructorLessonsPage() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    
     const [lessons, setLessons] = useState<Lesson[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -38,18 +44,27 @@ export default function InstructorLessonsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [showRecapModal, setShowRecapModal] = useState(false);
     const [lessonToComplete, setLessonToComplete] = useState<any>(null);
+    
+    // Pagination state
+    const currentPage = parseInt(searchParams.get("page") || "1");
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+
+    const pageSize = 10;
 
     useEffect(() => {
         loadLessons();
-    }, [filter]);
+    }, [filter, currentPage]);
 
     async function loadLessons() {
         setLoading(true);
         setError(null);
         try {
-            const result = await getMyLessons(filter === "ALL" ? undefined : filter);
+            const result = await getMyLessons(filter === "ALL" ? undefined : filter, currentPage, pageSize);
             if (result.success && result.data) {
                 setLessons(result.data as any);
+                setTotalPages(result.totalPages || 1);
+                setTotalCount(result.total || 0);
             } else {
                 setError(result.error || "Erreur lors de la récupération des cours");
             }
@@ -112,19 +127,29 @@ export default function InstructorLessonsPage() {
                 {["ALL", "PENDING", "CONFIRMED", "COMPLETED"].map((status) => (
                     <button
                         key={status}
-                        onClick={() => setFilter(status)}
+                        onClick={() => {
+                            setFilter(status);
+                            router.push("/dashboard/instructor/lessons?page=1");
+                        }}
                         className={`px-4 py-2 rounded-lg font-medium transition ${filter === status
                             ? "bg-gold-500 text-slate-900"
                             : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                             }`}
                     >
                         {status === "ALL" && "Tous"}
-                        {status === "PENDING" && `En attente (${pendingLessonsCount})`}
-                        {status === "CONFIRMED" && `Confirmés (${confirmedLessonsCount})`}
-                        {status === "COMPLETED" && `Terminés (${completedLessonsCount})`}
+                        {status === "PENDING" && `En attente`}
+                        {status === "CONFIRMED" && `Confirmés`}
+                        {status === "COMPLETED" && `Terminés`}
                     </button>
                 ))}
             </div>
+
+            {/* Range display */}
+            {!loading && totalCount > 0 && (
+                <div className="mb-4 text-sm text-slate-500 font-medium">
+                    Affichage de {((currentPage - 1) * pageSize) + 1} à {Math.min(currentPage * pageSize, totalCount)} sur {totalCount} cours
+                </div>
+            )}
 
             {/* Barre de recherche */}
             <div className="relative mb-6">
@@ -322,6 +347,17 @@ export default function InstructorLessonsPage() {
                             </div>
                         );
                     })}
+                </div>
+            )}
+
+            {!loading && totalPages > 1 && (
+                <div className="mt-8">
+                    <Pagination 
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        baseUrl="/dashboard/instructor/lessons"
+                        searchParams={{}} // Filter state is handled by the URL if needed, but here it's local state + URL page
+                    />
                 </div>
             )}
 

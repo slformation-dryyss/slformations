@@ -83,7 +83,7 @@ export default async function AdminUsersPage({
   const query = q?.toLowerCase() || "";
   const selectedRole = role || "ALL";
   const currentPage = parseInt(pageParam || '1') || 1;
-  const pageSize = 20;
+  const pageSize = 10;
 
   const whereClause = {
     AND: [

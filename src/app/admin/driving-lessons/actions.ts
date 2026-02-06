@@ -382,36 +382,48 @@ export async function getAllAssignments() {
 }
 
 /**
- * Récupérer tous les cours de conduite
+ * Récupérer tous les cours de conduite paginés
  */
-export async function getAllLessons(limit: number = 50) {
+export async function getAllLessons(page: number = 1, pageSize: number = 10) {
     await requireAdmin();
 
     try {
-        const lessons = await prisma.drivingLesson.findMany({
-            include: {
-                student: {
-                    select: {
-                        firstName: true,
-                        lastName: true,
+        const skip = (page - 1) * pageSize;
+        
+        const [total, lessons] = await Promise.all([
+            prisma.drivingLesson.count(),
+            prisma.drivingLesson.findMany({
+                include: {
+                    student: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        },
                     },
-                },
-                instructor: {
-                    include: {
-                        user: {
-                            select: {
-                                firstName: true,
-                                lastName: true,
+                    instructor: {
+                        include: {
+                            user: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                },
                             },
                         },
                     },
                 },
-            },
-            orderBy: { date: "desc" },
-            take: limit,
-        });
+                orderBy: { date: "desc" },
+                skip,
+                take: pageSize,
+            })
+        ]);
 
-        return { success: true, data: lessons };
+        return { 
+            success: true, 
+            data: lessons, 
+            total, 
+            totalPages: Math.ceil(total / pageSize),
+            currentPage: page 
+        };
     } catch (error: any) {
         console.error("Error fetching lessons:", error);
         return { success: false, error: "Erreur lors de la récupération des cours" };

@@ -327,9 +327,9 @@ export async function deleteAvailabilitySlot(slotId: string, deleteAllInGroup: b
 }
 
 /**
- * Récupérer les cours réservés de l'instructeur
+ * Récupérer les cours réservés de l'instructeur (paginés)
  */
-export async function getMyLessons(status?: string) {
+export async function getMyLessons(status?: string, page: number = 1, pageSize: number = 10) {
     const user = await getOrCreateUser();
     if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
@@ -346,27 +346,41 @@ export async function getMyLessons(status?: string) {
             return { success: false, error: "Profil instructeur introuvable" };
         }
 
-        const lessons = await prisma.drivingLesson.findMany({
-            where: {
-                instructorId: instructorProfile.id,
-                ...(status && { status }),
-            },
-            include: {
-                student: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        phone: true,
-                        nationalIdNumber: true
+        const skip = (page - 1) * pageSize;
+        const where = {
+            instructorId: instructorProfile.id,
+            ...(status && status !== "ALL" && { status }),
+        };
+
+        const [total, lessons] = await Promise.all([
+            prisma.drivingLesson.count({ where }),
+            prisma.drivingLesson.findMany({
+                where,
+                include: {
+                    student: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            phone: true,
+                            nationalIdNumber: true
+                        },
                     },
                 },
-            },
-            orderBy: [{ date: "asc" }, { startTime: "asc" }],
-        });
+                orderBy: [{ date: "desc" }, { startTime: "desc" }],
+                skip,
+                take: pageSize,
+            })
+        ]);
 
-        return { success: true, data: lessons || [] };
+        return { 
+            success: true, 
+            data: lessons || [], 
+            total, 
+            totalPages: Math.ceil(total / pageSize),
+            currentPage: page
+        };
     } catch (error: any) {
         console.error("Error fetching instructor lessons:", error);
         return { success: false, error: error.message || "Erreur lors de la récupération des cours" };

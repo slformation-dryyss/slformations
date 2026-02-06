@@ -1,11 +1,22 @@
 import { requireAdmin } from "@/lib/auth";
 import { getAllLessons } from "../actions";
 import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Pagination } from "@/components/admin/Pagination";
 
-export default async function AdminAllLessonsPage() {
+export default async function AdminAllLessonsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string }>;
+}) {
     await requireAdmin();
-    const result = await getAllLessons();
+    const { page: pageParam } = await searchParams;
+    const currentPage = parseInt(pageParam || '1') || 1;
+    const pageSize = 10;
+
+    const result = await getAllLessons(currentPage, pageSize);
     const lessons = result.success && result.data ? result.data : [];
+    const total = result.success ? (result as any).total : 0;
+    const totalPages = result.success ? (result as any).totalPages : 0;
 
     return (
         <div className="pb-8">
@@ -21,7 +32,9 @@ export default async function AdminAllLessonsPage() {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50 border-b border-slate-200">
                             <tr>
-                                <th className="px-6 py-4 font-bold text-slate-700">Date & Heure</th>
+                                <th className="px-6 py-4 font-bold text-slate-700">
+                                    Date & Heure ({((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, total)} sur {total})
+                                </th>
                                 <th className="px-6 py-4 font-bold text-slate-700">Élève</th>
                                 <th className="px-6 py-4 font-bold text-slate-700">Moniteur</th>
                                 <th className="px-6 py-4 font-bold text-slate-700">Statut</th>
@@ -74,6 +87,17 @@ export default async function AdminAllLessonsPage() {
                         </tbody>
                     </table>
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="border-t border-slate-200 bg-slate-50/50">
+                        <Pagination 
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            baseUrl="/admin/driving-lessons/lessons"
+                            searchParams={{}}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );
