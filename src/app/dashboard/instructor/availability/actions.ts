@@ -327,9 +327,15 @@ export async function deleteAvailabilitySlot(slotId: string, deleteAllInGroup: b
 }
 
 /**
- * Récupérer les cours réservés de l'instructeur (paginés)
+ * Récupérer les cours réservés de l'instructeur (paginés avec filtres)
  */
-export async function getMyLessons(status?: string, page: number = 1, pageSize: number = 10) {
+export async function getMyLessons(
+    status?: string, 
+    page: number = 1, 
+    pageSize: number = 10,
+    from?: string,
+    to?: string
+) {
     const user = await getOrCreateUser();
     if (!user) return { success: false, error: "AUTH_REQUIRED" };
 
@@ -347,9 +353,15 @@ export async function getMyLessons(status?: string, page: number = 1, pageSize: 
         }
 
         const skip = (page - 1) * pageSize;
-        const where = {
+        const where: any = {
             instructorId: instructorProfile.id,
             ...(status && status !== "ALL" && { status }),
+            ...((from || to) && {
+                date: {
+                    ...(from && { gte: new Date(from) }),
+                    ...(to && { lte: new Date(to) }),
+                }
+            })
         };
 
         const [total, lessons] = await Promise.all([

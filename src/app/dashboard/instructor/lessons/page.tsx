@@ -44,6 +44,8 @@ export default function InstructorLessonsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [showRecapModal, setShowRecapModal] = useState(false);
     const [lessonToComplete, setLessonToComplete] = useState<any>(null);
+    const [from, setFrom] = useState("");
+    const [to, setTo] = useState("");
     
     // Pagination state
     const currentPage = parseInt(searchParams.get("page") || "1");
@@ -60,7 +62,13 @@ export default function InstructorLessonsPage() {
         setLoading(true);
         setError(null);
         try {
-            const result = await getMyLessons(filter === "ALL" ? undefined : filter, currentPage, pageSize);
+            const result = await getMyLessons(
+                filter === "ALL" ? undefined : filter, 
+                currentPage, 
+                pageSize,
+                from || undefined,
+                to || undefined
+            );
             if (result.success && result.data) {
                 setLessons(result.data as any);
                 setTotalPages(result.totalPages || 1);
@@ -123,25 +131,75 @@ export default function InstructorLessonsPage() {
             </div>
 
             {/* Filtres */}
-            <div className="flex gap-2 mb-6">
-                {["ALL", "PENDING", "CONFIRMED", "COMPLETED"].map((status) => (
-                    <button
-                        key={status}
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-6 items-end">
+                <div className="flex-1 w-full">
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Statut</label>
+                    <div className="flex flex-wrap gap-2">
+                        {["ALL", "PENDING", "CONFIRMED", "COMPLETED"].map((status) => (
+                            <button
+                                key={status}
+                                onClick={() => {
+                                    setFilter(status);
+                                    router.push("/dashboard/instructor/lessons?page=1");
+                                }}
+                                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filter === status
+                                    ? "bg-slate-900 text-white shadow-lg shadow-slate-900/10 scale-[1.02]"
+                                    : "bg-slate-50 text-slate-500 hover:bg-slate-100"
+                                    }`}
+                            >
+                                {status === "ALL" && "Tous"}
+                                {status === "PENDING" && `En attente`}
+                                {status === "CONFIRMED" && `Confirmés`}
+                                {status === "COMPLETED" && `Terminés`}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="w-full md:w-auto">
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Période</label>
+                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 p-2 rounded-xl">
+                        <input 
+                            type="date" 
+                            className="bg-transparent border-none text-xs font-bold focus:ring-0 cursor-pointer" 
+                            value={from}
+                            onChange={(e) => setFrom(e.target.value)}
+                        />
+                        <span className="text-[10px] font-black text-slate-300">AU</span>
+                        <input 
+                            type="date" 
+                            className="bg-transparent border-none text-xs font-bold focus:ring-0 cursor-pointer" 
+                            value={to}
+                            onChange={(e) => setTo(e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                <div className="flex gap-2 w-full md:w-auto">
+                    <button 
                         onClick={() => {
-                            setFilter(status);
                             router.push("/dashboard/instructor/lessons?page=1");
+                            loadLessons();
                         }}
-                        className={`px-4 py-2 rounded-lg font-medium transition ${filter === status
-                            ? "bg-gold-500 text-slate-900"
-                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                            }`}
+                        className="flex-1 md:flex-none px-6 py-3 bg-gold-500 text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gold-600 transition-all shadow-lg shadow-gold-500/10"
                     >
-                        {status === "ALL" && "Tous"}
-                        {status === "PENDING" && `En attente`}
-                        {status === "CONFIRMED" && `Confirmés`}
-                        {status === "COMPLETED" && `Terminés`}
+                        Filtrer
                     </button>
-                ))}
+                    {(from || to || filter !== "ALL") && (
+                        <button 
+                            onClick={() => {
+                                setFrom("");
+                                setTo("");
+                                setFilter("ALL");
+                                router.push("/dashboard/instructor/lessons?page=1");
+                            }}
+                            className="px-4 py-3 bg-slate-100 text-slate-400 rounded-xl hover:bg-slate-200 transition-all"
+                            title="Réinitialiser"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Range display */}

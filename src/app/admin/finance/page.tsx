@@ -5,29 +5,50 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Euro, TrendingUp, ShoppingBag, CreditCard } from "lucide-react";
 import ExportOrdersButton from "@/components/admin/finance/ExportOrdersButton";
+import { Pagination } from "@/components/admin/Pagination";
 
-async function getFinanceStats() {
-  const totalRevenueAgg = await prisma.order.aggregate({
-    _sum: { amount: true },
-    where: { status: "PAID" },
-  });
+async function getFinanceStats(page: number = 1, pageSize: number = 10) {
+  const skip = (page - 1) * pageSize;
+  
+  const [totalRevenueAgg, totalOrdersCount, recentOrders] = await Promise.all([
+    prisma.order.aggregate({
+      _sum: { amount: true },
+      where: { status: "PAID" },
+    }),
+    prisma.order.count({
+      where: { status: "PAID" },
+    }),
+    prisma.order.findMany({
+      skip,
+      take: pageSize,
+      orderBy: { createdAt: "desc" },
+      include: { user: true, items: true },
+      where: { status: "PAID" },
+    })
+  ]);
+
   const totalRevenue = totalRevenueAgg._sum.amount || 0;
 
-  const recentOrders = await prisma.order.findMany({
-    take: 10,
-    orderBy: { createdAt: "desc" },
-    include: { user: true, items: true },
-    where: { status: "PAID" },
-  });
-
-  return { totalRevenue, recentOrders };
+  return { 
+    totalRevenue, 
+    recentOrders,
+    totalOrdersCount,
+    totalPages: Math.ceil(totalOrdersCount / pageSize)
+  };
 }
 
-export default async function AdminFinancePage() {
+export default async function AdminFinancePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const params = await searchParams;
   // STRICTLY PROTECTED: ONLY OWNER CAN ACCESS
   await requireOwner();
   
-  const stats = await getFinanceStats();
+  const currentPage = parseInt(params.page || '1') || 1;
+  const pageSize = 10;
+  const stats = await getFinanceStats(currentPage, pageSize);
 
   return (
     <div>
@@ -79,9 +100,9 @@ export default async function AdminFinancePage() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-slate-500 truncate">Commandes</dt>
+                  <dt className="text-sm font-medium text-slate-500 truncate">Total Transactions</dt>
                   <dd>
-                    <div className="text-2xl font-bold text-slate-900">{stats.recentOrders.length}</div>
+                    <div className="text-2xl font-bold text-slate-900">{stats.totalOrdersCount}</div>
                   </dd>
                 </dl>
               </div>
@@ -129,6 +150,17 @@ export default async function AdminFinancePage() {
             ))
           )}
         </ul>
+
+        {stats.totalPages > 1 && (
+          <div className="p-4 bg-slate-50 border-t border-slate-200">
+            <Pagination 
+                currentPage={currentPage}
+                totalPages={stats.totalPages}
+                baseUrl="/admin/finance"
+                searchParams={{}}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

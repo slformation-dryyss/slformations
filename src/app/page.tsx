@@ -63,7 +63,7 @@ export default async function Home() {
     return course?.price ? `${course.price}€` : fallback;
   };
 
-  const priceA1 = getPrice('permis-a1', '695€');
+  const priceA1 = getPrice('permis-a1', '895€');
   const priceBA = getPrice('permis-b-auto-classique', '980€');
   const priceBM = getPrice('permis-b-manuelle-classique', '1095€');
   const priceAAC = getPrice('permis-b-aac-auto', '1255€');
@@ -800,7 +800,7 @@ export default async function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {[
                 {
-                  name: "Inès Bouraoui",
+                  name: "Inès B.",
                   role: "Élève Permis B",
                   text: "Je suis actuellement inscrite à cette école. Un accueil très chaleureux et une équipe qui motive. Ma monitrice est très patiente et passionnée, elle adapte parfaitement les cours à mes lacunes.",
                   stars: 5,
@@ -885,7 +885,7 @@ export default async function Home() {
                 <div className="mb-10 flex flex-col">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">à partir de</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-6xl font-black text-slate-900 tracking-tighter">695</span>
+                    <span className="text-6xl font-black text-slate-900 tracking-tighter">895</span>
                     <span className="text-3xl font-bold text-gold-500">€</span>
                   </div>
                 </div>

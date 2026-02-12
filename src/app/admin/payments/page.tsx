@@ -15,41 +15,65 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { addManualPaymentAction, deletePaymentAction } from "./actions";
+import { Pagination } from "@/components/admin/Pagination";
 import Link from "next/link";
 
 export default async function AdminPaymentsPage({
     searchParams
 }: {
-    searchParams: Promise<{ method?: string; query?: string }>
+    searchParams: Promise<{ 
+        method?: string; 
+        query?: string; 
+        page?: string;
+        from?: string;
+        to?: string;
+    }>
 }) {
     await requireAdmin();
     const params = await searchParams;
     const methodFilter = params.method;
     const query = params.query;
+    const currentPage = parseInt(params.page || '1') || 1;
+    const pageSize = 10;
+    const { from, to } = params;
 
-    const payments = await prisma.payment.findMany({
-        where: {
-            AND: [
-                methodFilter ? { provider: methodFilter } : {},
-                query ? {
-                    OR: [
-                        { order: { user: { name: { contains: query, mode: "insensitive" } } } },
-                        { order: { user: { email: { contains: query, mode: "insensitive" } } } },
-                        // adminNote is not in schema, skipping filter
-                    ]
-                } : {}
-            ]
-        },
-        include: {
-            order: {
-                include: {
-                    user: true,
-                    course: true
+    const where: any = {
+        AND: [
+            methodFilter ? { provider: methodFilter } : {},
+            query ? {
+                OR: [
+                    { order: { user: { name: { contains: query, mode: "insensitive" } } } },
+                    { order: { user: { email: { contains: query, mode: "insensitive" } } } },
+                ]
+            } : {},
+            (from || to) ? {
+                createdAt: {
+                    ...(from ? { gte: new Date(from) } : {}),
+                    ...(to ? { lte: new Date(to) } : {})
                 }
-            }
-        },
-        orderBy: { createdAt: "desc" }
-    });
+            } : {}
+        ]
+    };
+
+    const [totalCount, payments] = await Promise.all([
+        prisma.payment.count({ where }),
+        prisma.payment.findMany({
+            where,
+            include: {
+                order: {
+                    include: {
+                        user: true,
+                        course: true
+                    }
+                }
+            },
+            orderBy: { createdAt: "desc" },
+            skip: (currentPage - 1) * pageSize,
+            take: pageSize
+        })
+    ]);
+
+    const totalPages = Math.ceil(totalCount / pageSize);
 
     const users = await prisma.user.findMany({
         orderBy: { name: "asc" },
@@ -62,7 +86,16 @@ export default async function AdminPaymentsPage({
         select: { id: true, title: true, price: true }
     });
 
-    const totalAmount = payments.reduce((acc, curr) => acc + (curr.status === "SUCCEEDED" ? curr.amount : 0), 0);
+    const totalAmountResult = await prisma.payment.aggregate({
+        where: {
+            ...where,
+            status: "SUCCEEDED"
+        },
+        _sum: {
+            amount: true
+        }
+    });
+    const totalAmount = totalAmountResult._sum.amount || 0;
 
     return (
         <div className="space-y-8 pb-20">
@@ -80,9 +113,6 @@ export default async function AdminPaymentsPage({
                         Exporter CSV
                     </a>
                     <button 
-                        // Note: In a real app, use a client component for the modal toggle. 
-                        // For now, we'll keep it simple and use a details/summary or similar if possible, 
-                        // but a Modal is better. I'll use a hidden checkbox trick or just a simple form below.
                         className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-gold-500 hover:text-slate-900 transition-all shadow-lg shadow-slate-900/10"
                     >
                         <Plus className="w-4 h-4" />
@@ -98,7 +128,7 @@ export default async function AdminPaymentsPage({
                         <Wallet className="w-7 h-7 text-gold-600" />
                     </div>
                     <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Total Encaissé</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Total Encaissé (Filtré)</p>
                         <p className="text-2xl font-black text-slate-900">{totalAmount.toLocaleString('fr-FR')} €</p>
                     </div>
                 </div>
@@ -108,7 +138,7 @@ export default async function AdminPaymentsPage({
                     </div>
                     <div>
                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Paiements Stripe</p>
-                        <p className="text-2xl font-black text-slate-900">{payments.filter(p => p.provider === "STRIPE").length}</p>
+                        <p className="text-2xl font-black text-slate-900">{totalCount > 0 ? totalCount : 0}</p>
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex items-center gap-5">
@@ -117,7 +147,7 @@ export default async function AdminPaymentsPage({
                     </div>
                     <div>
                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Paiements Manuels</p>
-                        <p className="text-2xl font-black text-slate-900">{payments.filter(p => p.provider === "MANUAL").length}</p>
+                        <p className="text-2xl font-black text-slate-900">{totalCount}</p>
                     </div>
                 </div>
             </div>
@@ -180,25 +210,58 @@ export default async function AdminPaymentsPage({
 
             {/* Payments List */}
             <div className="bg-white rounded-[3rem] border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Historique des transactions</h2>
-                    <div className="flex gap-4 w-full md:w-auto">
-                        <div className="relative flex-1 md:w-64">
+                <div className="p-8 border-b border-slate-100 flex flex-col lg:flex-row justify-between items-center gap-6">
+                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter shrink-0">Historique des transactions</h2>
+                    
+                    <form className="flex flex-wrap lg:flex-nowrap gap-4 w-full justify-end">
+                        <div className="relative flex-1 max-w-xs">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                             <input 
                                 type="text" 
-                                placeholder="Rechercher..." 
-                                className="w-full bg-slate-50 border-0 rounded-2xl pl-12 pr-4 py-3 text-sm font-bold focus:ring-2 focus:ring-gold-500"
+                                name="query"
+                                defaultValue={query}
+                                placeholder="Nom ou email..." 
+                                className="w-full bg-slate-50 border-transparent rounded-2xl pl-12 pr-4 py-3 text-sm font-bold focus:ring-2 focus:ring-gold-500 focus:bg-white transition-all outline-none"
                             />
                         </div>
-                        <select className="bg-slate-50 border-0 rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-gold-500">
+
+                        <select 
+                            name="method"
+                            defaultValue={methodFilter}
+                            className="bg-slate-50 border-transparent rounded-2xl px-6 py-3 text-sm font-bold focus:ring-2 focus:ring-gold-500 focus:bg-white transition-all outline-none cursor-pointer"
+                        >
                             <option value="">Tous les modes</option>
                             <option value="STRIPE">Stripe</option>
                             <option value="VIREMENT">Virement</option>
                             <option value="ESPECE">Espèces</option>
                             <option value="CPF">CPF</option>
                         </select>
-                    </div>
+
+                        <div className="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-2xl">
+                            <input
+                                type="date"
+                                name="from"
+                                defaultValue={from}
+                                className="bg-transparent border-none text-sm font-bold outline-none cursor-pointer"
+                                title="Depuis le"
+                            />
+                            <span className="text-slate-400 text-xs font-black">AU</span>
+                            <input
+                                type="date"
+                                name="to"
+                                defaultValue={to}
+                                className="bg-transparent border-none text-sm font-bold outline-none cursor-pointer"
+                                title="Jusqu'au"
+                            />
+                        </div>
+
+                        <button 
+                            type="submit"
+                            className="px-6 py-3 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-gold-500 hover:text-slate-900 transition-all shadow-lg shadow-slate-900/10 active:scale-95 whitespace-nowrap"
+                        >
+                            Filtrer
+                        </button>
+                    </form>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -258,6 +321,22 @@ export default async function AdminPaymentsPage({
                         </tbody>
                     </table>
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="p-8 border-t border-slate-100 bg-slate-50/30">
+                        <Pagination 
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            baseUrl="/admin/payments"
+                            searchParams={{
+                                method: methodFilter,
+                                query,
+                                from,
+                                to
+                            }}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

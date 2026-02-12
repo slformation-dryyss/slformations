@@ -74,18 +74,26 @@ function RoleBadge({ roles, role }: { roles?: string[], role?: string }) {
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; role?: string; page?: string }>;
+  searchParams: Promise<{ 
+    q?: string; 
+    role?: string; 
+    page?: string;
+    onboarding?: string;
+    blocked?: string;
+    from?: string;
+    to?: string;
+  }>;
 }) {
   const adminUser = await requireAdmin();
   const isOwner = adminUser.role === "OWNER" || (adminUser.roles && adminUser.roles.includes("OWNER"));
 
-  const { q, role, page: pageParam } = await searchParams;
+  const { q, role, page: pageParam, onboarding, blocked, from, to } = await searchParams;
   const query = q?.toLowerCase() || "";
   const selectedRole = role || "ALL";
   const currentPage = parseInt(pageParam || '1') || 1;
   const pageSize = 10;
 
-  const whereClause = {
+  const whereClause: any = {
     AND: [
       query ? {
         OR: [
@@ -99,6 +107,14 @@ export default async function AdminUsersPage({
           { role: selectedRole as any },
           { roles: { has: selectedRole } }
         ]
+      } : {},
+      onboarding ? { onboardingStatus: onboarding } : {},
+      blocked !== undefined && blocked !== "" ? { isBlocked: blocked === "true" } : {},
+      (from || to) ? {
+        createdAt: {
+          ...(from ? { gte: new Date(from) } : {}),
+          ...(to ? { lte: new Date(to) } : {})
+        }
       } : {}
     ]
   };
@@ -148,25 +164,74 @@ export default async function AdminUsersPage({
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-slate-900 shrink-0">Annuaire Utilisateurs</h1>
+        <div className="shrink-0">
+          <CreateUserButton />
+        </div>
+      </div>
 
-        {/* Centered Search Bar */}
-        <div className="flex-1 max-w-md mx-auto w-full">
-          <form className="relative">
+      {/* Advanced Filters */}
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
+        <form className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <input type="hidden" name="role" value={selectedRole} />
+          
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-gold-500 transition-colors" />
             <input
               type="text"
               name="q"
               defaultValue={query}
-              placeholder="Rechercher par nom ou email..."
-              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-full focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 transition-all outline-none"
+              placeholder="Rechercher..."
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-transparent rounded-lg text-sm focus:bg-white focus:border-gold-500/30 focus:ring-2 focus:ring-gold-500/10 outline-none transition-all"
             />
-            <Search className="w-5 h-5 text-slate-400 absolute left-3 top-2.5" />
-            {selectedRole !== "ALL" && <input type="hidden" name="role" value={selectedRole} />}
-          </form>
-        </div>
+          </div>
 
-        <div className="shrink-0">
-          <CreateUserButton />
-        </div>
+          <select
+            name="onboarding"
+            defaultValue={onboarding}
+            className="w-full px-3 py-2 bg-slate-50 border border-transparent rounded-lg text-sm focus:bg-white focus:border-gold-500/30 focus:ring-2 focus:ring-gold-500/10 outline-none transition-all cursor-pointer"
+          >
+            <option value="">Statut Onboarding</option>
+            <option value="NEW">Nouveau</option>
+            <option value="IN_PROGRESS">En cours</option>
+            <option value="DONE">Terminé</option>
+          </select>
+
+          <select
+            name="blocked"
+            defaultValue={blocked}
+            className="w-full px-3 py-2 bg-slate-50 border border-transparent rounded-lg text-sm focus:bg-white focus:border-gold-500/30 focus:ring-2 focus:ring-gold-500/10 outline-none transition-all cursor-pointer"
+          >
+            <option value="">État du compte</option>
+            <option value="false">Actif</option>
+            <option value="true">Bloqué</option>
+          </select>
+
+          <div className="flex items-center gap-2 lg:col-span-2">
+            <div className="flex-1 flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-lg border border-transparent focus-within:bg-white focus-within:border-gold-500/30 focus-within:ring-2 focus-within:ring-gold-500/10 transition-all">
+              <input
+                type="date"
+                name="from"
+                defaultValue={from}
+                className="w-full bg-transparent border-none text-sm outline-none p-1 cursor-pointer"
+                title="Date de début"
+              />
+              <span className="text-slate-400 text-xs font-bold uppercase tracking-widest px-1">au</span>
+              <input
+                type="date"
+                name="to"
+                defaultValue={to}
+                className="w-full bg-transparent border-none text-sm outline-none p-1 cursor-pointer"
+                title="Date de fin"
+              />
+            </div>
+            <button
+              type="submit"
+              className="px-6 py-2 bg-slate-900 text-white rounded-lg text-sm font-black uppercase tracking-widest hover:bg-gold-500 hover:text-slate-900 transition-all shadow-lg shadow-slate-900/10 active:scale-95 whitespace-nowrap"
+            >
+              Filtrer
+            </button>
+          </div>
+        </form>
       </div>
 
       {/* Tabs Navigation */}

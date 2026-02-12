@@ -343,38 +343,52 @@ export async function getInstructors() {
 }
 
 /**
- * Récupérer toutes les attributions actives
+ * Récupérer toutes les attributions actives (paginées)
  */
-export async function getAllAssignments() {
+export async function getAllAssignments(page: number = 1, pageSize: number = 10) {
     await requireAdmin();
 
     try {
-        const assignments = await prisma.instructorAssignment.findMany({
-            where: { isActive: true },
-            include: {
-                student: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
+        const skip = (page - 1) * pageSize;
+        const where = { isActive: true };
+
+        const [total, assignments] = await Promise.all([
+            prisma.instructorAssignment.count({ where }),
+            prisma.instructorAssignment.findMany({
+                where,
+                include: {
+                    student: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                        },
                     },
-                },
-                instructor: {
-                    include: {
-                        user: {
-                            select: {
-                                firstName: true,
-                                lastName: true,
+                    instructor: {
+                        include: {
+                            user: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                },
                             },
                         },
                     },
                 },
-            },
-            orderBy: { createdAt: "desc" },
-        });
+                orderBy: { createdAt: "desc" },
+                skip,
+                take: pageSize,
+            })
+        ]);
 
-        return { success: true, data: assignments };
+        return { 
+            success: true, 
+            data: assignments,
+            total,
+            totalPages: Math.ceil(total / pageSize),
+            currentPage: page
+        };
     } catch (error: any) {
         console.error("Error fetching assignments:", error);
         return { success: false, error: "Erreur lors de la récupération des attributions" };
@@ -382,22 +396,54 @@ export async function getAllAssignments() {
 }
 
 /**
- * Récupérer tous les cours de conduite paginés
+ * Récupérer tous les cours de conduite paginés avec filtres
  */
-export async function getAllLessons(page: number = 1, pageSize: number = 10) {
+export async function getAllLessons(
+    page: number = 1, 
+    pageSize: number = 10,
+    filters?: {
+        instructorId?: string;
+        status?: string;
+        from?: string;
+        to?: string;
+        query?: string;
+    }
+) {
     await requireAdmin();
 
     try {
         const skip = (page - 1) * pageSize;
         
+        const where: any = {
+            AND: [
+                filters?.instructorId ? { instructorId: filters.instructorId } : {},
+                filters?.status ? { status: filters.status } : {},
+                (filters?.from || filters?.to) ? {
+                    date: {
+                        ...(filters.from ? { gte: new Date(filters.from) } : {}),
+                        ...(filters.to ? { lte: new Date(filters.to) } : {})
+                    }
+                } : {},
+                filters?.query ? {
+                    OR: [
+                        { student: { firstName: { contains: filters.query, mode: 'insensitive' } } },
+                        { student: { lastName: { contains: filters.query, mode: 'insensitive' } } },
+                        { student: { email: { contains: filters.query, mode: 'insensitive' } } }
+                    ]
+                } : {}
+            ]
+        };
+
         const [total, lessons] = await Promise.all([
-            prisma.drivingLesson.count(),
+            prisma.drivingLesson.count({ where }),
             prisma.drivingLesson.findMany({
+                where,
                 include: {
                     student: {
                         select: {
                             firstName: true,
                             lastName: true,
+                            email: true,
                         },
                     },
                     instructor: {

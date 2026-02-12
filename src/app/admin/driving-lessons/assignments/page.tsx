@@ -4,17 +4,26 @@ import { Users, UserPlus, Trash2, Mail, Car, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { AssignmentManager } from "@/components/admin/driving-lessons/AssignmentManager";
 import { DeleteAssignmentButton } from "@/components/admin/driving-lessons/DeleteAssignmentButton";
+import { Pagination } from "@/components/admin/Pagination";
 
-export default async function AdminAssignmentsPage() {
+export default async function AdminAssignmentsPage({
+    searchParams
+}: {
+    searchParams: Promise<{ page?: string }>
+}) {
     await requireAdmin();
+    const params = await searchParams;
+    const currentPage = parseInt(params.page || '1') || 1;
+    const pageSize = 10;
 
     const [assignmentsRes, instructorsRes] = await Promise.all([
-        getAllAssignments(),
+        getAllAssignments(currentPage, pageSize),
         getInstructors()
     ]);
 
     const assignments = assignmentsRes.success && assignmentsRes.data ? assignmentsRes.data : [];
     const instructors = instructorsRes.success && instructorsRes.data ? instructorsRes.data : [];
+    const totalPages = (assignmentsRes as any).totalPages || 1;
 
     return (
         <div className="pb-8">
@@ -65,6 +74,17 @@ export default async function AdminAssignmentsPage() {
                                 </div>
                             )}
                         </div>
+
+                        {totalPages > 1 && (
+                            <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+                                <Pagination 
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    baseUrl="/admin/driving-lessons/assignments"
+                                    searchParams={{}}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
 

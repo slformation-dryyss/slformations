@@ -87,7 +87,7 @@ export default async function PermisMotoPage() {
                         <PriceCard
                         title="Formule Essentielle"
                         subtitle="Permis A1 (125cc)"
-                        price={a1?.price ? `${a1.price}€` : "695€"}
+                        price={a1?.price ? `${a1.price}€` : "895€"}
                         features={[
                             "Frais d'inscription inclus",
                             "Démarches administratives ANTS",
