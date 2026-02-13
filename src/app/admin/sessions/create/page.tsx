@@ -10,7 +10,13 @@ async function getData() {
   });
   
   const teachers = await prisma.user.findMany({
-    where: { role: "INSTRUCTOR" },
+    where: {
+      OR: [
+        { role: "INSTRUCTOR" },
+        { role: "TEACHER" },
+        { roles: { hasSome: ["INSTRUCTOR", "TEACHER"] } },
+      ],
+    },
     select: { id: true, firstName: true, lastName: true, email: true },
     orderBy: { lastName: "asc" },
   });

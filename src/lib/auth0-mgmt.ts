@@ -94,12 +94,29 @@ export async function triggerPasswordResetEmail(email: string) {
     return true;
 }
 
-export async function createAuth0User(data: { email: string; firstName: string; lastName: string; password?: string }) {
+export async function createAuth0User(data: { email: string; firstName: string; lastName: string; password?: string, roles?: string[] }) {
     const token = await getManagementApiToken();
     const rawDomain = process.env.AUTH0_ISSUER_BASE_URL;
     if (!rawDomain) throw new Error("Missing AUTH0_ISSUER_BASE_URL");
 
     const domain = rawDomain.replace(/\/$/, "");
+
+    const body: any = {
+        connection: "Username-Password-Authentication",
+        email: data.email,
+        password: data.password || Math.random().toString(36).slice(-12) + "A1!",
+        given_name: data.firstName,
+        family_name: data.lastName,
+        name: `${data.firstName} ${data.lastName}`,
+        email_verified: true,
+        verify_email: false,
+    };
+
+    if (data.roles && data.roles.length > 0) {
+        body.app_metadata = {
+            roles: data.roles
+        };
+    }
 
     const response = await fetch(`${domain}/api/v2/users`, {
         method: "POST",
@@ -107,16 +124,7 @@ export async function createAuth0User(data: { email: string; firstName: string; 
             "content-type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-            connection: "Username-Password-Authentication",
-            email: data.email,
-            password: data.password || Math.random().toString(36).slice(-12) + "A1!",
-            given_name: data.firstName,
-            family_name: data.lastName,
-            name: `${data.firstName} ${data.lastName}`,
-            email_verified: true,
-            verify_email: false,
-        }),
+        body: JSON.stringify(body),
     });
 
     if (!response.ok) {

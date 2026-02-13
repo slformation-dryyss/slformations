@@ -38,7 +38,8 @@ export async function createUserAction(formData: {
       email,
       firstName,
       lastName,
-      password: tempPassword
+      password: tempPassword,
+      roles: roles 
     });
   } catch (error: any) {
     throw new Error(`Erreur Auth0: ${error.message}`);
