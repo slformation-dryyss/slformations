@@ -13,7 +13,8 @@ export const metadata = {
 import { prisma } from "@/lib/prisma";
 
 export default async function PermisBPage() {
-  // Fetch courses directly from DB
+  // Fetch courses directly from DB.
+  // Heures à l'unité : on accepte 2 slugs possibles (local vs prod peuvent différer).
   const courses = await prisma.course.findMany({
     where: {
       slug: {
@@ -24,6 +25,8 @@ export default async function PermisBPage() {
           'permis-b-auto-confort',
           'permis-b-aac-manuelle',
           'permis-b-aac-auto',
+          '1h-conduite-manuelle',
+          '1h-conduite-auto',
           'permis-b-h-manuelle',
           'permis-b-h-auto'
         ]
@@ -31,8 +34,10 @@ export default async function PermisBPage() {
     }
   });
 
-  // Helper to find course by slug
   const getCourse = (slug: string) => courses.find(c => c.slug === slug);
+  // Heure à l'unité : priorité au slug trouvé en base (compatible local 1h-conduite-* et prod permis-b-h-*)
+  const getUnitCourse = (slugPrimary: string, slugFallback: string) =>
+    getCourse(slugPrimary) ?? getCourse(slugFallback);
 
   const bmClassique = getCourse('permis-b-manuelle-classique');
   const bmSerenite = getCourse('permis-b-manuelle-serenite');
@@ -40,8 +45,8 @@ export default async function PermisBPage() {
   const baConfort = getCourse('permis-b-auto-confort');
   const aacManuelle = getCourse('permis-b-aac-manuelle');
   const aacAuto = getCourse('permis-b-aac-auto');
-  const unitManuelle = getCourse('permis-b-h-manuelle');
-  const unitAuto = getCourse('permis-b-h-auto');
+  const unitManuelle = getUnitCourse('1h-conduite-manuelle', 'permis-b-h-manuelle');
+  const unitAuto = getUnitCourse('1h-conduite-auto', 'permis-b-h-auto');
 
   return (
     <div className="min-h-screen text-slate-900 font-sans flex flex-col">
@@ -116,7 +121,7 @@ export default async function PermisBPage() {
                   <PriceCard
                     title={bmClassique?.title || "Classique"}
                     subtitle={bmClassique?.description || "L'essentiel pour débuter"}
-                    price={bmClassique ? `${bmClassique.price}€` : "1200€"}
+                    price={bmClassique ? `${bmClassique.price}€` : "Sur devis"}
                     features={[
                       "Frais d'inscription inclus",
                       "Démarches administratives ANTS",
@@ -132,7 +137,7 @@ export default async function PermisBPage() {
                   <PriceCard
                     title={bmSerenite?.title || "Sérénité"}
                     subtitle={bmSerenite?.description || "Pour prendre le temps d'apprendre"}
-                    price={bmSerenite ? `${bmSerenite.price}€` : "1700€"}
+                    price={bmSerenite ? `${bmSerenite.price}€` : "Sur devis"}
                     features={[
                       "Tout inclus Formule Classique",
                       `${bmSerenite?.drivingHours || 30}h de conduite`,
@@ -164,7 +169,7 @@ export default async function PermisBPage() {
                   <PriceCard
                     title={baClassique?.title || "Classique"}
                     subtitle={baClassique?.description || "Rapide et efficace"}
-                    price={baClassique ? `${baClassique.price}€` : "980€"}
+                    price={baClassique ? `${baClassique.price}€` : "Sur devis"}
                     features={[
                       "Frais d'inscription inclus",
                       "Démarches administratives ANTS",
@@ -180,7 +185,7 @@ export default async function PermisBPage() {
                   <PriceCard
                     title={baConfort?.title || "Confort"}
                     subtitle={baConfort?.description || "La maîtrise totale"}
-                    price={baConfort ? `${baConfort.price}€` : "1400€"}
+                    price={baConfort ? `${baConfort.price}€` : "Sur devis"}
                     features={[
                       "Tout inclus Formule Classique",
                       `${baConfort?.drivingHours || 20}h de conduite`,
@@ -218,7 +223,7 @@ export default async function PermisBPage() {
                   <PriceCard
                     title={aacManuelle?.title || "AAC Manuelle"}
                     subtitle={aacManuelle?.description || "Dès 15 ans en boîte manuelle"}
-                    price={aacManuelle ? `${aacManuelle.price}€` : "1400€"}
+                    price={aacManuelle ? `${aacManuelle.price}€` : "Sur devis"}
                     features={[
                       "Formation initiale (Code + 20h)",
                       "RDV Pédagogiques inclus",
@@ -234,7 +239,7 @@ export default async function PermisBPage() {
                   <PriceCard
                     title={aacAuto?.title || "AAC Automatique"}
                     subtitle={aacAuto?.description || "Dès 15 ans en boîte auto"}
-                    price={aacAuto ? `${aacAuto.price}€` : "1200€"}
+                    price={aacAuto ? `${aacAuto.price}€` : "Sur devis"}
                     features={[
                       "Formation initiale (Code + 13h)",
                       "RDV Pédagogiques inclus",
@@ -266,7 +271,7 @@ export default async function PermisBPage() {
                   <PriceCard
                     title={unitManuelle?.title || "Heure de Conduite (Manuelle)"}
                     subtitle="Pour perfectionnement ou heure supplémentaire"
-                    price={unitManuelle ? `${unitManuelle.price}€` : "50€"}
+                    price={unitManuelle ? `${unitManuelle.price}€` : "Sur devis"}
                     features={[
                       "Leçon de conduite 1h",
                       "Moniteur diplômé",
@@ -281,7 +286,7 @@ export default async function PermisBPage() {
                   <PriceCard
                     title={unitAuto?.title || "Heure de Conduite (Auto)"}
                     subtitle="Pour perfectionnement ou heure supplémentaire"
-                    price={unitAuto ? `${unitAuto.price}€` : "40€"}
+                    price={unitAuto ? `${unitAuto.price}€` : "Sur devis"}
                     features={[
                       "Leçon de conduite 1h",
                       "Moniteur diplômé",
